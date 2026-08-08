@@ -30,7 +30,8 @@ describe("invariants", () => {
     for (let i = 1; i < states.length; i++) {
       const prev = states[i - 1];
       const next = states[i];
-      const residual = totalRevenue(next) - totalSpend(next) - prev.fiscal.debt_service + next.fiscal.deficit;
+      const nonMinistry = ctx.registry.get("fiscal.non_ministry_spend_annual");
+      const residual = totalRevenue(next) - totalSpend(next) - nonMinistry - prev.fiscal.debt_service + next.fiscal.deficit;
       expect(Math.abs(residual)).toBeLessThan(1e-6);
       // Debt issuance matches the deficit exactly.
       const issued = next.fiscal.debt - prev.fiscal.debt;

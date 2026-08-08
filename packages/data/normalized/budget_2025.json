@@ -1,0 +1,407 @@
+{
+ "year": 2025,
+ "gross_expenditure_ils_m": 755907,
+ "debt_principal_ils_m": 155777,
+ "debt_interest_ils_m": 56200,
+ "spend_excl_financing_ils_m": 543930,
+ "ministry_baselines_ils_m": {
+  "defense": 129928,
+  "education": 106445,
+  "health": 63076,
+  "internal_security": 27610,
+  "transport": 38108,
+  "welfare": 85737,
+  "housing": 9415,
+  "justice": 4828,
+  "economy": 5673,
+  "foreign_affairs": 2596,
+  "environment": 367,
+  "water_agriculture": 2722,
+  "culture_sport": 1404,
+  "science": 1552,
+  "religious_services": 799,
+  "immigration": 1635,
+  "hasbara": 500
+ },
+ "non_ministry_spend_ils_m": 61535,
+ "revenue_ils_m": {
+  "direct_taxes": 285460,
+  "indirect_taxes": 196603,
+  "other": 26015
+ },
+ "gdp_used_ils_m": 2129371,
+ "sections": [
+  {
+   "code": "0000",
+   "title": "הכנסות המדינה",
+   "net_allocated": 755906699000,
+   "net_revised": 755906699000
+  },
+  {
+   "code": "0001",
+   "title": "נשיא המדינה ולשכתו",
+   "net_allocated": 83098000,
+   "net_revised": 100056000
+  },
+  {
+   "code": "0002",
+   "title": "הכנסת",
+   "net_allocated": 998183000,
+   "net_revised": 1199162000
+  },
+  {
+   "code": "0004",
+   "title": "משרד ראש הממשלה",
+   "net_allocated": 3459113000,
+   "net_revised": 5894192000
+  },
+  {
+   "code": "0005",
+   "title": "משרד האוצר",
+   "net_allocated": 4461991000,
+   "net_revised": 5041835000
+  },
+  {
+   "code": "0006",
+   "title": "משרד הפנים",
+   "net_allocated": 420895000,
+   "net_revised": 945345000
+  },
+  {
+   "code": "0007",
+   "title": "המשרד לביטחון לאומי",
+   "net_allocated": 26727589000,
+   "net_revised": 28841551000
+  },
+  {
+   "code": "0008",
+   "title": "משרד המשפטים",
+   "net_allocated": 4828234000,
+   "net_revised": 5527461000
+  },
+  {
+   "code": "0009",
+   "title": "משרד החוץ",
+   "net_allocated": 2596165000,
+   "net_revised": 2916043000
+  },
+  {
+   "code": "0010",
+   "title": "מטה לביטחון לאומי",
+   "net_allocated": 57810000,
+   "net_revised": 65406000
+  },
+  {
+   "code": "0011",
+   "title": "מבקר המדינה",
+   "net_allocated": 443299000,
+   "net_revised": 443299000
+  },
+  {
+   "code": "0012",
+   "title": "גמלאות ופיצויים",
+   "net_allocated": 24835556000,
+   "net_revised": 23700518000
+  },
+  {
+   "code": "0013",
+   "title": "הוצאות שונות",
+   "net_allocated": 4543183000,
+   "net_revised": 2577200000
+  },
+  {
+   "code": "0014",
+   "title": "בחירות ומימון מפלגות",
+   "net_allocated": 232966000,
+   "net_revised": 258101000
+  },
+  {
+   "code": "0015",
+   "title": "משרד הביטחון",
+   "net_allocated": 109827371000,
+   "net_revised": 149038907000
+  },
+  {
+   "code": "0016",
+   "title": "הוצאות חירום אזרחיות",
+   "net_allocated": 551881000,
+   "net_revised": 747428000
+  },
+  {
+   "code": "0017",
+   "title": "תאום הפעולות בשטחים",
+   "net_allocated": 131079000,
+   "net_revised": 250389000
+  },
+  {
+   "code": "0018",
+   "title": "הרשויות המקומיות",
+   "net_allocated": 6688192000,
+   "net_revised": 8997235000
+  },
+  {
+   "code": "0019",
+   "title": "מדע, תרבות וספורט",
+   "net_allocated": 2807783000,
+   "net_revised": 3244175000
+  },
+  {
+   "code": "0020",
+   "title": "משרד החינוך",
+   "net_allocated": 89799197000,
+   "net_revised": 96301140000
+  },
+  {
+   "code": "0021",
+   "title": "ההשכלה הגבוהה",
+   "net_allocated": 14266438000,
+   "net_revised": 14857577000
+  },
+  {
+   "code": "0022",
+   "title": "המשרד לשירותי דת",
+   "net_allocated": 799004000,
+   "net_revised": 935762000
+  },
+  {
+   "code": "0023",
+   "title": "משרד הרווחה",
+   "net_allocated": 12203303000,
+   "net_revised": 14351151000
+  },
+  {
+   "code": "0024",
+   "title": "משרד הבריאות",
+   "net_allocated": 59148419000,
+   "net_revised": 61389153000
+  },
+  {
+   "code": "0025",
+   "title": "הרשות לניצולי השואה",
+   "net_allocated": 5120719000,
+   "net_revised": 5308146000
+  },
+  {
+   "code": "0026",
+   "title": "המשרד להגנת הסביבה",
+   "net_allocated": 367416000,
+   "net_revised": 1194811000
+  },
+  {
+   "code": "0027",
+   "title": "הקצבות לביטוח לאומי",
+   "net_allocated": 61035374000,
+   "net_revised": 67188221000
+  },
+  {
+   "code": "0029",
+   "title": "משרד הבינוי והשיכון",
+   "net_allocated": 335563000,
+   "net_revised": 530110000
+  },
+  {
+   "code": "0030",
+   "title": "משרד העלייה והקליטה",
+   "net_allocated": 1634563000,
+   "net_revised": 1951725000
+  },
+  {
+   "code": "0031",
+   "title": "הוצאות ביטחוניות שונות",
+   "net_allocated": 19912202000,
+   "net_revised": 14504241000
+  },
+  {
+   "code": "0033",
+   "title": "משרד החקלאות",
+   "net_allocated": 1914581000,
+   "net_revised": 2140421000
+  },
+  {
+   "code": "0034",
+   "title": "משרד האנרגיה",
+   "net_allocated": 541020000,
+   "net_revised": 735083000
+  },
+  {
+   "code": "0035",
+   "title": "הועדה לאנרגיה אטומית",
+   "net_allocated": 147927000,
+   "net_revised": 147927000
+  },
+  {
+   "code": "0036",
+   "title": "תעסוקה",
+   "net_allocated": 4600069000,
+   "net_revised": 5259472000
+  },
+  {
+   "code": "0037",
+   "title": "משרד התיירות",
+   "net_allocated": 172477000,
+   "net_revised": 1284270000
+  },
+  {
+   "code": "0038",
+   "title": "כלכלה ותעשייה",
+   "net_allocated": 4590913000,
+   "net_revised": 3181652000
+  },
+  {
+   "code": "0039",
+   "title": "משרד התקשורת",
+   "net_allocated": 86459000,
+   "net_revised": 155165000
+  },
+  {
+   "code": "0040",
+   "title": "משרד התחבורה",
+   "net_allocated": 617993000,
+   "net_revised": 844790000
+  },
+  {
+   "code": "0041",
+   "title": "רשות ממשלתית למים וביוב",
+   "net_allocated": 107671000,
+   "net_revised": 127586000
+  },
+  {
+   "code": "0042",
+   "title": "מענקי בינוי ושיכון",
+   "net_allocated": 3429255000,
+   "net_revised": 3647767000
+  },
+  {
+   "code": "0043",
+   "title": "המרכז למיפוי ישראל",
+   "net_allocated": 114645000,
+   "net_revised": 158601000
+  },
+  {
+   "code": "0045",
+   "title": "תשלום ריבית ועמלות",
+   "net_allocated": 56200000000,
+   "net_revised": 57910000000
+  },
+  {
+   "code": "0046",
+   "title": "חוק חיילים משוחררים",
+   "net_allocated": 2777555000,
+   "net_revised": 2894750000
+  },
+  {
+   "code": "0047",
+   "title": "רזרבה כללית",
+   "net_allocated": 4200000000,
+   "net_revised": 0
+  },
+  {
+   "code": "0051",
+   "title": "דיור ממשלתי",
+   "net_allocated": 2508024000,
+   "net_revised": 1514026000
+  },
+  {
+   "code": "0052",
+   "title": "המשטרה ובתי הסוהר",
+   "net_allocated": 882892000,
+   "net_revised": 1128941000
+  },
+  {
+   "code": "0054",
+   "title": "רשויות פיקוח",
+   "net_allocated": 8719644000,
+   "net_revised": 4798410000
+  },
+  {
+   "code": "0060",
+   "title": "חינוך",
+   "net_allocated": 2379130000,
+   "net_revised": 1918674000
+  },
+  {
+   "code": "0067",
+   "title": "בריאות",
+   "net_allocated": 948572000,
+   "net_revised": 1174445000
+  },
+  {
+   "code": "0068",
+   "title": "רשות האוכלוסין",
+   "net_allocated": 869766000,
+   "net_revised": 1244943000
+  },
+  {
+   "code": "0070",
+   "title": "שיכון",
+   "net_allocated": 3142548000,
+   "net_revised": 11357960000
+  },
+  {
+   "code": "0073",
+   "title": "מפעלי מים",
+   "net_allocated": 700227000,
+   "net_revised": 447110000
+  },
+  {
+   "code": "0076",
+   "title": "תעשייה",
+   "net_allocated": 300856000,
+   "net_revised": 44697000
+  },
+  {
+   "code": "0078",
+   "title": "תיירות",
+   "net_allocated": 522527000,
+   "net_revised": 334086000
+  },
+  {
+   "code": "0079",
+   "title": "תחבורה",
+   "net_allocated": 37490340000,
+   "net_revised": 41044306000
+  },
+  {
+   "code": "0083",
+   "title": "הוצאות פיתוח אחרות",
+   "net_allocated": 3848171000,
+   "net_revised": 1544240000
+  },
+  {
+   "code": "0084",
+   "title": "תשלום חובות",
+   "net_allocated": 155776851000,
+   "net_revised": 155786851000
+  },
+  {
+   "code": "0089",
+   "title": "מפעלי משרד ראה\"מ והאוצר",
+   "net_allocated": 1414734000,
+   "net_revised": 1699334000
+  },
+  {
+   "code": "0093",
+   "title": "בתי חולים לבריאות הנפש",
+   "net_allocated": 2978850000,
+   "net_revised": 2978850000
+  },
+  {
+   "code": "0094",
+   "title": "בתי חולים ממשלתים",
+   "net_allocated": 25288924000,
+   "net_revised": 25288924000
+  },
+  {
+   "code": "0095",
+   "title": "נמל חדרה",
+   "net_allocated": 49988000,
+   "net_revised": 49988000
+  },
+  {
+   "code": "0098",
+   "title": "רשות מקרקעי ישראל",
+   "net_allocated": 65487776000,
+   "net_revised": 65487776000
+  }
+ ]
+}

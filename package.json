@@ -6,7 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p packages/engine && node scripts/check-no-any.mjs",
     "test": "vitest run packages/engine",
-    "smoke": "tsx scripts/smoke.ts"
+    "smoke": "tsx scripts/smoke.ts",
+    "etl": "tsx packages/data/etl/boi_macro.ts && tsx packages/data/etl/obudget_budget.ts && tsx packages/data/etl/cbs_localities.ts && tsx packages/data/etl/build_initial_state.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

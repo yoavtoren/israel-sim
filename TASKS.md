@@ -20,12 +20,12 @@
 - [x] GATE: typecheck clean (0 any) · tests green · smoke sane → report, wait
 
 ## M2 — ETL + real initial state
-- [ ] ETL: CBS locality file → normalized parquet + sidecar (C1)
-- [ ] ETL: Open Budget ministry baselines → normalized + sidecar
-- [ ] ETL: Bank of Israel macro (debt, rate, inflation, FX) + history series
-- [ ] Initial-state builder from normalized data; imputed values flagged
-- [ ] Replace placeholder initial state; update PLACEHOLDERS.md (initial-state entries cleared)
-- [ ] GATE: initial state matches published figures within 1%
+- [x] ETL: CBS locality file → normalized parquet + sidecar (C1)
+- [x] ETL: Open Budget ministry baselines → normalized + sidecar
+- [x] ETL: Bank of Israel macro (debt, rate, inflation, FX) + history series
+- [x] Initial-state builder from normalized data; imputed values flagged
+- [x] Replace placeholder initial state; update PLACEHOLDERS.md (initial-state entries cleared)
+- [x] GATE: initial state matches published figures within 1%
 
 ## M3 — All 17 ministries + degradation
 - [ ] 14 remaining MinistryDefs as data rows (outputs, stocks, rigidity, crowding, political_weight)

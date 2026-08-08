@@ -1,0 +1,58 @@
+{
+ "gdp_nominal_annual": {
+  "value": 2129370.71,
+  "period": "2025-Q2..2026-Q1",
+  "flow": "NA",
+  "series": "GDP_Q_N",
+  "note": "sum of last 4 quarters, NIS millions current prices"
+ },
+ "policy_rate": {
+  "value": 0.035,
+  "period": "2026-08-08",
+  "flow": "BR",
+  "series": "MNT_RIB_BOI_D",
+  "note": "fraction/yr"
+ },
+ "bond_yield_10y": {
+  "value": 0.038816186627,
+  "period": "2026-07",
+  "flow": "ZCM",
+  "series": "ZC_TSB_ZND_10Y_MA",
+  "note": "fraction/yr, monthly avg"
+ },
+ "unemployment": {
+  "value": 0.028563682143753998,
+  "period": "2026-06",
+  "flow": "LBM",
+  "series": "UE_R_M_SA",
+  "note": "fraction of labour force"
+ },
+ "participation": {
+  "value": 0.61819778543848,
+  "period": "2026-Q2",
+  "flow": "LBM",
+  "series": "LF_R_Q",
+  "note": "fraction of work-age population"
+ },
+ "workage_population": {
+  "value": 7257513.333333329,
+  "period": "2026-Q2",
+  "flow": "LBM",
+  "series": "POP_Q",
+  "note": "persons (source in thousands)"
+ },
+ "inflation_yoy": {
+  "value": 0.016488845780795458,
+  "period": "2025-06→2026-06",
+  "flow": "PRI",
+  "series": "CP",
+  "note": "y/y from headline index level"
+ },
+ "shekel_usd": {
+  "value": 3.006,
+  "period": "2026-08-07",
+  "flow": "EXR",
+  "series": "RER_USD_ILS",
+  "note": "₪ per USD"
+ }
+}

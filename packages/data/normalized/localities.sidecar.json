@@ -1,0 +1,26 @@
+{
+  "id": "cbs.census2022.localities",
+  "source_url": "https://data.gov.il datastore 9a9e085f-3bc8-41df-b15f-be0daaf99e30 + 7c860e04-9f8d-41c2-9f24-6249958d2081 + 5c78e9fa-c2e2-4771-93ff-7f400a12f7ba",
+  "retrieved": "2026-08-08",
+  "license": "CBS open data (data.gov.il)",
+  "rows": 1185,
+  "schema": {
+    "code": "int (CBS locality code)",
+    "name_he": "string",
+    "population": "persons (census 2022)",
+    "district": "string (napa)",
+    "socioeconomic_cluster": "int 1-10 (2019) | null",
+    "majority_religion": "string",
+    "majority_religiosity": "string (household majority)",
+    "employment_pcnt": "% employed of work-age | null",
+    "median_annual_wage_ils": "₪/yr | null",
+    "age0_19_pcnt": "%",
+    "age65_pcnt": "%"
+  },
+  "known_gaps": [
+    "Locality populations sum to 9585670 vs national census row 9601720 (diff -0.17%).",
+    "202 localities >1000 pop missing a 2019 socio-economic cluster.",
+    "Population values are census-2022 rounded approximations (pop_approx)."
+  ],
+  "transform_script": "packages/data/etl/cbs_localities.ts"
+}

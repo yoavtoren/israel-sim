@@ -1,0 +1,22 @@
+{
+  "id": "obudget.budget_2025",
+  "source_url": "https://next.obudget.org/api/query (raw_budget, year=2025, net_allocated)",
+  "retrieved": "2026-08-08",
+  "license": "Open Budget / MoF open data",
+  "rows": 62,
+  "schema": {
+    "code": "string(4)",
+    "title": "string",
+    "net_allocated": "₪",
+    "net_revised": "₪"
+  },
+  "known_gaps": [
+    "net_allocated (original approved) used, not net_revised (war supplements) — baseline = pre-war-supplement law.",
+    "Section 0019 (science, culture & sport) split 50/50 science/culture_sport — imputed.",
+    "hasbara has no dedicated budget section; ₪500M placeholder kept.",
+    "Gross business-enterprise sections excluded from ministry spend: 0094 בתי חולים ממשלתים, 0098 רשות מקרקעי ישראל, 0089 מפעלי משרד ראה\"מ והאוצר, 0095 נמל חדרה",
+    "Cross-checks: internal_security (0007+0052) matches functional category C112; transport (0079+0040) matches C331.",
+    "Direct-tax split into income/corporate/capital and indirect into VAT/customs is imputed (62/28/10 and 78/22)."
+  ],
+  "transform_script": "packages/data/etl/obudget_budget.ts"
+}

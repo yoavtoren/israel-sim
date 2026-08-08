@@ -58,7 +58,9 @@ export function fiscalStep(s: WorldState, c: Registry, log: TickLogEntry[]): voi
   s.fiscal.revenue.customs = gdp * c.get("fiscal.revenue_share_customs") * mult;
 
   const revenue = totalRevenue(s);
-  const spend = totalSpend(s);
+  // Non-ministry spend (pensions, Knesset, local-authority grants, reserves…)
+  // is a published aggregate the player cannot currently steer; M3+ decomposes it.
+  const spend = totalSpend(s) + c.get("fiscal.non_ministry_spend_annual");
   s.fiscal.deficit = spend + s.fiscal.debt_service - revenue;
 
   // Quarterly debt issuance covers a quarter of the annualized deficit.

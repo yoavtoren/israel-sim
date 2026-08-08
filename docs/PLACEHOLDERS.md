@@ -2,11 +2,22 @@
 
 Every entry below is marked `"confidence": "placeholder"` in its file. This is the roadmap for the M2/M9 real-data passes. Keep this list in sync with the constants files.
 
-## Wholesale placeholder files
-| File | What | Replace with |
+## Resolved in M2 (now real data — kept here as provenance)
+- Ministry `baseline_budget` fields: Open Budget 2025 net_allocated, mapped section sums (see budget_2025.sidecar.json for mapping caveats). hasbara stays a ₪500M placeholder (no dedicated section).
+- `fiscal.revenue_share_*`, `fiscal.non_ministry_spend_annual`: derived from Open Budget 2025 + BoI GDP (tax-type splits within direct/indirect are imputed 62/28/10 and 78/22).
+- Initial macro (GDP, policy rate, 10y yield, unemployment, inflation, participation, USD/ILS): BoI SDMX, mid-2026 readings.
+- `macro.working_age_share`: BoI LBM 15+ population / imputed total population (note: 15+, not 15–64).
+- Locality table + census-derived sector populations: CBS census 2022 via data.gov.il.
+
+## Remaining imputations introduced in M2 (see initial_2026.sidecar.json)
+| What | Value | Replace with |
 |---|---|---|
-| `packages/data/normalized/placeholder_initial_2026.json` | Entire initial state (macro, sectors, security, diplomacy, politics, infrastructure) | M2: CBS locality/sector files, BoI macro series, MoH/MoE stocks, Open Budget |
-| `packages/data/defs/ministries.json` `baseline_budget` fields | Ministry baselines, sum ₪457.5B — **excludes non-ministry spend** (pensions, general transfers, interest is separate), so revenue shares below are deliberately understated to keep the deficit plausible (~2.7% GDP). Internally consistent, jointly wrong vs. reality. | M2: Open Budget (next.obudget.org) approved-budget lines; add non-ministry spend lines, then restore realistic ~30% revenue/GDP |
+| debt/GDP at t0 | 0.69 | BoI/MoF debt statistics (no SDMX series found; try MoF Accountant General reports) |
+| K/Y capital-output ratio | 4.0 | BoI CAP dataflow (capital stock) |
+| Population growth since census 2022 | 1.5%/yr | CBS monthly population estimates |
+| Sector classification method | area-majority religion×religiosity | CBS social-survey shares (undercounts national_religious: 6.5% vs published ~11%) |
+| Direct/indirect tax split into 5 revenue fields | 62/28/10, 78/22 | MoF revenue administration tables |
+| `placeholder_initial_2026.json` still supplies | security, diplomacy, politics, infrastructure stocks, environment, sector attributes other than population, fx_reserves, gini, poverty, credit_rating | M4–M6 data passes |
 
 ## packages/data/constants/macro.json
 | id | value | Replace with |

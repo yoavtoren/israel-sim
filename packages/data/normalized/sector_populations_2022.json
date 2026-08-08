@@ -1,0 +1,11 @@
+{
+ "national_total": 9601720,
+ "by_sector": {
+  "secular": 5921390,
+  "national_religious": 623020,
+  "haredi": 1092330,
+  "arab": 1914870,
+  "other": 34230
+ },
+ "covered": 9585840
+}

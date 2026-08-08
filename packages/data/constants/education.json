@@ -1,7 +1,62 @@
 [
-  { "id": "education.teacher_budget_share", "value": 0.6, "unit": "share of ministry budget on teacher wages", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget education line items)", "ci": [0.5, 0.7] },
-  { "id": "education.cost_per_teacher_annual", "value": 0.24, "unit": "₪M per teacher FTE per yr (wage + overhead)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoE wage tables)", "ci": [0.18, 0.3] },
-  { "id": "education.teacher_adjustment_quarterly", "value": 0.05, "unit": "fraction of gap to sustainable level closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (hiring/attrition rates)", "ci": [0.02, 0.1] },
-  { "id": "education.teacher_max_growth_quarterly", "value": 0.03, "unit": "max fraction change of teacher stock per quarter (saturation)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (training-pipeline capacity)", "ci": [0.01, 0.05] },
-  { "id": "education.spend_to_hc", "value": 0.08, "unit": "Δ human-capital index per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=4, scale=2.2)", "confidence": "placeholder", "source": "invented, rescaled from Hanushek & Woessmann 2015; needs own-panel FE estimate", "ci": [0.03, 0.15] }
+ {
+  "id": "education.teacher_budget_share",
+  "value": 0.4735,
+  "unit": "share of ministry budget on teacher wages",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "derived 2026-08-08 from BoI LBM / budget 2025 so baseline funding sustains current stocks",
+  "ci": [
+   0.5,
+   0.7
+  ]
+ },
+ {
+  "id": "education.cost_per_teacher_annual",
+  "value": 0.24,
+  "unit": "₪M per teacher FTE per yr (wage + overhead)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (MoE wage tables)",
+  "ci": [
+   0.18,
+   0.3
+  ]
+ },
+ {
+  "id": "education.teacher_adjustment_quarterly",
+  "value": 0.05,
+  "unit": "fraction of gap to sustainable level closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (hiring/attrition rates)",
+  "ci": [
+   0.02,
+   0.1
+  ]
+ },
+ {
+  "id": "education.teacher_max_growth_quarterly",
+  "value": 0.03,
+  "unit": "max fraction change of teacher stock per quarter (saturation)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (training-pipeline capacity)",
+  "ci": [
+   0.01,
+   0.05
+  ]
+ },
+ {
+  "id": "education.spend_to_hc",
+  "value": 0.08,
+  "unit": "Δ human-capital index per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=4, scale=2.2)",
+  "confidence": "placeholder",
+  "source": "invented, rescaled from Hanushek & Woessmann 2015; needs own-panel FE estimate",
+  "ci": [
+   0.03,
+   0.15
+  ]
+ }
 ]

@@ -1,0 +1,16 @@
+{
+  "id": "cbs.census2022.sector_split",
+  "source_url": "https://data.gov.il datastore 9a9e085f-3bc8-41df-b15f-be0daaf99e30",
+  "retrieved": "2026-08-08",
+  "license": "CBS open data (data.gov.il)",
+  "rows": 5,
+  "schema": {
+    "by_sector": "persons per sector (census 2022)"
+  },
+  "known_gaps": [
+    "IMPUTED CLASSIFICATION: each statistical area / locality is assigned wholly to its household-majority religion & religiosity; minorities within areas are misassigned.",
+    "Jewish religiosity mapping: חרדי→haredi, דתי→national_religious, מסורתי+חילוני→secular; non-Jewish non-Arab→other.",
+    "Covered population 9585840 vs national 9601720."
+  ],
+  "transform_script": "packages/data/etl/cbs_localities.ts"
+}

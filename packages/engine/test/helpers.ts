@@ -28,7 +28,7 @@ export function loadContext(seed = "m1-seed"): { ctx: EngineContext; initial: Wo
   const ministries = parseMinistryDefs(defsRaw);
 
   const initialRaw = JSON.parse(
-    readFileSync(join(dataDir, "normalized", "placeholder_initial_2026.json"), "utf8"),
+    readFileSync(join(dataDir, "normalized", "initial_2026.json"), "utf8"),
   ) as InitialStateJson;
 
   const initial = buildInitialState(initialRaw, ministries, registry, seed);

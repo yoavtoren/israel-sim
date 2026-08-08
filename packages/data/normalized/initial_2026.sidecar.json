@@ -1,0 +1,17 @@
+{
+  "id": "israel-sim.initial_state.2026",
+  "source_url": "assembled from macro_current.json (BoI), budget_2025.json (Open Budget), sector_populations_2022.json (CBS census)",
+  "retrieved": "2026-08-08",
+  "license": "mixed open data; see component sidecars",
+  "rows": 1,
+  "schema": {
+    "shape": "InitialStateJson (packages/engine/src/state/init.ts)"
+  },
+  "known_gaps": [
+    "REAL (fetched): gdp_real ₪2129B (2025-Q2..2026-Q1), inflation, policy_rate, unemployment, bond_yield_10y, shekel_usd, participation; ministry baselines & non-ministry spend & revenue shares (budget 2025); sector populations (census 2022 religiosity split).",
+    "IMPUTED: population grown from census 2022 at 1.5%/yr for 3.2y → 10070253; debt/GDP=0.69 (MoF ~69% end-2024, not fetched); K/Y=4.0; debt_effective_rate = published interest / imputed debt = 3.83%.",
+    "CARRIED PLACEHOLDERS: security, diplomacy, politics, infrastructure stocks, environment, sector attributes other than population, fx_reserves, gini, poverty, credit_rating.",
+    "GDP is nominal (current prices); engine treats t0 prices as base — acceptable until M9 deflator work."
+  ],
+  "transform_script": "packages/data/etl/build_initial_state.ts"
+}

@@ -19,7 +19,7 @@ const groups: unknown[][] = readdirSync(constantsDir)
   .map((f) => JSON.parse(readFileSync(join(constantsDir, f), "utf8")) as unknown[]);
 const registry = buildRegistry(groups);
 const ministries = parseMinistryDefs(JSON.parse(readFileSync(join(dataDir, "defs", "ministries.json"), "utf8")));
-const initialRaw = JSON.parse(readFileSync(join(dataDir, "normalized", "placeholder_initial_2026.json"), "utf8")) as InitialStateJson;
+const initialRaw = JSON.parse(readFileSync(join(dataDir, "normalized", "initial_2026.json"), "utf8")) as InitialStateJson;
 const initial = buildInitialState(initialRaw, ministries, registry, "smoke-seed");
 const ctx: EngineContext = { registry, ministries, start_year: initialRaw.start_year };
 
@@ -59,7 +59,7 @@ for (let i = 0; i < 40; i++) {
   }
 
   if (s.t.quarter === 1) {
-    const spend = totalSpend(s) + s.fiscal.debt_service;
+    const spend = totalSpend(s) + registry.get("fiscal.non_ministry_spend_annual") + s.fiscal.debt_service;
     console.log(
       `${(s.t.year - 1).toString().padEnd(5)} ${(s.macro.gdp_real / 1000).toFixed(0).padStart(7)} ` +
       `${(s.macro.debt_gdp * 100).toFixed(1).padStart(8)}% ${(s.macro.unemployment * 100).toFixed(2).padStart(5)}% ` +

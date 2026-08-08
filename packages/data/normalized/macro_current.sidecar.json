@@ -1,0 +1,15 @@
+{
+  "id": "boi.macro_current",
+  "source_url": "https://edge.boi.org.il/FusionEdgeServer/sdmx/v2/ (BOI.STATISTICS: NA, BR, ZCM, LBM, PRI, EXR)",
+  "retrieved": "2026-08-08",
+  "license": "Bank of Israel open data",
+  "rows": 8,
+  "schema": {
+    "<key>": "{ value:number, period:string, flow:string, series:string, note:string }"
+  },
+  "known_gaps": [
+    "GDP is sum of last 4 quarterly nominal observations (NIS millions).",
+    "No government debt-stock series found on BoI SDMX; debt/GDP is set separately (low confidence) in build_initial_state.ts."
+  ],
+  "transform_script": "packages/data/etl/boi_macro.ts"
+}
