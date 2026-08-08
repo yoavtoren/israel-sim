@@ -1,0 +1,19 @@
+[
+  { "id": "macro.alpha", "value": 0.35, "unit": "capital share of output", "lag_kernel": "immediate", "confidence": "medium", "source": "Gollin 2002; standard growth-accounting share", "ci": [0.3, 0.4] },
+  { "id": "macro.tfp_growth_annual", "value": 0.007, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (BoI productivity reports)", "ci": [0.003, 0.012] },
+  { "id": "macro.depreciation_annual", "value": 0.055, "unit": "fraction of capital stock/yr", "lag_kernel": "immediate", "confidence": "medium", "source": "Penn World Table depreciation rates (approx)", "ci": [0.04, 0.07] },
+  { "id": "macro.investment_rate", "value": 0.22, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS national accounts)", "ci": [0.18, 0.26] },
+  { "id": "macro.working_age_share", "value": 0.58, "unit": "share of population aged 15-64", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS demographic tables)", "ci": [0.55, 0.62] },
+  { "id": "macro.natural_unemployment", "value": 0.04, "unit": "fraction of labour force", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (BoI NAIRU estimates)", "ci": [0.03, 0.05] },
+  { "id": "macro.okun_coefficient", "value": 0.4, "unit": "Δunemployment per unit output gap", "lag_kernel": "immediate", "confidence": "medium", "source": "Ball, Leigh & Loungani 2017", "ci": [0.25, 0.55] },
+  { "id": "macro.phillips_slope", "value": 0.1, "unit": "Δinflation/yr per unit output gap per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (BoI Phillips-curve estimates)", "ci": [0.03, 0.25] },
+  { "id": "macro.inflation_anchoring_quarterly", "value": 0.05, "unit": "fraction of gap to target closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.02, 0.15] },
+  { "id": "macro.inflation_target", "value": 0.02, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "high", "source": "BoI target band 1-3%, midpoint" },
+  { "id": "macro.neutral_real_rate", "value": 0.015, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (BoI r* estimates)", "ci": [0.005, 0.025] },
+  { "id": "macro.taylor_inflation_coef", "value": 1.5, "unit": "policy-rate response per unit inflation gap", "lag_kernel": "immediate", "confidence": "medium", "source": "Taylor 1993" },
+  { "id": "macro.taylor_gap_coef", "value": 0.5, "unit": "policy-rate response per unit output gap", "lag_kernel": "immediate", "confidence": "medium", "source": "Taylor 1993" },
+  { "id": "macro.policy_rate_smoothing_quarterly", "value": 0.8, "unit": "AR(1) weight on previous rate", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (BoI reaction-function estimates)", "ci": [0.6, 0.9] },
+  { "id": "macro.output_gap_persistence_quarterly", "value": 0.85, "unit": "AR(1) weight on previous gap", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (fit to CBS quarterly GDP)", "ci": [0.7, 0.95] },
+  { "id": "macro.demand_shock_sigma_quarterly", "value": 0.002, "unit": "SD of quarterly demand shock, fraction of potential", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (fit to CBS quarterly GDP residuals)", "ci": [0.001, 0.01] },
+  { "id": "macro.hc_decay_annual", "value": 0.005, "unit": "fraction of human-capital index/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (skill-depreciation literature)", "ci": [0.002, 0.015] }
+]

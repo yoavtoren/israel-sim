@@ -1,0 +1,42 @@
+[
+  {
+    "id": "education", "baseline_budget": 85000, "rigidity": 0.85, "crowding": 0.7,
+    "political_weight": { "secular": 0.8, "national_religious": 0.7, "haredi": 0.9, "arab": 0.8, "other": 0.5 },
+    "outputs": [
+      { "kind": "funded_stock", "target": "infrastructure.teachers", "budget_share_id": "education.teacher_budget_share", "cost_per_unit_id": "education.cost_per_teacher_annual", "adjust_rate_id": "education.teacher_adjustment_quarterly", "max_growth_id": "education.teacher_max_growth_quarterly" },
+      { "kind": "pipeline", "target": "macro.human_capital", "elasticity_id": "education.spend_to_hc", "decays_below": 0.8 }
+    ]
+  },
+  {
+    "id": "health", "baseline_budget": 60000, "rigidity": 0.85, "crowding": 0.7,
+    "political_weight": { "secular": 0.8, "national_religious": 0.7, "haredi": 0.7, "arab": 0.9, "other": 0.7 },
+    "outputs": [
+      { "kind": "funded_stock", "target": "infrastructure.hospital_beds", "budget_share_id": "health.bed_budget_share", "cost_per_unit_id": "health.cost_per_bed_annual", "adjust_rate_id": "health.bed_adjustment_quarterly", "max_growth_id": "health.bed_max_growth_quarterly" },
+      { "kind": "derived_stock", "target": "infrastructure.icu_beds", "source_path": "infrastructure.hospital_beds", "share_id": "health.icu_share", "adjust_rate_id": "health.icu_adjustment_quarterly" }
+    ]
+  },
+  {
+    "id": "defense", "baseline_budget": 110000, "rigidity": 0.7, "crowding": 0.5,
+    "political_weight": { "secular": 0.7, "national_religious": 0.9, "haredi": 0.3, "arab": 0.2, "other": 0.6 },
+    "outputs": [
+      { "kind": "readiness", "target": "security.force_readiness", "base_id": "defense.readiness_base", "adjust_rate_id": "defense.readiness_adjustment_quarterly" },
+      { "kind": "production", "munition_class": "interceptors", "baseline_id": "defense.production_interceptors_quarterly" },
+      { "kind": "production", "munition_class": "precision_guided", "baseline_id": "defense.production_precision_guided_quarterly" },
+      { "kind": "production", "munition_class": "artillery_shells", "baseline_id": "defense.production_artillery_shells_quarterly" }
+    ]
+  },
+  { "id": "welfare", "baseline_budget": 95000, "rigidity": 0.9, "crowding": 0.7, "political_weight": {}, "outputs": [] },
+  { "id": "transport", "baseline_budget": 35000, "rigidity": 0.6, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "internal_security", "baseline_budget": 20000, "rigidity": 0.8, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "housing", "baseline_budget": 12000, "rigidity": 0.5, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "economy", "baseline_budget": 10000, "rigidity": 0.6, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "justice", "baseline_budget": 8000, "rigidity": 0.8, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "water_agriculture", "baseline_budget": 6000, "rigidity": 0.6, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "immigration", "baseline_budget": 3500, "rigidity": 0.6, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "culture_sport", "baseline_budget": 3000, "rigidity": 0.5, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "religious_services", "baseline_budget": 3000, "rigidity": 0.5, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "foreign_affairs", "baseline_budget": 2500, "rigidity": 0.7, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "environment", "baseline_budget": 2000, "rigidity": 0.5, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "science", "baseline_budget": 2000, "rigidity": 0.5, "crowding": 0.6, "political_weight": {}, "outputs": [] },
+  { "id": "hasbara", "baseline_budget": 500, "rigidity": 0.3, "crowding": 0.6, "political_weight": {}, "outputs": [] }
+]

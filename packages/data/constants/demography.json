@@ -1,0 +1,7 @@
+[
+  { "id": "demography.growth_annual_secular", "value": 0.012, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS projections to 2065 by group)", "ci": [0.008, 0.016] },
+  { "id": "demography.growth_annual_national_religious", "value": 0.022, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS projections to 2065 by group)", "ci": [0.015, 0.03] },
+  { "id": "demography.growth_annual_haredi", "value": 0.038, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "medium", "source": "CBS Haredi growth ~4%/yr (approx), needs exact series", "ci": [0.03, 0.045] },
+  { "id": "demography.growth_annual_arab", "value": 0.02, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS projections to 2065 by group)", "ci": [0.015, 0.025] },
+  { "id": "demography.growth_annual_other", "value": 0.005, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS immigration statistics)", "ci": [0, 0.02] }
+]

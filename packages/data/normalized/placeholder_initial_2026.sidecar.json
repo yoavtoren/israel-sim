@@ -1,0 +1,15 @@
+{
+  "id": "placeholder.initial_state.2026",
+  "source_url": "none — invented placeholder",
+  "retrieved": "2026-08-09",
+  "license": "n/a",
+  "rows": 1,
+  "schema": { "shape": "InitialStateJson (packages/engine/src/state/init.ts)" },
+  "known_gaps": [
+    "ENTIRE FILE is an invented placeholder at plausible 2026 orders of magnitude.",
+    "Replaced in M2 by CBS locality file, Open Budget baselines, and BoI macro series.",
+    "Sector populations are rough splits summing to ~10.05M; overlaps (e.g. immigrants inside other sectors) ignored.",
+    "Ministry budgets live in packages/data/defs/ministries.json and sum to ₪457.5B — excludes non-ministry spend (pensions, general transfers), see docs/PLACEHOLDERS.md."
+  ],
+  "transform_script": "none — hand-written"
+}

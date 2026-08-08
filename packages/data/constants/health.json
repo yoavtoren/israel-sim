@@ -1,0 +1,8 @@
+[
+  { "id": "health.bed_budget_share", "value": 0.5, "unit": "share of ministry budget sustaining hospital beds", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget health line items)", "ci": [0.4, 0.6] },
+  { "id": "health.cost_per_bed_annual", "value": 1.5, "unit": "₪M per staffed bed per yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoH hospital cost reports)", "ci": [1.0, 2.5] },
+  { "id": "health.bed_adjustment_quarterly", "value": 0.05, "unit": "fraction of gap to sustainable level closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.02, 0.1] },
+  { "id": "health.bed_max_growth_quarterly", "value": 0.02, "unit": "max fraction change of bed stock per quarter (saturation)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (construction/staffing lead times)", "ci": [0.01, 0.04] },
+  { "id": "health.icu_share", "value": 0.06, "unit": "ICU beds as share of hospital beds", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoH bed registry)", "ci": [0.04, 0.09] },
+  { "id": "health.icu_adjustment_quarterly", "value": 0.05, "unit": "fraction of gap to target ICU share closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.02, 0.1] }
+]

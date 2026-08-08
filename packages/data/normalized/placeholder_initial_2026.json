@@ -1,0 +1,99 @@
+{
+  "start_year": 2026,
+  "macro": {
+    "gdp_real": 2050000,
+    "gdp_potential": 2050000,
+    "inflation": 0.025,
+    "policy_rate": 0.045,
+    "unemployment": 0.04,
+    "participation": 0.62,
+    "debt_gdp": 0.67,
+    "bond_yield_10y": 0.044,
+    "credit_rating": 12.3,
+    "shekel_usd": 3.6,
+    "fx_reserves": 780000,
+    "productivity_index": 1.0,
+    "capital_stock": 8200000,
+    "human_capital": 1.0,
+    "gini": 0.38,
+    "poverty_rate": 0.2
+  },
+  "fiscal": {
+    "tax_policy": { "revenue_multiplier": 1 },
+    "debt_effective_rate": 0.035,
+    "emergency_reserve": 10000
+  },
+  "sectors": {
+    "secular": {
+      "population": 4700000, "growth_rate": 0.012, "age_structure": [0.22, 0.62, 0.16],
+      "labour_participation": { "men": 0.68, "women": 0.64 },
+      "education_years": 13.5, "vocational_share": 0.35, "income_median": 14000,
+      "poverty_rate": 0.09, "welfare_dependency": 0.08, "military_service_rate": 0.75,
+      "political_representation": 40, "grievance": 0.25, "trust_in_state": 0.5, "fertility": 2.0
+    },
+    "national_religious": {
+      "population": 1400000, "growth_rate": 0.022, "age_structure": [0.32, 0.58, 0.1],
+      "labour_participation": { "men": 0.7, "women": 0.68 },
+      "education_years": 13.8, "vocational_share": 0.3, "income_median": 13000,
+      "poverty_rate": 0.12, "welfare_dependency": 0.1, "military_service_rate": 0.85,
+      "political_representation": 14, "grievance": 0.3, "trust_in_state": 0.55, "fertility": 3.9
+    },
+    "haredi": {
+      "population": 1400000, "growth_rate": 0.038, "age_structure": [0.45, 0.5, 0.05],
+      "labour_participation": { "men": 0.55, "women": 0.8 },
+      "education_years": 11.5, "vocational_share": 0.12, "income_median": 7500,
+      "poverty_rate": 0.34, "welfare_dependency": 0.25, "military_service_rate": 0.05,
+      "political_representation": 18, "grievance": 0.35, "trust_in_state": 0.3, "fertility": 6.4
+    },
+    "arab": {
+      "population": 2200000, "growth_rate": 0.02, "age_structure": [0.32, 0.6, 0.08],
+      "labour_participation": { "men": 0.6, "women": 0.4 },
+      "education_years": 12.0, "vocational_share": 0.22, "income_median": 8500,
+      "poverty_rate": 0.32, "welfare_dependency": 0.2, "military_service_rate": 0.05,
+      "political_representation": 10, "grievance": 0.5, "trust_in_state": 0.25, "fertility": 2.9
+    },
+    "other": {
+      "population": 350000, "growth_rate": 0.005, "age_structure": [0.18, 0.62, 0.2],
+      "labour_participation": { "men": 0.66, "women": 0.6 },
+      "education_years": 13.0, "vocational_share": 0.3, "income_median": 11000,
+      "poverty_rate": 0.18, "welfare_dependency": 0.12, "military_service_rate": 0.4,
+      "political_representation": 4, "grievance": 0.3, "trust_in_state": 0.4, "fertility": 1.8
+    }
+  },
+  "security": {
+    "stockpiles": { "interceptors": 12000, "precision_guided": 30000, "artillery_shells": 600000 },
+    "domestic_production": { "interceptors": 240, "precision_guided": 600, "artillery_shells": 12000 },
+    "force_readiness": 0.8,
+    "reserve_mobilization": 0,
+    "intel_capability": 0.7,
+    "active_fronts": [],
+    "deterrence_index": 0.7,
+    "threat_level": { "hezbollah": 0.6, "hamas": 0.5, "iran": 0.7, "west_bank": 0.5 }
+  },
+  "diplomacy": {
+    "alignment": { "usa": 0.8, "eu": 0.3, "china": 0.0, "russia": -0.2, "egypt": 0.3, "jordan": 0.25, "saudi_arabia": 0.1, "uae": 0.4 },
+    "sanctions": [],
+    "arms_embargo": false,
+    "trade_access": { "europe": 0.95, "north_america": 1.0, "asia": 0.9, "middle_east": 0.5 },
+    "un_standing": -0.4,
+    "us_support": { "military_aid": 14000, "veto_reliability": 0.9 }
+  },
+  "politics": {
+    "coalition": { "seats": 64, "parties": [], "stability": 0.6 },
+    "approval_by_sector": { "secular": 0.35, "national_religious": 0.55, "haredi": 0.5, "arab": 0.2, "other": 0.35 },
+    "protest_intensity": 0.15,
+    "social_cohesion": 0.55,
+    "institutional_trust": 0.45,
+    "civil_war_pressure": 0.05
+  },
+  "infrastructure": {
+    "road_capacity": 1.0, "rail_km": 1400, "congestion_index": 0.65,
+    "hospital_beds": 19800, "icu_beds": 1150, "physicians_per_1000": 3.3,
+    "classrooms": 75000, "teachers": 210000, "teacher_quality_index": 1.0,
+    "desalination_capacity_mcm": 585, "water_deficit": 0,
+    "generation_capacity_mw": 21000, "renewable_share": 0.12,
+    "housing_stock": 2900000, "housing_starts": 60000
+  },
+  "environment": { "emissions": 60, "air_quality_index": 0.7, "open_space_index": 0.6 },
+  "economic_model": "mixed"
+}

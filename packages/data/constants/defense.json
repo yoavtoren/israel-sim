@@ -1,0 +1,8 @@
+[
+  { "id": "defense.readiness_base", "value": 0.8, "unit": "force-readiness level (0-1) sustained at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (no public source; expert judgment)", "ci": [0.7, 0.9] },
+  { "id": "defense.readiness_adjustment_quarterly", "value": 0.1, "unit": "fraction of gap to funded readiness closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.05, 0.2] },
+  { "id": "defense.production_interceptors_quarterly", "value": 240, "unit": "units/quarter at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (SIPRI + defense-industry reports)", "ci": [100, 600] },
+  { "id": "defense.production_precision_guided_quarterly", "value": 600, "unit": "units/quarter at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (SIPRI + defense-industry reports)", "ci": [200, 1500] },
+  { "id": "defense.production_artillery_shells_quarterly", "value": 12000, "unit": "units/quarter at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (SIPRI + defense-industry reports)", "ci": [5000, 30000] },
+  { "id": "defense.munition_expiry_quarterly", "value": 0.02, "unit": "fraction of stockpile expiring/consumed in training per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (shelf-life literature)", "ci": [0.01, 0.04] }
+]

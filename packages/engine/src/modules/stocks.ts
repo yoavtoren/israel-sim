@@ -1,0 +1,29 @@
+/**
+ * Tick step 6: stock accounting — capital accumulation, human-capital decay,
+ * munition shelf-life expiry. Degradation-from-underfunding rules arrive in M3.
+ */
+
+import type { MunitionClass, TickLogEntry, WorldState } from "../state/types";
+import type { Registry } from "../constants/registry";
+
+export function stocksStep(s: WorldState, c: Registry, log: TickLogEntry[]): void {
+  // Capital: quarterly investment minus depreciation.
+  const invest = c.get("macro.investment_rate") * s.macro.gdp_real;
+  const dep = c.get("macro.depreciation_annual") * s.macro.capital_stock;
+  const dK = (invest - dep) / 4;
+  s.macro.capital_stock += dK;
+  log.push({ t: s.t, step: 6, fn: "capital_accumulation", target: "macro.capital_stock", delta: dK, constant_id: "macro.investment_rate", note: null });
+
+  // Human capital decays slowly absent new investment.
+  const dH = -(c.get("macro.hc_decay_annual") / 4) * s.macro.human_capital;
+  s.macro.human_capital += dH;
+  log.push({ t: s.t, step: 6, fn: "hc_decay", target: "macro.human_capital", delta: dH, constant_id: "macro.hc_decay_annual", note: null });
+
+  // Munitions expire (shelf life / training consumption).
+  const expiry = c.get("defense.munition_expiry_quarterly");
+  for (const cls of Object.keys(s.security.stockpiles) as MunitionClass[]) {
+    const loss = s.security.stockpiles[cls] * expiry;
+    s.security.stockpiles[cls] -= loss;
+    log.push({ t: s.t, step: 6, fn: "munition_expiry", target: `security.stockpiles.${cls}`, delta: -loss, constant_id: "defense.munition_expiry_quarterly", note: null });
+  }
+}

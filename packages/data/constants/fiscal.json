@@ -1,0 +1,14 @@
+[
+  { "id": "fiscal.revenue_share_income", "value": 0.075, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget / MoF revenue tables); understated because non-ministry spend is excluded in M1, see docs/PLACEHOLDERS.md" },
+  { "id": "fiscal.revenue_share_vat", "value": 0.075, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget / MoF revenue tables)" },
+  { "id": "fiscal.revenue_share_corporate", "value": 0.035, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget / MoF revenue tables)" },
+  { "id": "fiscal.revenue_share_capital", "value": 0.015, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget / MoF revenue tables)" },
+  { "id": "fiscal.revenue_share_customs", "value": 0.02, "unit": "share of GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget / MoF revenue tables)" },
+  { "id": "fiscal.yield_base", "value": 0.02, "unit": "fraction/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (fit to BoI yield history)", "ci": [0.01, 0.03] },
+  { "id": "fiscal.yield_beta_debt", "value": 0.03, "unit": "Δyield per unit debt/GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (sovereign-spread literature)", "ci": [0.01, 0.06] },
+  { "id": "fiscal.yield_beta_deficit", "value": 0.15, "unit": "Δyield per unit deficit/GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (sovereign-spread literature)", "ci": [0.05, 0.35] },
+  { "id": "fiscal.debt_repricing_quarterly", "value": 0.03, "unit": "fraction of stock repricing to market yield per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoF debt maturity profile)", "ci": [0.02, 0.06] },
+  { "id": "fiscal.rating_debt_coef", "value": 10, "unit": "rating notches (0-20) per unit debt/GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (rating-agency methodology studies)" },
+  { "id": "fiscal.rating_deficit_coef", "value": 40, "unit": "rating notches (0-20) per unit deficit/GDP", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (rating-agency methodology studies)" },
+  { "id": "fiscal.rating_adjust_quarterly", "value": 0.1, "unit": "fraction of gap to implied rating closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" }
+]
