@@ -1,0 +1,21 @@
+[
+ { "id": "politics.reversion_quarterly", "value": 0.05, "unit": "fraction of gap to base closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M7 replaces bases with endogenous targets" },
+ { "id": "politics.approval_base_secular", "value": 0.35, "unit": "0-1 approval base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, anchored to polling averages" },
+ { "id": "politics.approval_base_national_religious", "value": 0.55, "unit": "0-1 approval base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, anchored to polling averages" },
+ { "id": "politics.approval_base_haredi", "value": 0.5, "unit": "0-1 approval base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, anchored to polling averages" },
+ { "id": "politics.approval_base_arab", "value": 0.2, "unit": "0-1 approval base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, anchored to polling averages" },
+ { "id": "politics.approval_base_other", "value": 0.35, "unit": "0-1 approval base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.grievance_base_secular", "value": 0.25, "unit": "0-1 grievance base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.grievance_base_national_religious", "value": 0.3, "unit": "0-1 grievance base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.grievance_base_haredi", "value": 0.35, "unit": "0-1 grievance base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.grievance_base_arab", "value": 0.5, "unit": "0-1 grievance base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.grievance_base_other", "value": 0.3, "unit": "0-1 grievance base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.cohesion_base", "value": 0.55, "unit": "0-1 cohesion base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M7 makes cohesion endogenous (spec §9)" },
+ { "id": "security.threat_base_hezbollah", "value": 0.6, "unit": "0-1 structural threat base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M6 makes threat endogenous" },
+ { "id": "security.threat_base_hamas", "value": 0.5, "unit": "0-1 structural threat base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M6 makes threat endogenous" },
+ { "id": "security.threat_base_iran", "value": 0.7, "unit": "0-1 structural threat base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M6 makes threat endogenous" },
+ { "id": "security.threat_base_west_bank", "value": 0.5, "unit": "0-1 structural threat base", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; M6 makes threat endogenous" },
+ { "id": "security.threat_reversion_quarterly", "value": 0.05, "unit": "fraction of gap to base closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "water.deficit_relief_quarterly", "value": 0.1, "unit": "fraction of deficit relieved per quarter at reference desalination capacity", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs Water Authority balances" },
+ { "id": "water.desal_ref_capacity", "value": 585, "unit": "mcm/yr reference desalination capacity", "lag_kernel": "immediate", "confidence": "placeholder", "source": "t0 calibration reference" }
+]

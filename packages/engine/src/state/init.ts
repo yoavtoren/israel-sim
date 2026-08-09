@@ -115,6 +115,8 @@ export function buildInitialState(
     reforms: {},
     economic_model: raw.economic_model,
     pipeline: [],
+    pending_events: [],
+    event_cooldowns: {},
     log: [],
   };
 

@@ -6,6 +6,7 @@
 
 import type { Decisions, EngineEvent, TickResult, TickLogEntry, WorldState } from "./state/types";
 import type { MinistryDef } from "./ministries/defs";
+import type { EventDef } from "./events/defs";
 import type { Registry } from "./constants/registry";
 import { makeTickStreams } from "./rng";
 import { resolveDecisions, fiscalStep } from "./modules/fiscal";
@@ -18,10 +19,14 @@ import { demographyStep } from "./modules/demography";
 import { sectorsStep } from "./modules/sectors";
 import { localitiesStep } from "./modules/localities";
 import { macroStep } from "./modules/macro";
+import { eventsStep } from "./events/resolver";
+import { politicsStep } from "./modules/politics";
 
 export interface EngineContext {
   registry: Registry;
   ministries: MinistryDef[];
+  /** declarative event definitions (empty array → no events) */
+  events: EventDef[];
   /** t0 of the run; defines the absolute tick index */
   start_year: number;
 }
@@ -49,8 +54,8 @@ export function tick(prev: WorldState, decisions: Decisions, ctx: EngineContext)
   localitiesStep(s, ctx.registry, log);                         // 8
   macroStep(s, ctx.registry, streams("macro"), log);            // 9
   // 10 security & diplomacy — M6
-  // 11 hazards & events — M5
-  // 12 politics — M7
+  eventsStep(s, ctx.events, ctx.registry, streams("hazards"), idx, events, log); // 11
+  politicsStep(s, ctx.registry, log);                           // 12 (mean-reversion stub until M7)
 
   // 13 log & advance clock.
   s.log = log;

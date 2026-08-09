@@ -1,0 +1,474 @@
+[
+ {
+  "id": "hazards.base_terror_incident",
+  "value": 4.04802,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "calibrated by etl/calibrate_hazards.ts: E[rate] at 2026 initial state = 21/yr (incidents.json regime 2021-2025)"
+ },
+ {
+  "id": "hazards.base_mass_protest",
+  "value": 0.19427,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "calibrated by etl/calibrate_hazards.ts: E[rate] at 2026 initial state = 1.8/yr (incidents.json regime 2021-2025)"
+ },
+ {
+  "id": "hazards.base_rocket_gaza",
+  "value": 0.1,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs ACLED/GTD fit"
+ },
+ {
+  "id": "hazards.base_rocket_north",
+  "value": 0.05,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs ACLED/GTD fit"
+ },
+ {
+  "id": "hazards.base_wb_flareup",
+  "value": 0.12,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs ACLED fit"
+ },
+ {
+  "id": "hazards.base_cyber",
+  "value": 0.1,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_reservist_burnout",
+  "value": 0.03,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_haredi_protest",
+  "value": 0.05,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_col_protest",
+  "value": 0.04,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_judicial_crisis",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_teacher_strike",
+  "value": 0.04,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_doctors_strike",
+  "value": 0.04,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_downgrade",
+  "value": 0.005,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs rating-history fit"
+ },
+ {
+  "id": "hazards.base_shekel_slide",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_brain_drain",
+  "value": 0.008,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_tech_boom",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_gas_windfall",
+  "value": 0.01,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_inflation_spike",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_housing_pop",
+  "value": 0.008,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_drought",
+  "value": 0.05,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs IMS rainfall stats"
+ },
+ {
+  "id": "hazards.base_hospital_winter",
+  "value": 0.05,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_heatwave",
+  "value": 0.06,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_earthquake",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs GSI recurrence estimates"
+ },
+ {
+  "id": "hazards.base_coalition_crisis",
+  "value": 0.03,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_scandal",
+  "value": 0.05,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_unity",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_un_condemnation",
+  "value": 0.08,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs UN voting-record fit"
+ },
+ {
+  "id": "hazards.base_icc",
+  "value": 0.01,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_us_delay",
+  "value": 0.01,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_abraham",
+  "value": 0.008,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_asia_deal",
+  "value": 0.01,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.base_aliyah",
+  "value": 0.02,
+  "unit": "events/quarter before exp()",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_grievance",
+  "value": 0.9,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "spec §8.1 example; needs ACLED fit",
+  "ci": [
+   0.3,
+   1.5
+  ]
+ },
+ {
+  "id": "hazards.beta_grievance_mild",
+  "value": 0.5,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_grievance_strong",
+  "value": 1.2,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_intel_neg",
+  "value": -0.7,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "spec §8.1 example; needs fit",
+  "ci": [
+   -1.2,
+   -0.2
+  ]
+ },
+ {
+  "id": "hazards.beta_intel_low",
+  "value": 0.5,
+  "unit": "exp coefficient on (1 − intel)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_threat",
+  "value": 0.6,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "spec §8.1 example; needs fit"
+ },
+ {
+  "id": "hazards.beta_threat_strong",
+  "value": 1.2,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_deterrence_low",
+  "value": 0.8,
+  "unit": "exp coefficient on (1 − deterrence)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_deterrence_pos",
+  "value": 0.8,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_mobilization",
+  "value": 2,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_cohesion_low",
+  "value": 0.8,
+  "unit": "exp coefficient on (1 − cohesion)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_trust_low",
+  "value": 0.6,
+  "unit": "exp coefficient on (1 − trust)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_trust_pos",
+  "value": 0.5,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_protest_momentum",
+  "value": 1,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_poverty",
+  "value": 2,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_inflation",
+  "value": 5,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_underfunding",
+  "value": 2,
+  "unit": "exp coefficient on (1 − funding_ratio)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_debt",
+  "value": 2,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs rating-history fit"
+ },
+ {
+  "id": "hazards.beta_debt_mild",
+  "value": 1,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_unstanding_low",
+  "value": 0.5,
+  "unit": "exp coefficient on (1 − un_standing)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_unstanding_pos",
+  "value": 0.3,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_hc_pos",
+  "value": 0.5,
+  "unit": "exp coefficient",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_fx_passthrough",
+  "value": 1,
+  "unit": "exp coefficient on 0.25·shekel_usd",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_beds_low",
+  "value": 3,
+  "unit": "exp coefficient on (1 − 5e-5·beds)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_stability_low",
+  "value": 1.5,
+  "unit": "exp coefficient on (1 − stability)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "hazards.beta_us_alignment_low",
+  "value": 1.5,
+  "unit": "exp coefficient on (1 − alignment.usa)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ }
+]

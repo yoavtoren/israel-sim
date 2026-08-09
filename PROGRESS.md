@@ -40,3 +40,12 @@
 - Data: welfare ministry poverty output moved from macro-level inverse_level to sector response functions + degradation on haredi/arab poverty.
 - Stubbed still: sector income/gini dynamics (M7), grievance decay (M7), hazards (M5), security/diplomacy (M6). Locality housing-cost term in migration deferred.
 - Next: M5 — hazard expression DSL, Poisson event draws, 40 core events, ACLED/GTD calibration.
+
+## M5 — 2026-08-09 — GATE GREEN (round 1 of 3; 1 fix: preview events netted against baseline shadow tick)
+- Exists: events/defs.ts (declarative EventDef: structured hazard terms base·exp(Σβ·(offset+scale·x)) — data, not a string DSL; conditions; effects with wildcards+clamps; spawns with probs; binary vs Poisson-multiplicity), events/hazards.ts (evalHazard + Knuth poisson), events/resolver.ts (step 11: spawn queue → conditions → hazard draws; cooldowns and pending_events live IN the state). 42 events in defs/events.json across security/protest/economy/infra/politics/diplomacy incl. escalation chain rocket→retaliation→border_escalation→second_front→emergency_procurement and the intifada threshold event. politics.ts step-12 stub (approval/grievance/cohesion mean reversion) + threat-level reversion & water-deficit relief in stocks step keep ambient shocks bounded.
+- State additions: pending_events[], event_cooldowns{}, EngineEvent.count. EngineContext.events (loaded from defs/events.json by helpers/smoke).
+- previewBudget now nets events against the zero-change shadow tick — returns only decision-caused events.
+- Calibration: etl/calibrate_hazards.ts sets terror/protest bases so E[rate] at the 2026 state = incidents.json regime means (21/yr, 1.8/yr).
+- Gate: tsc clean 0-any; 23/23 tests. m5_hazards.test.ts: 200 sim-years → terror 18.1/yr (target 21, band ±30%), protest 1.20/yr (target 1.8, band ±50%), annual variance >1, spawn chain fires, cooldowns suppress refires, 10y baseline stays bounded. Smoke sane — ambient event drag now visibly shaves GDP/raises debt vs M4 (emergent, intended).
+- Stubbed still: security/diplomacy dynamics + red lines (M6), real coalition politics (M7), player_choices on events (UI-era).
+- Next: M6 — stockpile production/consumption with fronts, diplomacy drift, sanctions, red lines (mass-atrocity, nuclear, debt spiral → IMF, civil-conflict absorbing state).

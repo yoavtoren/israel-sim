@@ -24,6 +24,19 @@ export function stocksStep(s: WorldState, c: Registry, log: TickLogEntry[]): voi
   s.infrastructure.housing_stock += dHousing;
   log.push({ t: s.t, step: 6, fn: "housing_accumulation", target: "infrastructure.housing_stock", delta: dHousing, constant_id: "housing.demolition_annual", note: null });
 
+  // Water deficit relieved by desalination capacity (relative to its t0 level).
+  const relief = c.get("water.deficit_relief_quarterly") * (s.infrastructure.desalination_capacity_mcm / c.get("water.desal_ref_capacity")) * s.infrastructure.water_deficit;
+  s.infrastructure.water_deficit = Math.max(0, s.infrastructure.water_deficit - relief);
+  if (relief > 0) log.push({ t: s.t, step: 6, fn: "water_relief", target: "infrastructure.water_deficit", delta: -relief, constant_id: "water.deficit_relief_quarterly", note: null });
+
+  // Threat levels decay toward their structural bases (full security module in M6).
+  for (const adversary of Object.keys(s.security.threat_level)) {
+    const base = c.get(`security.threat_base_${adversary}`);
+    const d = c.get("security.threat_reversion_quarterly") * (base - s.security.threat_level[adversary]);
+    s.security.threat_level[adversary] = Math.min(1, Math.max(0, s.security.threat_level[adversary] + d));
+    log.push({ t: s.t, step: 6, fn: "threat_reversion", target: `security.threat_level.${adversary}`, delta: d, constant_id: `security.threat_base_${adversary}`, note: null });
+  }
+
   // Munitions expire (shelf life / training consumption).
   const expiry = c.get("defense.munition_expiry_quarterly");
   for (const cls of Object.keys(s.security.stockpiles) as MunitionClass[]) {

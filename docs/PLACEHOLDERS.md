@@ -63,3 +63,8 @@ All 31 entries are `placeholder` confidence (transport road/rail costs, welfare 
 - `constants/localities.json`: all 12 entries placeholder (migration mu, attractiveness weights, service refs/weights, periphery elasticity) — replace with CBS internal-migration matrices and program evaluations.
 - `constants/sectors.json`: poverty-participation alpha and poverty-welfare beta, both placeholder (NII incidence studies).
 - `normalized/history/participation_by_sector.json`: hand-transcribed anchors ±2pp, 25-64 definition (def_bridge constant bridges to 15+ macro rate).
+
+## Added in M5
+- `constants/hazards.json`: 32 base rates + 26 betas. `base_terror_incident` and `base_mass_protest` are medium (calibrated to incidents.json 2021–25 regime mean); everything else placeholder — the real ACLED/GTD fit (API key/license needed) replaces them in M9.
+- `constants/stability.json`: politics approval/grievance/cohesion bases + reversion, security threat bases + reversion, water deficit relief — all placeholder stubs that M6/M7 replace with endogenous dynamics.
+- `normalized/history/incidents.json`: hand-transcribed annual counts ±30% on intifada years.

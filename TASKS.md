@@ -42,11 +42,11 @@
 - [x] GATE: backtest of sectoral participation 2000–2025 (report MAPE)
 
 ## M5 — Hazard engine + 40 core events
-- [ ] Hazard expression DSL parser + evaluator (whitelisted ops, no eval)
-- [ ] Poisson event draws from forked RNG stream; cooldowns; escalation `spawns`
-- [ ] 40 core EventDefs (JSON) + effects application via StatePath
-- [ ] ETL: ACLED/GTD incident history for calibration
-- [ ] GATE: terror/protest rates match historical distribution
+- [x] Hazard model as structured JSON terms (base·exp(Σβx), βs from constants, no eval — safer than a string DSL)
+- [x] Poisson event draws from forked RNG stream; cooldowns; escalation `spawns`
+- [x] 40 core EventDefs (JSON) + effects application via StatePath
+- [x] Incident history 2000–2025 (hand-transcribed Shabak/GTD anchors; ACLED/GTD APIs need keys/licenses) + calibration script
+- [x] GATE: terror/protest rates match historical distribution
 
 ## M6 — Security, diplomacy, red lines
 - [ ] Stockpiles produce/consume, quarters-of-supply, force readiness, deterrence (step 10)

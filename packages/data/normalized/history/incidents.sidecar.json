@@ -1,0 +1,14 @@
+{
+  "id": "history.incidents.2000_2025",
+  "source_url": "hand-transcribed approximations: Shabak annual terror-data reports, GTD country summaries, press archives for protest waves",
+  "retrieved": "2026-08-09",
+  "license": "published figures, transcribed",
+  "rows": 26,
+  "schema": { "fatal_terror_attacks": "attacks with fatalities per year (approx)", "major_protest_waves": "nationwide sustained protest waves per year (approx)" },
+  "known_gaps": [
+    "HAND-TRANSCRIBED approximations, ±30% on intifada years; replace with ACLED (API key required) or GTD (license required) series.",
+    "Definition of 'major protest wave' is judgment-based.",
+    "Hazard bases are calibrated to the 2021-2025 regime mean, not the full-period mean (regime choice documented in calibration_regime)."
+  ],
+  "transform_script": "hand-written; consumed by packages/data/etl/calibrate_hazards.ts"
+}

@@ -48,7 +48,7 @@ export function degradationStep(
       const needed = rule.for_quarters ?? 1;
       if (ms.degradation_counters[i] < needed) return;
       if (ms.degradation_counters[i] === needed && rule.triggers_event) {
-        events.push({ id: rule.triggers_event, note: `${def.id}: ${rule.surfaces_as}` });
+        events.push({ id: rule.triggers_event, note: `${def.id}: ${rule.surfaces_as}`, count: 1 });
       }
       for (const path of expandEffectPaths(s, rule.effect)) {
         const delta = rule.additive === true ? rule.rate / 4 : (getPath(s, path) * rule.rate) / 4;

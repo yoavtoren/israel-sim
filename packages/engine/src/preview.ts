@@ -87,5 +87,18 @@ export function previewBudget(
     }
   }
 
-  return { diffs, breaks, events: proposed.events };
+  // Only events the DECISION causes: ambient hazard events fire identically in
+  // both shadow ticks (same seed/tick) and are netted out.
+  const baseCounts = new Map<string, number>();
+  for (const e of baseline.events) baseCounts.set(e.id, (baseCounts.get(e.id) ?? 0) + e.count);
+  const causedEvents = proposed.events.filter((e) => {
+    const remaining = baseCounts.get(e.id) ?? 0;
+    if (remaining >= e.count) {
+      baseCounts.set(e.id, remaining - e.count);
+      return false;
+    }
+    return true;
+  });
+
+  return { diffs, breaks, events: causedEvents };
 }

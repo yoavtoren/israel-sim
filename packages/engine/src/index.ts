@@ -5,6 +5,8 @@ export type {
 } from "./state/types";
 export { sectorsStep, participationCurve, aggregateParticipation, aggregatePoverty, SECTOR_IDS } from "./modules/sectors";
 export { localitiesStep, nationalServiceIndex } from "./modules/localities";
+export { parseEventDefs, type EventDef, type HazardDef, type EffectDef } from "./events/defs";
+export { evalHazard, poisson } from "./events/hazards";
 export type { LocalityInitRow, InitOptions } from "./state/init";
 export { tick, tickIndexOf, type EngineContext } from "./tick";
 export { buildInitialState, type InitialStateJson } from "./state/init";

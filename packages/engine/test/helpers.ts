@@ -5,7 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  buildInitialState, buildRegistry, parseMinistryDefs,
+  buildInitialState, buildRegistry, parseEventDefs, parseMinistryDefs,
   type InitialStateJson, type LocalityInitRow, type WorldState,
 } from "../src/index";
 import type { EngineContext } from "../src/tick";
@@ -26,6 +26,7 @@ export function loadContext(seed = "m1-seed", startYear?: number): { ctx: Engine
 
   const defsRaw: unknown = JSON.parse(readFileSync(join(dataDir, "defs", "ministries.json"), "utf8"));
   const ministries = parseMinistryDefs(defsRaw);
+  const events = parseEventDefs(JSON.parse(readFileSync(join(dataDir, "defs", "events.json"), "utf8")));
 
   const initialRaw = JSON.parse(
     readFileSync(join(dataDir, "normalized", "initial_2026.json"), "utf8"),
@@ -35,7 +36,7 @@ export function loadContext(seed = "m1-seed", startYear?: number): { ctx: Engine
   ) as LocalityInitRow[];
 
   const initial = buildInitialState(initialRaw, ministries, registry, seed, { localities, startYear });
-  return { ctx: { registry, ministries, start_year: startYear ?? initialRaw.start_year }, initial };
+  return { ctx: { registry, ministries, events, start_year: startYear ?? initialRaw.start_year }, initial };
 }
 
 export function deepFreeze<T>(obj: T): T {

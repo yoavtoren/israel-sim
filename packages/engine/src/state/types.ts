@@ -208,6 +208,8 @@ export interface WorldState {
   economic_model: EconomicModelId;
 
   pipeline: PendingEffect[];
+  /** event ids force-fired next tick (escalation spawns, spec §8.2) */ pending_events: string[];
+  /** per event id: absolute tick index before which it may not refire */ event_cooldowns: Record<string, number>;
   /** log of the most recent tick */ log: TickLogEntry[];
 }
 
@@ -221,6 +223,7 @@ export interface Decisions {
 export interface EngineEvent {
   id: string;
   note: string;
+  /** incident multiplicity (Poisson count for non-binary events); 1 otherwise */ count: number;
 }
 
 export interface TickResult {

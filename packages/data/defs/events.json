@@ -1,0 +1,436 @@
+[
+ { "id": "terror_incident", "cooldown": 0, "binary": false,
+   "hazard": { "base_rate_id": "hazards.base_terror_incident", "terms": [
+     { "path": "sectors.arab.grievance", "beta_id": "hazards.beta_grievance" },
+     { "path": "security.intel_capability", "beta_id": "hazards.beta_intel_neg" },
+     { "path": "security.threat_level.west_bank", "beta_id": "hazards.beta_threat" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.social_cohesion", "delta": -0.0004, "clamp": [0, 1] },
+     { "target": "politics.protest_intensity", "delta": 0.0004, "clamp": [0, 1] },
+     { "target": "security.threat_level.west_bank", "delta": 0.002, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.0002, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A terror attack with casualties inside Israel; scale with count." },
+
+ { "id": "rocket_attack_gaza", "cooldown": 0, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_rocket_gaza", "terms": [
+     { "path": "security.threat_level.hamas", "beta_id": "hazards.beta_threat_strong" },
+     { "path": "security.deterrence_index", "beta_id": "hazards.beta_deterrence_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "security.stockpiles.interceptors", "delta": -120, "clamp": [0, 1000000] },
+     { "target": "politics.social_cohesion", "delta": -0.002, "clamp": [0, 1] },
+     { "target": "security.threat_level.hamas", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "retaliation_strike", "prob": 0.7 } ],
+   "narrative_context": "Rocket barrages from Gaza; Iron Dome intercepts, communities in shelters." },
+
+ { "id": "rocket_attack_north", "cooldown": 0, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_rocket_north", "terms": [
+     { "path": "security.threat_level.hezbollah", "beta_id": "hazards.beta_threat_strong" },
+     { "path": "security.deterrence_index", "beta_id": "hazards.beta_deterrence_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "security.stockpiles.interceptors", "delta": -250, "clamp": [0, 1000000] },
+     { "target": "politics.social_cohesion", "delta": -0.003, "clamp": [0, 1] },
+     { "target": "security.threat_level.hezbollah", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "retaliation_strike", "prob": 0.7 } ],
+   "narrative_context": "Fire from Lebanon toward the Galilee; northern communities evacuated." },
+
+ { "id": "retaliation_strike", "cooldown": 1, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "security.stockpiles.precision_guided", "delta": -400, "clamp": [0, 1000000] },
+     { "target": "security.threat_level.hamas", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "security.threat_level.hezbollah", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "diplomacy.un_standing", "delta": -0.01, "clamp": [-1, 1] } ],
+   "spawns": [ { "id": "border_escalation", "prob": 0.25 } ],
+   "narrative_context": "Air-force retaliation; munitions expended, diplomatic cost abroad." },
+
+ { "id": "border_escalation", "cooldown": 4, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "security.threat_level.hamas", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "security.threat_level.hezbollah", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "security.deterrence_index", "delta": -0.01, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "second_front_pressure", "prob": 0.2 } ],
+   "narrative_context": "Tit-for-tat exchanges harden into a sustained escalation along the border." },
+
+ { "id": "second_front_pressure", "cooldown": 8, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "security.threat_level.iran", "delta": 0.03, "clamp": [0, 1] },
+     { "target": "security.threat_level.hezbollah", "delta": 0.03, "clamp": [0, 1] },
+     { "target": "security.force_readiness", "delta": -0.01, "clamp": [0, 1] },
+     { "target": "security.stockpiles.artillery_shells", "delta": -20000, "clamp": [0, 10000000] },
+     { "target": "security.stockpiles.interceptors", "delta": -500, "clamp": [0, 1000000] } ],
+   "spawns": [ { "id": "emergency_procurement", "prob": 0.5 } ],
+   "narrative_context": "Multi-front pressure builds; stockpiles drain faster than production." },
+
+ { "id": "emergency_procurement", "cooldown": 8, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "fiscal.emergency_reserve", "delta": -5000, "clamp": [0, 1000000000] },
+     { "target": "security.stockpiles.artillery_shells", "delta": 30000 },
+     { "target": "security.stockpiles.precision_guided", "delta": 1000 } ],
+   "spawns": [],
+   "narrative_context": "Emergency munitions purchases abroad at premium prices." },
+
+ { "id": "west_bank_flareup", "cooldown": 0, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_wb_flareup", "terms": [
+     { "path": "security.threat_level.west_bank", "beta_id": "hazards.beta_threat" },
+     { "path": "sectors.arab.grievance", "beta_id": "hazards.beta_grievance_mild" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "sectors.arab.grievance", "delta": 0.01, "clamp": [0, 1] },
+     { "target": "security.threat_level.west_bank", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.003, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "terror_incident", "prob": 0.5 } ],
+   "narrative_context": "Raids, checkpoints and clashes across the West Bank." },
+
+ { "id": "intifada_outbreak", "cooldown": 40, "binary": true, "hazard": null,
+   "condition": [
+     { "path": "security.threat_level.west_bank", "op": ">=", "value": 0.85 },
+     { "path": "sectors.arab.grievance", "op": ">=", "value": 0.75 } ],
+   "effects": [
+     { "target": "security.threat_level.west_bank", "delta": 0.1, "clamp": [0, 1] },
+     { "target": "sectors.arab.grievance", "delta": 0.1, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.05, "clamp": [0, 1] },
+     { "target": "security.force_readiness", "delta": -0.05, "clamp": [0, 1] },
+     { "target": "politics.protest_intensity", "delta": 0.1, "clamp": [0, 1] },
+     { "target": "diplomacy.un_standing", "delta": -0.05, "clamp": [-1, 1] } ],
+   "spawns": [ { "id": "terror_incident", "prob": 0.9 }, { "id": "mass_protest", "prob": 0.5 } ],
+   "narrative_context": "Sustained uprising; years of accumulated grievance and escalation boil over." },
+
+ { "id": "cyber_attack", "cooldown": 1, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_cyber", "terms": [
+     { "path": "security.intel_capability", "beta_id": "hazards.beta_intel_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.productivity_index", "delta": -0.001 },
+     { "target": "politics.institutional_trust", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A significant cyber attack on infrastructure or finance." },
+
+ { "id": "stockpile_alert", "cooldown": 8, "binary": true, "hazard": null,
+   "condition": [ { "path": "security.stockpiles.interceptors", "op": "<=", "value": 4000 } ],
+   "effects": [
+     { "target": "security.force_readiness", "delta": -0.02, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.002, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Interceptor stocks below safety threshold; rationing doctrine debated." },
+
+ { "id": "reservist_burnout", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_reservist_burnout", "terms": [
+     { "path": "security.reserve_mobilization", "beta_id": "hazards.beta_mobilization" },
+     { "path": "politics.social_cohesion", "beta_id": "hazards.beta_cohesion_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "security.force_readiness", "delta": -0.02, "clamp": [0, 1] },
+     { "target": "sectors.secular.grievance", "delta": 0.01, "clamp": [0, 1] },
+     { "target": "sectors.national_religious.grievance", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Reserve families crack under repeat call-ups; service-burden resentment grows." },
+
+ { "id": "mass_protest", "cooldown": 2, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_mass_protest", "terms": [
+     { "path": "politics.social_cohesion", "beta_id": "hazards.beta_cohesion_low", "offset": 1, "scale": -1 },
+     { "path": "politics.institutional_trust", "beta_id": "hazards.beta_trust_low", "offset": 1, "scale": -1 },
+     { "path": "politics.protest_intensity", "beta_id": "hazards.beta_protest_momentum" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.protest_intensity", "delta": 0.03, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "politics.institutional_trust", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "general_strike", "prob": 0.15 } ],
+   "narrative_context": "A nationwide protest wave fills the squares week after week." },
+
+ { "id": "general_strike", "cooldown": 8, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "macro.productivity_index", "delta": -0.002 },
+     { "target": "politics.protest_intensity", "delta": 0.05, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "The Histadrut shuts the economy for days." },
+
+ { "id": "haredi_draft_protest", "cooldown": 2, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_haredi_protest", "terms": [
+     { "path": "sectors.haredi.grievance", "beta_id": "hazards.beta_grievance_strong" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.protest_intensity", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "sectors.haredi.grievance", "delta": 0.01, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.haredi", "delta": -0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Draft-order enforcement brings haredi crowds into the streets; roads blocked." },
+
+ { "id": "cost_of_living_protest", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_col_protest", "terms": [
+     { "path": "macro.poverty_rate", "beta_id": "hazards.beta_poverty" },
+     { "path": "macro.inflation", "beta_id": "hazards.beta_inflation" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.protest_intensity", "delta": 0.03, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Tent camps and cottage-cheese economics; the middle class is squeezed." },
+
+ { "id": "judicial_crisis", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_judicial_crisis", "terms": [
+     { "path": "politics.institutional_trust", "beta_id": "hazards.beta_trust_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.institutional_trust", "delta": -0.03, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.02, "clamp": [0, 1] },
+     { "target": "politics.protest_intensity", "delta": 0.08, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.secular", "delta": -0.02, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "mass_protest", "prob": 0.6 }, { "id": "brain_drain_wave", "prob": 0.2 } ],
+   "narrative_context": "A constitutional collision between government and courts." },
+
+ { "id": "teacher_strike", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_teacher_strike", "terms": [
+     { "path": "fiscal.ministries.education.funding_ratio", "beta_id": "hazards.beta_underfunding", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "infrastructure.teacher_quality_index", "delta": -0.003 },
+     { "target": "politics.approval_by_sector.*", "delta": -0.003, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "School year opens late; teachers strike over pay." },
+
+ { "id": "doctors_strike", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_doctors_strike", "terms": [
+     { "path": "fiscal.ministries.health.funding_ratio", "beta_id": "hazards.beta_underfunding", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.approval_by_sector.*", "delta": -0.003, "clamp": [0, 1] },
+     { "target": "politics.institutional_trust", "delta": -0.003, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Residents resign en masse; elective care stops." },
+
+ { "id": "credit_downgrade", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_downgrade", "terms": [
+     { "path": "macro.debt_gdp", "beta_id": "hazards.beta_debt" },
+     { "path": "politics.institutional_trust", "beta_id": "hazards.beta_trust_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.credit_rating", "delta": -1, "clamp": [0, 20] },
+     { "target": "macro.shekel_usd", "delta": 0.05 },
+     { "target": "macro.fx_reserves", "delta": -10000, "clamp": [0, 10000000] } ],
+   "spawns": [],
+   "narrative_context": "A major agency cuts the sovereign rating; the outlook page reads like a warning letter." },
+
+ { "id": "shekel_slide", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_shekel_slide", "terms": [
+     { "path": "diplomacy.un_standing", "beta_id": "hazards.beta_unstanding_low", "offset": 1, "scale": -1 },
+     { "path": "macro.debt_gdp", "beta_id": "hazards.beta_debt_mild" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.shekel_usd", "delta": 0.08 },
+     { "target": "macro.inflation", "delta": 0.002 },
+     { "target": "macro.fx_reserves", "delta": -15000, "clamp": [0, 10000000] } ],
+   "spawns": [],
+   "narrative_context": "Foreign investors trim shekel exposure; the currency lurches." },
+
+ { "id": "brain_drain_wave", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_brain_drain", "terms": [
+     { "path": "politics.social_cohesion", "beta_id": "hazards.beta_cohesion_low", "offset": 1, "scale": -1 },
+     { "path": "politics.institutional_trust", "beta_id": "hazards.beta_trust_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.human_capital", "delta": -0.003 },
+     { "target": "macro.productivity_index", "delta": -0.002 },
+     { "target": "politics.approval_by_sector.secular", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Relocation tickets: engineers and physicians take offers abroad." },
+
+ { "id": "tech_boom", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_tech_boom", "terms": [
+     { "path": "politics.institutional_trust", "beta_id": "hazards.beta_trust_pos" },
+     { "path": "macro.human_capital", "beta_id": "hazards.beta_hc_pos" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.productivity_index", "delta": 0.003 },
+     { "target": "macro.human_capital", "delta": 0.001 },
+     { "target": "politics.approval_by_sector.secular", "delta": 0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A wave of exits and mega-rounds; high-tech hiring surges." },
+
+ { "id": "gas_royalties_windfall", "cooldown": 20, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_gas_windfall", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.fx_reserves", "delta": 20000 },
+     { "target": "politics.approval_by_sector.*", "delta": 0.002, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "New offshore gas contracts; royalties flow to the sovereign wealth fund." },
+
+ { "id": "inflation_spike", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_inflation_spike", "terms": [
+     { "path": "macro.shekel_usd", "beta_id": "hazards.beta_fx_passthrough", "scale": 0.25 } ] },
+   "condition": null,
+   "effects": [ { "target": "macro.inflation", "delta": 0.005 } ],
+   "spawns": [],
+   "narrative_context": "Import prices jump; the CPI print surprises to the upside." },
+
+ { "id": "imf_fiscal_warning", "cooldown": 8, "binary": true, "hazard": null,
+   "condition": [ { "path": "macro.debt_gdp", "op": ">=", "value": 1.0 } ],
+   "effects": [
+     { "target": "macro.credit_rating", "delta": -0.5, "clamp": [0, 20] },
+     { "target": "politics.institutional_trust", "delta": -0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Article IV consultation ends with unusually blunt language on debt dynamics." },
+
+ { "id": "housing_bubble_pop", "cooldown": 20, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_housing_pop", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "infrastructure.housing_starts", "delta": -5000, "clamp": [0, 10000000] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Prices crack after years of froth; contractors freeze projects." },
+
+ { "id": "water_crisis", "cooldown": 8, "binary": true, "hazard": null,
+   "condition": [ { "path": "infrastructure.water_deficit", "op": ">=", "value": 150 } ],
+   "effects": [
+     { "target": "politics.approval_by_sector.*", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "sectors.arab.grievance", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Reservoirs at red lines; agricultural quotas slashed mid-season." },
+
+ { "id": "drought_year", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_drought", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "infrastructure.water_deficit", "delta": 80 },
+     { "target": "environment.open_space_index", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A failed rainy season stresses the national water system." },
+
+ { "id": "hospital_winter_collapse", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_hospital_winter", "terms": [
+     { "path": "infrastructure.hospital_beds", "beta_id": "hazards.beta_beds_low", "offset": 1, "scale": -0.00005 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.approval_by_sector.*", "delta": -0.004, "clamp": [0, 1] },
+     { "target": "politics.institutional_trust", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Internal-medicine wards at 130% occupancy; beds in corridors again." },
+
+ { "id": "heatwave_power_shortage", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_heatwave", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.approval_by_sector.*", "delta": -0.002, "clamp": [0, 1] },
+     { "target": "macro.productivity_index", "delta": -0.0005 } ],
+   "spawns": [],
+   "narrative_context": "Rolling brownouts during a record heatwave." },
+
+ { "id": "earthquake_minor", "cooldown": 1, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_earthquake", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "infrastructure.housing_stock", "delta": -2000, "clamp": [0, 100000000] },
+     { "target": "politics.institutional_trust", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.002, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A moderate quake along the Jordan rift; old buildings condemned." },
+
+ { "id": "coalition_crisis", "cooldown": 4, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_coalition_crisis", "terms": [
+     { "path": "politics.coalition.stability", "beta_id": "hazards.beta_stability_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.coalition.stability", "delta": -0.05, "clamp": [0, 1] },
+     { "target": "politics.institutional_trust", "delta": -0.005, "clamp": [0, 1] },
+     { "target": "politics.protest_intensity", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "early_elections_pressure", "prob": 0.3 } ],
+   "narrative_context": "A coalition partner threatens to bolt over the budget." },
+
+ { "id": "early_elections_pressure", "cooldown": 8, "binary": true, "hazard": null, "condition": null,
+   "effects": [
+     { "target": "politics.coalition.stability", "delta": -0.08, "clamp": [0, 1] },
+     { "target": "politics.social_cohesion", "delta": -0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Dissolution bills filed; the Knesset smells an election." },
+
+ { "id": "corruption_scandal", "cooldown": 6, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_scandal", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.institutional_trust", "delta": -0.02, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": -0.008, "clamp": [0, 1] },
+     { "target": "politics.protest_intensity", "delta": 0.02, "clamp": [0, 1] } ],
+   "spawns": [ { "id": "mass_protest", "prob": 0.3 }, { "id": "coalition_crisis", "prob": 0.3 } ],
+   "narrative_context": "Indictments reach a minister's bureau." },
+
+ { "id": "unity_moment", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_unity", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "politics.social_cohesion", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "politics.approval_by_sector.*", "delta": 0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A rescue, a medal, a moment the whole country shares." },
+
+ { "id": "un_condemnation", "cooldown": 2, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_un_condemnation", "terms": [
+     { "path": "diplomacy.un_standing", "beta_id": "hazards.beta_unstanding_low", "offset": 1, "scale": -1 },
+     { "path": "security.threat_level.west_bank", "beta_id": "hazards.beta_threat" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "diplomacy.un_standing", "delta": -0.01, "clamp": [-1, 1] },
+     { "target": "diplomacy.alignment.eu", "delta": -0.005, "clamp": [-1, 1] } ],
+   "spawns": [],
+   "narrative_context": "Another General Assembly vote, another lopsided count." },
+
+ { "id": "icc_pressure", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_icc", "terms": [
+     { "path": "diplomacy.un_standing", "beta_id": "hazards.beta_unstanding_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "diplomacy.alignment.eu", "delta": -0.02, "clamp": [-1, 1] },
+     { "target": "diplomacy.un_standing", "delta": -0.02, "clamp": [-1, 1] },
+     { "target": "diplomacy.trade_access.europe", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Warrants and briefs in The Hague; European ministries take note." },
+
+ { "id": "us_arms_delay", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_us_delay", "terms": [
+     { "path": "diplomacy.alignment.usa", "beta_id": "hazards.beta_us_alignment_low", "offset": 1, "scale": -1 } ] },
+   "condition": null,
+   "effects": [
+     { "target": "diplomacy.us_support.military_aid", "delta": -500, "clamp": [0, 1000000] },
+     { "target": "security.force_readiness", "delta": -0.005, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "A munitions shipment is 'under review' in Washington." },
+
+ { "id": "abraham_expansion", "cooldown": 12, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_abraham", "terms": [
+     { "path": "security.deterrence_index", "beta_id": "hazards.beta_deterrence_pos" },
+     { "path": "diplomacy.un_standing", "beta_id": "hazards.beta_unstanding_pos" } ] },
+   "condition": null,
+   "effects": [
+     { "target": "diplomacy.alignment.saudi_arabia", "delta": 0.05, "clamp": [-1, 1] },
+     { "target": "diplomacy.alignment.uae", "delta": 0.02, "clamp": [-1, 1] },
+     { "target": "diplomacy.trade_access.middle_east", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "security.deterrence_index", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Normalization widens; direct flights and trade corridors open." },
+
+ { "id": "asia_trade_deal", "cooldown": 12, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_asia_deal", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "diplomacy.trade_access.asia", "delta": 0.02, "clamp": [0, 1] },
+     { "target": "diplomacy.alignment.china", "delta": 0.02, "clamp": [-1, 1] } ],
+   "spawns": [],
+   "narrative_context": "A free-trade agreement is signed in East Asia." },
+
+ { "id": "aliyah_wave", "cooldown": 8, "binary": true,
+   "hazard": { "base_rate_id": "hazards.base_aliyah", "terms": [] },
+   "condition": null,
+   "effects": [
+     { "target": "macro.human_capital", "delta": 0.002 },
+     { "target": "politics.approval_by_sector.other", "delta": 0.01, "clamp": [0, 1] } ],
+   "spawns": [],
+   "narrative_context": "Instability abroad brings a wave of skilled immigrants." }
+]
