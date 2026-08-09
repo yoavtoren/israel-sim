@@ -57,3 +57,9 @@ All six entries (readiness base/adjustment, three production baselines, expiry) 
 
 ## Added in M3 — packages/data/constants/ministry_outputs.json
 All 31 entries are `placeholder` confidence (transport road/rail costs, welfare poverty elasticity, housing starts/subsidy, water desal costs, environment/justice/internal-security level anchors, science/economy TFP elasticities, culture cohesion, hasbara/FA UN-standing). Costs marked "calibrated" are set so baseline funding exactly sustains current stocks — replace alongside their stocks in the M9 pass. Degradation thresholds/rates live inline in packages/data/defs/ministries.json (spec §5 style), all invented.
+
+## Added in M4
+- `constants/participation.json`: 40 curve params are `medium` (fit by etl/calibrate_participation.ts to hand-transcribed CBS/BoI/Taub anchors — replace anchors with exact CBS LFS API series); convergence + edu/welfare target betas are placeholder/low (welfare beta is a contested assumption, ci [−0.08, 0]).
+- `constants/localities.json`: all 12 entries placeholder (migration mu, attractiveness weights, service refs/weights, periphery elasticity) — replace with CBS internal-migration matrices and program evaluations.
+- `constants/sectors.json`: poverty-participation alpha and poverty-welfare beta, both placeholder (NII incidence studies).
+- `normalized/history/participation_by_sector.json`: hand-transcribed anchors ±2pp, 25-64 definition (def_bridge constant bridges to 15+ macro rate).

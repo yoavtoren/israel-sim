@@ -1,7 +1,11 @@
 export type {
   WorldState, Decisions, TickResult, TickLogEntry, MinistryId, SectorId,
   MunitionClass, EconomicModelId, SectorState, MinistryState, PendingEffect,
+  LocalitySoA,
 } from "./state/types";
+export { sectorsStep, participationCurve, aggregateParticipation, aggregatePoverty, SECTOR_IDS } from "./modules/sectors";
+export { localitiesStep, nationalServiceIndex } from "./modules/localities";
+export type { LocalityInitRow, InitOptions } from "./state/init";
 export { tick, tickIndexOf, type EngineContext } from "./tick";
 export { buildInitialState, type InitialStateJson } from "./state/init";
 export { buildRegistry, type Registry, type ConstantEntry, type Confidence } from "./constants/registry";

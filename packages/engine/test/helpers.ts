@@ -6,13 +6,13 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildInitialState, buildRegistry, parseMinistryDefs,
-  type InitialStateJson, type WorldState,
+  type InitialStateJson, type LocalityInitRow, type WorldState,
 } from "../src/index";
 import type { EngineContext } from "../src/tick";
 
 const dataDir = fileURLToPath(new URL("../../data", import.meta.url));
 
-export function loadContext(seed = "m1-seed"): { ctx: EngineContext; initial: WorldState } {
+export function loadContext(seed = "m1-seed", startYear?: number): { ctx: EngineContext; initial: WorldState } {
   const constantsDir = join(dataDir, "constants");
   const groups: unknown[][] = readdirSync(constantsDir)
     .filter((f) => f.endsWith(".json"))
@@ -30,9 +30,12 @@ export function loadContext(seed = "m1-seed"): { ctx: EngineContext; initial: Wo
   const initialRaw = JSON.parse(
     readFileSync(join(dataDir, "normalized", "initial_2026.json"), "utf8"),
   ) as InitialStateJson;
+  const localities = JSON.parse(
+    readFileSync(join(dataDir, "normalized", "localities.json"), "utf8"),
+  ) as LocalityInitRow[];
 
-  const initial = buildInitialState(initialRaw, ministries, registry, seed);
-  return { ctx: { registry, ministries, start_year: initialRaw.start_year }, initial };
+  const initial = buildInitialState(initialRaw, ministries, registry, seed, { localities, startYear });
+  return { ctx: { registry, ministries, start_year: startYear ?? initialRaw.start_year }, initial };
 }
 
 export function deepFreeze<T>(obj: T): T {

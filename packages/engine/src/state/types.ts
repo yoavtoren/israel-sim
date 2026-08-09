@@ -54,17 +54,22 @@ export interface SectorState {
   /** children per woman */ fertility: number;
 }
 
-export interface LocalityState {
-  /** CBS locality code */ code: number;
-  name_he: string;
-  /** persons by sector */ population_by_sector: Partial<Record<SectorId, number>>;
-  /** CBS cluster 1–10 */ socioeconomic_cluster: number;
-  /** km from Tel Aviv CBD */ distance_from_centre: number;
-  /** fraction employed of working-age */ employment: number;
-  /** dwelling units */ housing_stock: number;
-  /** 0–1 composite */ infrastructure_quality: number;
-  /** 0–1 composite */ service_access: number;
-  /** persons/yr net */ migration_balance: number;
+/**
+ * Locality agents, structure-of-arrays (PLAN §4: plain parallel arrays keep
+ * the state JSON-serializable while 10-year runs stay fast). Index i is one
+ * locality across all arrays.
+ */
+export interface LocalitySoA {
+  count: number;
+  /** CBS locality code */ code: number[];
+  name_he: string[];
+  /** CBS socio-economic cluster 1–10; 0 = unknown */ cluster: number[];
+  /** persons */ population: number[];
+  /** fraction of working-age employed */ employment: number[];
+  /** census employment baseline, fraction */ emp_base: number[];
+  /** 0–1+ composite service access */ service_access: number[];
+  /** initial service access (t0 reference) */ service_base: number[];
+  /** persons/yr net internal migration */ migration_balance: number[];
 }
 
 export interface Front {
@@ -139,10 +144,12 @@ export interface WorldState {
     /** ₪M/yr */ debt_service: number;
     /** ₪M/yr, spend + service − revenue (positive = shortfall) */ deficit: number;
     /** ₪M */ emergency_reserve: number;
+    /** ₪M/yr, active periphery-program budget (0 = no program) */ periphery_spend: number;
+    /** clusters (1–10) targeted by the active periphery program */ periphery_target_clusters: number[];
   };
 
   sectors: Record<SectorId, SectorState>;
-  /** ~1,200 agents from M4; empty in M1–M3 */ localities: LocalityState[];
+  /** ~1,500 locality agents (SoA); count 0 when locality data not loaded */ localities: LocalitySoA;
 
   security: {
     /** units */ stockpiles: Record<MunitionClass, number>;
@@ -204,9 +211,11 @@ export interface WorldState {
   /** log of the most recent tick */ log: TickLogEntry[];
 }
 
-/** Player decisions for one tick. M1: budgets only. */
+/** Player decisions for one tick. Absent fields keep the current policy. */
 export interface Decisions {
   /** ₪M/yr, proposed annual budget per ministry */ budgets?: Partial<Record<MinistryId, number>>;
+  /** Periphery incentive program: targeted flow to localities in the given clusters. annual_budget 0 cancels. */
+  periphery?: { annual_budget: number; target_clusters: number[] };
 }
 
 export interface EngineEvent {

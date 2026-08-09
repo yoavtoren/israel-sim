@@ -34,6 +34,15 @@ export function resolveDecisions(
     }
     ms.funding_ratio = ms.budget / def.baseline_budget;
   }
+
+  if (decisions.periphery !== undefined) {
+    const prev = s.fiscal.periphery_spend;
+    s.fiscal.periphery_spend = Math.max(0, decisions.periphery.annual_budget);
+    s.fiscal.periphery_target_clusters = [...decisions.periphery.target_clusters];
+    if (s.fiscal.periphery_spend !== prev) {
+      log.push({ t: s.t, step: 1, fn: "periphery_program", target: "fiscal.periphery_spend", delta: s.fiscal.periphery_spend - prev, constant_id: null, note: `clusters ${s.fiscal.periphery_target_clusters.join(",")}` });
+    }
+  }
 }
 
 export function totalSpend(s: WorldState): number {
@@ -63,7 +72,7 @@ export function fiscalStep(s: WorldState, c: Registry, log: TickLogEntry[]): voi
   const revenue = totalRevenue(s);
   // Non-ministry spend (pensions, Knesset, local-authority grants, reserves…)
   // is a published aggregate the player cannot currently steer; M3+ decomposes it.
-  const spend = totalSpend(s) + c.get("fiscal.non_ministry_spend_annual");
+  const spend = totalSpend(s) + c.get("fiscal.non_ministry_spend_annual") + s.fiscal.periphery_spend;
   s.fiscal.deficit = spend + s.fiscal.debt_service - revenue;
 
   // Quarterly debt issuance covers a quarter of the annualized deficit.

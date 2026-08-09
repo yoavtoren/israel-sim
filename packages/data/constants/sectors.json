@@ -1,0 +1,4 @@
+[
+ { "id": "sectors.poverty_participation_alpha", "value": 0.5, "unit": "Δ sector poverty rate per unit Δ sector participation (opposite sign)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (NII poverty-employment incidence)", "ci": [0.2, 0.8] },
+ { "id": "sectors.poverty_welfare_beta", "value": 0.1, "unit": "relative poverty growth per yr per unit welfare underfunding (1 − funding_ratio)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (transfer-incidence studies)", "ci": [0.03, 0.25] }
+]

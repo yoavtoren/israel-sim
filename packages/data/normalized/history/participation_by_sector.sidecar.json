@@ -1,0 +1,14 @@
+{
+  "id": "history.participation_by_sector.2000_2025",
+  "source_url": "hand-transcribed trend anchors: CBS Labour Force Survey by population group, BoI Annual Reports, Taub Center haredi/Arab employment studies",
+  "retrieved": "2026-08-09",
+  "license": "published figures, transcribed",
+  "rows": 10,
+  "schema": { "years": "int[6]", "series.<sector>_<gender>": "participation fraction (ages ~25-64) at each anchor year" },
+  "known_gaps": [
+    "HAND-TRANSCRIBED 5-year anchors, not fetched series — approximate to ±2pp; replace with exact CBS LFS API series.",
+    "Definition is prime-age (~25-64) participation; macro.participation is 15+ — bridged by participation.def_bridge constant.",
+    "secular includes traditional; national_religious and other are weakly sourced interpolations."
+  ],
+  "transform_script": "hand-written; consumed by packages/data/etl/calibrate_participation.ts"
+}

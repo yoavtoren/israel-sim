@@ -35,11 +35,11 @@
 - [x] GATE: budget preview works (engine-level test: propose budget → diff of what moves/breaks)
 
 ## M4 — Sectors + localities + migration
-- [ ] Sector states + response functions from constants; demography (step 7)
-- [ ] Locality SoA columns + serializer; migration/employment/services tick (step 8)
-- [ ] Periphery-program lever (targeted flows)
-- [ ] ETL: sectoral participation history 2000–2025
-- [ ] GATE: backtest of sectoral participation 2000–2025 (report MAPE)
+- [x] Sector states + response functions from constants; demography (step 7)
+- [x] Locality SoA columns + serializer; migration/employment/services tick (step 8)
+- [x] Periphery-program lever (targeted flows)
+- [x] ETL: sectoral participation history 2000–2025
+- [x] GATE: backtest of sectoral participation 2000–2025 (report MAPE)
 
 ## M5 — Hazard engine + 40 core events
 - [ ] Hazard expression DSL parser + evaluator (whitelisted ops, no eval)

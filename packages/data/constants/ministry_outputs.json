@@ -1,33 +1,250 @@
 [
- { "id": "transport.road_budget_share", "value": 0.5, "unit": "share of ministry budget sustaining road capacity", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget transport line items)" },
- { "id": "transport.cost_per_road_index", "value": 19054, "unit": "₪M/yr per 1.0 road-capacity index sustained", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, calibrated so baseline funding sustains index 1.0" },
- { "id": "transport.road_adjustment_quarterly", "value": 0.03, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "transport.road_max_growth_quarterly", "value": 0.02, "unit": "max fraction change per quarter (saturation)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (construction lead times)" },
- { "id": "transport.rail_budget_share", "value": 0.2, "unit": "share of ministry budget sustaining rail", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "transport.cost_per_rail_km", "value": 5.44, "unit": "₪M/yr per km sustained (opex + renewal)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, calibrated so baseline funding sustains 1,400 km" },
- { "id": "transport.rail_adjustment_quarterly", "value": 0.02, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "transport.rail_max_growth_quarterly", "value": 0.015, "unit": "max fraction change per quarter (saturation)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (rail construction lead times)" },
- { "id": "welfare.poverty_base", "value": 0.2, "unit": "poverty rate sustained at baseline welfare funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; anchored to NII poverty report ~20%, needs exact series" },
- { "id": "welfare.poverty_elasticity", "value": 0.15, "unit": "poverty elasticity w.r.t. welfare funding ratio", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (NII transfer-incidence studies)", "ci": [0.05, 0.3] },
- { "id": "welfare.poverty_adjust_quarterly", "value": 0.1, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "housing.starts_base", "value": 55000, "unit": "units/yr started regardless of ministry budget", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS housing starts series)" },
- { "id": "housing.subsidy_budget_share", "value": 0.4, "unit": "share of ministry budget subsidizing starts", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Open Budget housing line items)" },
- { "id": "housing.cost_per_subsidized_start", "value": 0.75, "unit": "₪M subsidy per additional start", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoCH program costs)" },
- { "id": "housing.demolition_annual", "value": 0.002, "unit": "fraction of housing stock demolished/yr", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (CBS dwelling stock series)" },
- { "id": "water.desal_budget_share", "value": 0.6, "unit": "share of ministry budget sustaining desalination", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (Water Authority reports)" },
- { "id": "water.cost_per_mcm", "value": 2.79, "unit": "₪M/yr per mcm/yr capacity sustained", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, calibrated so baseline funding sustains 585 mcm" },
- { "id": "water.desal_adjustment_quarterly", "value": 0.03, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "water.desal_max_growth_quarterly", "value": 0.03, "unit": "max fraction change per quarter (saturation)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (plant construction times)" },
- { "id": "environment.air_quality_base", "value": 0.7, "unit": "air-quality index (0-1) sustained at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (MoEP monitoring)" },
- { "id": "environment.aq_adjust_quarterly", "value": 0.05, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "justice.trust_base", "value": 0.45, "unit": "institutional-trust level (0-1) sustained at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; anchored to IDI trust surveys, needs exact series" },
- { "id": "justice.trust_adjust_quarterly", "value": 0.05, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "internal_security.protest_base", "value": 0.15, "unit": "protest intensity (0-1) at baseline funding", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data (protest-event counts, M5 ACLED)" },
- { "id": "internal_security.protest_elasticity", "value": 0.2, "unit": "protest elasticity w.r.t. police funding ratio", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.05, 0.4] },
- { "id": "internal_security.protest_adjust_quarterly", "value": 0.1, "unit": "fraction of gap closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented, needs real data" },
- { "id": "science.spend_to_tfp", "value": 0.01, "unit": "Δ TFP index per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=3, scale=2)", "confidence": "placeholder", "source": "invented; R&D-TFP literature (Hall/Mairesse) suggests order, needs own estimate", "ci": [0.003, 0.03] },
- { "id": "economy.spend_to_tfp", "value": 0.005, "unit": "Δ TFP index per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=3, scale=2)", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.001, 0.015] },
- { "id": "culture.spend_to_cohesion", "value": 0.008, "unit": "Δ social cohesion (0-1) per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=2, scale=1)", "confidence": "placeholder", "source": "invented, needs real data", "ci": [0.001, 0.02] },
- { "id": "foreign_affairs.spend_to_un_standing", "value": 0.05, "unit": "Δ UN standing (-1..1) per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=2, scale=1)", "confidence": "placeholder", "source": "invented, needs real data (UN voting alignment vs diplomatic spending)", "ci": [0.01, 0.12] },
- { "id": "hasbara.spend_to_un_standing", "value": 0.02, "unit": "Δ UN standing (-1..1) per unit funding-ratio deviation sustained 1yr", "lag_kernel": "gamma(shape=2, scale=1)", "confidence": "placeholder", "source": "invented (spec §3.4 example of an unmeasured parameter)", "ci": [0, 0.06] }
+ {
+  "id": "transport.road_budget_share",
+  "value": 0.5,
+  "unit": "share of ministry budget sustaining road capacity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (Open Budget transport line items)"
+ },
+ {
+  "id": "transport.cost_per_road_index",
+  "value": 19054,
+  "unit": "₪M/yr per 1.0 road-capacity index sustained",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, calibrated so baseline funding sustains index 1.0"
+ },
+ {
+  "id": "transport.road_adjustment_quarterly",
+  "value": 0.03,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "transport.road_max_growth_quarterly",
+  "value": 0.02,
+  "unit": "max fraction change per quarter (saturation)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (construction lead times)"
+ },
+ {
+  "id": "transport.rail_budget_share",
+  "value": 0.2,
+  "unit": "share of ministry budget sustaining rail",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "transport.cost_per_rail_km",
+  "value": 5.44,
+  "unit": "₪M/yr per km sustained (opex + renewal)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, calibrated so baseline funding sustains 1,400 km"
+ },
+ {
+  "id": "transport.rail_adjustment_quarterly",
+  "value": 0.02,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "transport.rail_max_growth_quarterly",
+  "value": 0.015,
+  "unit": "max fraction change per quarter (saturation)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (rail construction lead times)"
+ },
+ {
+  "id": "housing.starts_base",
+  "value": 55000,
+  "unit": "units/yr started regardless of ministry budget",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (CBS housing starts series)"
+ },
+ {
+  "id": "housing.subsidy_budget_share",
+  "value": 0.4,
+  "unit": "share of ministry budget subsidizing starts",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (Open Budget housing line items)"
+ },
+ {
+  "id": "housing.cost_per_subsidized_start",
+  "value": 0.75,
+  "unit": "₪M subsidy per additional start",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (MoCH program costs)"
+ },
+ {
+  "id": "housing.demolition_annual",
+  "value": 0.002,
+  "unit": "fraction of housing stock demolished/yr",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (CBS dwelling stock series)"
+ },
+ {
+  "id": "water.desal_budget_share",
+  "value": 0.6,
+  "unit": "share of ministry budget sustaining desalination",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (Water Authority reports)"
+ },
+ {
+  "id": "water.cost_per_mcm",
+  "value": 2.79,
+  "unit": "₪M/yr per mcm/yr capacity sustained",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, calibrated so baseline funding sustains 585 mcm"
+ },
+ {
+  "id": "water.desal_adjustment_quarterly",
+  "value": 0.03,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "water.desal_max_growth_quarterly",
+  "value": 0.03,
+  "unit": "max fraction change per quarter (saturation)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (plant construction times)"
+ },
+ {
+  "id": "environment.air_quality_base",
+  "value": 0.7,
+  "unit": "air-quality index (0-1) sustained at baseline funding",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (MoEP monitoring)"
+ },
+ {
+  "id": "environment.aq_adjust_quarterly",
+  "value": 0.05,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "justice.trust_base",
+  "value": 0.45,
+  "unit": "institutional-trust level (0-1) sustained at baseline funding",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; anchored to IDI trust surveys, needs exact series"
+ },
+ {
+  "id": "justice.trust_adjust_quarterly",
+  "value": 0.05,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "internal_security.protest_base",
+  "value": 0.15,
+  "unit": "protest intensity (0-1) at baseline funding",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (protest-event counts, M5 ACLED)"
+ },
+ {
+  "id": "internal_security.protest_elasticity",
+  "value": 0.2,
+  "unit": "protest elasticity w.r.t. police funding ratio",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data",
+  "ci": [
+   0.05,
+   0.4
+  ]
+ },
+ {
+  "id": "internal_security.protest_adjust_quarterly",
+  "value": 0.1,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "science.spend_to_tfp",
+  "value": 0.01,
+  "unit": "Δ TFP index per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=3, scale=2)",
+  "confidence": "placeholder",
+  "source": "invented; R&D-TFP literature (Hall/Mairesse) suggests order, needs own estimate",
+  "ci": [
+   0.003,
+   0.03
+  ]
+ },
+ {
+  "id": "economy.spend_to_tfp",
+  "value": 0.005,
+  "unit": "Δ TFP index per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=3, scale=2)",
+  "confidence": "placeholder",
+  "source": "invented, needs real data",
+  "ci": [
+   0.001,
+   0.015
+  ]
+ },
+ {
+  "id": "culture.spend_to_cohesion",
+  "value": 0.008,
+  "unit": "Δ social cohesion (0-1) per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=2, scale=1)",
+  "confidence": "placeholder",
+  "source": "invented, needs real data",
+  "ci": [
+   0.001,
+   0.02
+  ]
+ },
+ {
+  "id": "foreign_affairs.spend_to_un_standing",
+  "value": 0.05,
+  "unit": "Δ UN standing (-1..1) per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=2, scale=1)",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (UN voting alignment vs diplomatic spending)",
+  "ci": [
+   0.01,
+   0.12
+  ]
+ },
+ {
+  "id": "hasbara.spend_to_un_standing",
+  "value": 0.02,
+  "unit": "Δ UN standing (-1..1) per unit funding-ratio deviation sustained 1yr",
+  "lag_kernel": "gamma(shape=2, scale=1)",
+  "confidence": "placeholder",
+  "source": "invented (spec §3.4 example of an unmeasured parameter)",
+  "ci": [
+   0,
+   0.06
+  ]
+ }
 ]

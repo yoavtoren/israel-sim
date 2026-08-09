@@ -1,0 +1,362 @@
+[
+ {
+  "id": "participation.haredi_men.low",
+  "value": 0.315,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_men.high",
+  "value": 0.565,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_men.k",
+  "value": 0.17,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_men.t0",
+  "value": 2009,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_women.low",
+  "value": 0.42,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_women.high",
+  "value": 0.82,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_women.k",
+  "value": 0.17,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.haredi_women.t0",
+  "value": 2010,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_men.low",
+  "value": 0.775,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_men.high",
+  "value": 0.61,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_men.k",
+  "value": 0.1,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_men.t0",
+  "value": 2002,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_women.low",
+  "value": 0.115,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_women.high",
+  "value": 0.49,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_women.k",
+  "value": 0.12,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.arab_women.t0",
+  "value": 2014,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_men.low",
+  "value": 0.67,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_men.high",
+  "value": 0.682,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_men.k",
+  "value": 0.34,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_men.t0",
+  "value": 2011,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_women.low",
+  "value": 0.545,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_women.high",
+  "value": 0.705,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_women.k",
+  "value": 0.13,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.secular_women.t0",
+  "value": 2005,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_men.low",
+  "value": 0.685,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_men.high",
+  "value": 0.725,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_men.k",
+  "value": 0.1,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_men.t0",
+  "value": 2005,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_women.low",
+  "value": 0.6,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_women.high",
+  "value": 0.765,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_women.k",
+  "value": 0.1,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.national_religious_women.t0",
+  "value": 2008,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_men.low",
+  "value": 0.635,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_men.high",
+  "value": 0.683,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_men.k",
+  "value": 0.08,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_men.t0",
+  "value": 1999,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_women.low",
+  "value": 0.54,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_women.high",
+  "value": 0.69,
+  "unit": "participation fraction (25-64)",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_women.k",
+  "value": 0.08,
+  "unit": "1/yr logistic steepness",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.other_women.t0",
+  "value": 2005,
+  "unit": "logistic midpoint year",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "fit by packages/data/etl/calibrate_participation.ts to normalized/history/participation_by_sector.json (hand-transcribed CBS/BoI/Taub anchors)"
+ },
+ {
+  "id": "participation.def_bridge",
+  "value": 0.942,
+  "unit": "macro 15+ participation per weighted 25-64 sector participation",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "computed: BoI LF_R_Q (15+) / weighted 25-64 curve aggregate at 2026"
+ },
+ {
+  "id": "participation.convergence_quarterly",
+  "value": 0.25,
+  "unit": "fraction of gap to curve target closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data"
+ },
+ {
+  "id": "participation.edu_target_beta",
+  "value": 0.05,
+  "unit": "relative shift of participation target per unit education funding-ratio deviation",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs real data (spec §6.1 response function)",
+  "ci": [
+   0,
+   0.15
+  ]
+ },
+ {
+  "id": "participation.welfare_target_beta",
+  "value": -0.03,
+  "unit": "relative shift of participation target per unit welfare funding-ratio deviation (transfer-dependency channel)",
+  "lag_kernel": "immediate",
+  "confidence": "low",
+  "source": "assumption; contested literature on transfer generosity vs participation",
+  "ci": [
+   -0.08,
+   0
+  ]
+ }
+]

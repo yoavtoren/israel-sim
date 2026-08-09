@@ -31,7 +31,7 @@ describe("invariants", () => {
       const prev = states[i - 1];
       const next = states[i];
       const nonMinistry = ctx.registry.get("fiscal.non_ministry_spend_annual");
-      const residual = totalRevenue(next) - totalSpend(next) - nonMinistry - prev.fiscal.debt_service + next.fiscal.deficit;
+      const residual = totalRevenue(next) - totalSpend(next) - nonMinistry - next.fiscal.periphery_spend - prev.fiscal.debt_service + next.fiscal.deficit;
       expect(Math.abs(residual)).toBeLessThan(1e-6);
       // Debt issuance matches the deficit exactly.
       const issued = next.fiscal.debt - prev.fiscal.debt;
@@ -50,6 +50,13 @@ describe("invariants", () => {
         .reduce((a, e) => a + e.delta, 0);
       const diff = totalPopulation(next) - totalPopulation(prev);
       expect(Math.abs(diff - flows)).toBeLessThan(1e-3); // persons, fp epsilon
+
+      // Localities stay in sync with the sector total (population conserves
+      // across sectors AND localities); internal migration is zero-sum.
+      const locSum = next.localities.population.reduce((a, b) => a + b, 0);
+      expect(Math.abs(locSum / totalPopulation(next) - 1)).toBeLessThan(1e-9);
+      const migSum = next.localities.migration_balance.reduce((a, b) => a + b, 0);
+      expect(Math.abs(migSum)).toBeLessThan(totalPopulation(next) * 1e-9);
     }
   });
 

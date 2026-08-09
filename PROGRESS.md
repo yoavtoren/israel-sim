@@ -32,3 +32,11 @@
 - Constants: +31 placeholder entries (ministry_outputs.json); registry now 95 entries.
 - Stubbed still: localities (M4), hazards/events beyond degradation triggers (M5), security/diplomacy dynamics (M6), politics step (M7).
 - Next: M4 — sector response functions, locality SoA agents, migration, participation backtest.
+
+## M4 — 2026-08-09 — GATE GREEN (round 1 of 3; 1 fix: clamp locality employment target)
+- Exists: sectorsStep (7b) — participation converges to logistic curves per sector×gender fit to 2000–2025 anchors (etl/calibrate_participation.ts grid search, fit-MAPE ≤1.1%/series), policy shifters (edu/welfare funding), sector poverty responds to participation + welfare underfunding, macro.participation (via 25-64→15+ def_bridge) and macro.poverty_rate now aggregated from sectors. localitiesStep (8) — 1,489 SoA agents (LocalitySoA replaces LocalityState[]): service access ← national service index (teachers/beds/roads), employment ← census base × labour market × services (clamped [.05,.98]), zero-sum internal migration around weighted mean attractiveness, populations rescaled to sector total each tick (conservation across sectors AND localities, invariant-tested). Periphery lever: Decisions.periphery {annual_budget, target_clusters} → fiscal.periphery_spend (in budget constraint + money invariant) → attractiveness bonus per targeted capita.
+- Interface: buildInitialState(..., opts {localities, startYear}); sector participation initialized from curves at t0; sector poverty rescaled to match headline; exports sectorsStep/localitiesStep/participationCurve/aggregates/LocalitySoA.
+- Gate: tsc clean 0-any; 19/19 tests. Backtest 2000→2025 MAPE per series printed by m4_backtest.test.ts: OVERALL 0.85%, worst arab_women 2.72% (thresholds 8%/12%). Periphery test: targeted clusters 1–3 gain population share and the program raises the deficit. Smoke sane (GDP a bit higher than M3 — participation trend now feeds labour supply).
+- Data: welfare ministry poverty output moved from macro-level inverse_level to sector response functions + degradation on haredi/arab poverty.
+- Stubbed still: sector income/gini dynamics (M7), grievance decay (M7), hazards (M5), security/diplomacy (M6). Locality housing-cost term in migration deferred.
+- Next: M5 — hazard expression DSL, Poisson event draws, 40 core events, ACLED/GTD calibration.

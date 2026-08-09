@@ -15,6 +15,8 @@ import { pipelineStep } from "./modules/pipeline";
 import { stocksStep } from "./modules/stocks";
 import { degradationStep } from "./modules/degradation";
 import { demographyStep } from "./modules/demography";
+import { sectorsStep } from "./modules/sectors";
+import { localitiesStep } from "./modules/localities";
 import { macroStep } from "./modules/macro";
 
 export interface EngineContext {
@@ -42,8 +44,9 @@ export function tick(prev: WorldState, decisions: Decisions, ctx: EngineContext)
   pipelineStep(s, log);                                         // 5
   stocksStep(s, ctx.registry, log);                             // 6
   degradationStep(s, ctx.ministries, events, log);              // 6b
-  demographyStep(s, ctx.registry, log);                         // 7
-  // 8 localities — M4
+  demographyStep(s, ctx.registry, log);                         // 7a demography
+  sectorsStep(s, ctx.registry, log);                            // 7b sector dynamics
+  localitiesStep(s, ctx.registry, log);                         // 8
   macroStep(s, ctx.registry, streams("macro"), log);            // 9
   // 10 security & diplomacy — M6
   // 11 hazards & events — M5
