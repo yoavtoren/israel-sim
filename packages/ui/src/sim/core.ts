@@ -86,7 +86,18 @@ export class SimCore implements SimApi {
         .map((e) => e.id),
     };
 
-    return { meta, frame: this.project(this.state, []), state: this.state };
+    // The t0 state has empty fiscal flows (revenue/deficit are computed inside a
+    // tick) — seed the boot frame's strip from a zero-change shadow tick so the
+    // Budget Chamber doesn't open on ₪0.0B. tick() is pure; state is untouched.
+    const frame0 = this.project(this.state, []);
+    const shadow = tick(this.state, {}, this.ctx).state;
+    frame0.revenue_total = totalRevenue(shadow);
+    frame0.spend_total =
+      totalSpend(shadow) + registry.get("fiscal.non_ministry_spend_annual") + shadow.fiscal.debt_service + shadow.fiscal.periphery_spend;
+    frame0.deficit = shadow.fiscal.deficit;
+    frame0.debt_service = shadow.fiscal.debt_service;
+
+    return { meta, frame: frame0, state: this.state };
   }
 
   advance(quarters: number, decisions: Decisions): AdvancePayload {
