@@ -1,0 +1,184 @@
+[
+ {
+  "year": 2000,
+  "real_gdp_index": 186833.965525,
+  "unemployment": 0.088,
+  "debt_gdp": 0.78,
+  "poverty": 0.18
+ },
+ {
+  "year": 2001,
+  "real_gdp_index": 187486.43655,
+  "unemployment": 0.093,
+  "debt_gdp": 0.81,
+  "poverty": 0.185
+ },
+ {
+  "year": 2002,
+  "real_gdp_index": 187091.7075,
+  "unemployment": 0.103,
+  "debt_gdp": 0.88,
+  "poverty": 0.19
+ },
+ {
+  "year": 2003,
+  "real_gdp_index": 189956.29885,
+  "unemployment": 0.107,
+  "debt_gdp": 0.93,
+  "poverty": 0.195
+ },
+ {
+  "year": 2004,
+  "real_gdp_index": 197967.02159999998,
+  "unemployment": 0.104,
+  "debt_gdp": 0.91,
+  "poverty": 0.2
+ },
+ {
+  "year": 2005,
+  "real_gdp_index": 207890.65085,
+  "unemployment": 0.09,
+  "debt_gdp": 0.87,
+  "poverty": 0.205
+ },
+ {
+  "year": 2006,
+  "real_gdp_index": 218969.37005,
+  "unemployment": 0.084,
+  "debt_gdp": 0.81,
+  "poverty": 0.2
+ },
+ {
+  "year": 2007,
+  "real_gdp_index": 232589.5007,
+  "unemployment": 0.073,
+  "debt_gdp": 0.74,
+  "poverty": 0.2
+ },
+ {
+  "year": 2008,
+  "real_gdp_index": 239761.94345000002,
+  "unemployment": 0.061,
+  "debt_gdp": 0.72,
+  "poverty": 0.198
+ },
+ {
+  "year": 2009,
+  "real_gdp_index": 243210.702025,
+  "unemployment": 0.075,
+  "debt_gdp": 0.75,
+  "poverty": 0.205
+ },
+ {
+  "year": 2010,
+  "real_gdp_index": 256167.405325,
+  "unemployment": 0.067,
+  "debt_gdp": 0.71,
+  "poverty": 0.2
+ },
+ {
+  "year": 2011,
+  "real_gdp_index": 271046.583775,
+  "unemployment": 0.056,
+  "debt_gdp": 0.69,
+  "poverty": 0.198
+ },
+ {
+  "year": 2012,
+  "real_gdp_index": 276948.590525,
+  "unemployment": 0.0701,
+  "debt_gdp": 0.68,
+  "poverty": 0.197
+ },
+ {
+  "year": 2013,
+  "real_gdp_index": 288724.855575,
+  "unemployment": 0.0633,
+  "debt_gdp": 0.67,
+  "poverty": 0.187
+ },
+ {
+  "year": 2014,
+  "real_gdp_index": 300539.05725,
+  "unemployment": 0.0599,
+  "debt_gdp": 0.66,
+  "poverty": 0.185
+ },
+ {
+  "year": 2015,
+  "real_gdp_index": 306557.564825,
+  "unemployment": 0.0534,
+  "debt_gdp": 0.64,
+  "poverty": 0.196
+ },
+ {
+  "year": 2016,
+  "real_gdp_index": 318570.30627500004,
+  "unemployment": 0.0493,
+  "debt_gdp": 0.62,
+  "poverty": 0.185
+ },
+ {
+  "year": 2017,
+  "real_gdp_index": 333372.490275,
+  "unemployment": 0.0431,
+  "debt_gdp": 0.61,
+  "poverty": 0.181
+ },
+ {
+  "year": 2018,
+  "real_gdp_index": 347589.179125,
+  "unemployment": 0.0406,
+  "debt_gdp": 0.61,
+  "poverty": 0.181
+ },
+ {
+  "year": 2019,
+  "real_gdp_index": 359767.785425,
+  "unemployment": 0.0389,
+  "debt_gdp": 0.6,
+  "poverty": 0.18
+ },
+ {
+  "year": 2020,
+  "real_gdp_index": 352313.394675,
+  "unemployment": 0.0438,
+  "debt_gdp": 0.71,
+  "poverty": 0.185
+ },
+ {
+  "year": 2021,
+  "real_gdp_index": 386390.053075,
+  "unemployment": 0.0506,
+  "debt_gdp": 0.68,
+  "poverty": 0.19
+ },
+ {
+  "year": 2022,
+  "real_gdp_index": 410906.854775,
+  "unemployment": 0.0384,
+  "debt_gdp": 0.605,
+  "poverty": 0.185
+ },
+ {
+  "year": 2023,
+  "real_gdp_index": 418948.85812499997,
+  "unemployment": 0.0351,
+  "debt_gdp": 0.62,
+  "poverty": 0.185
+ },
+ {
+  "year": 2024,
+  "real_gdp_index": 420105.14677500003,
+  "unemployment": 0.0304,
+  "debt_gdp": 0.69,
+  "poverty": 0.19
+ },
+ {
+  "year": 2025,
+  "real_gdp_index": 433351.96329999994,
+  "unemployment": 0.03,
+  "debt_gdp": 0.69,
+  "poverty": 0.19
+ }
+]

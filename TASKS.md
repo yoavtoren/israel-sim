@@ -68,7 +68,7 @@
 - [x] GATE: plays fine with narrator off
 
 ## M9 — Calibration
-- [ ] Backtest 2000→2025 with actual budgets + shocks; MAPE per series
-- [ ] Sensitivity sweep ±1 SD over constants; rank dominant coefficients
-- [ ] Adversarial exploit hunt; each exploit → new degradation rule
-- [ ] GATE: MAPE reported per series
+- [x] Backtest 2000→2025 with actual budgets + shocks; MAPE per series
+- [x] Sensitivity sweep ±1 SD over constants; rank dominant coefficients
+- [x] Adversarial exploit hunt; each exploit → new degradation rule
+- [x] GATE: MAPE reported per series

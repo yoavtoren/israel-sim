@@ -5,7 +5,7 @@
   "unit": "share of ministry budget on teacher wages",
   "lag_kernel": "immediate",
   "confidence": "placeholder",
-  "source": "derived 2026-08-08 from BoI LBM / budget 2025 so baseline funding sustains current stocks",
+  "source": "derived 2026-08-09 from BoI LBM / budget 2025 so baseline funding sustains current stocks",
   "ci": [
    0.5,
    0.7

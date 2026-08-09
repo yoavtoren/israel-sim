@@ -13,11 +13,11 @@
  },
  {
   "id": "macro.tfp_growth_annual",
-  "value": 0.007,
+  "value": 0.011,
   "unit": "fraction/yr",
   "lag_kernel": "immediate",
-  "confidence": "placeholder",
-  "source": "invented, needs real data (BoI productivity reports)",
+  "confidence": "medium",
+  "source": "calibrated to 2000-2025 chained real GDP growth (M9 backtest, etl/boi_history.ts); upper BoI productivity range",
   "ci": [
    0.003,
    0.012

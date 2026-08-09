@@ -39,7 +39,9 @@ if (macro.participation) m.participation = macro.participation.value;
 m.debt_gdp = DEBT_GDP;
 m.bond_yield_10y = macro.bond_yield_10y.value;
 m.shekel_usd = macro.shekel_usd.value;
-m.capital_stock = Math.round(4.0 * gdp); // K/Y = 4.0 placeholder ratio
+// K/Y = 2.6: consistent with I/Y=0.22 and δ=0.055 on a ~3%/yr balanced path
+// (K/Y=4.0 froze capital growth — M9 backtest fix; PWT range for Israel ~2.5-3).
+m.capital_stock = Math.round(2.6 * gdp);
 
 const fiscal = base.fiscal as Record<string, unknown>;
 fiscal.debt_effective_rate = +debtEffectiveRate.toFixed(5);

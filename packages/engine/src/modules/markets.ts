@@ -9,6 +9,14 @@ import type { Registry } from "../constants/registry";
 
 export function marketsStep(s: WorldState, c: Registry, log: TickLogEntry[]): void {
   const gdp = s.macro.gdp_real;
+
+  // The model runs in real (constant-price) units; debt is a nominal stock, so
+  // inflation erodes its real value. Without this term debt/GDP cannot
+  // reproduce 2000-2025 history (M9 backtest).
+  const erosion = (s.fiscal.debt * s.macro.inflation) / 4;
+  s.fiscal.debt -= erosion;
+  log.push({ t: s.t, step: 3, fn: "inflation_erosion", target: "fiscal.debt", delta: -erosion, constant_id: null, note: `π=${(s.macro.inflation * 100).toFixed(2)}%` });
+
   s.macro.debt_gdp = s.fiscal.debt / gdp;
   const deficitGdp = s.fiscal.deficit / gdp;
 

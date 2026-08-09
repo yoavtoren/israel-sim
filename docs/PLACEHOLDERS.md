@@ -77,3 +77,9 @@ All 31 entries are `placeholder` confidence (transport road/rail costs, welfare 
 - `defs/reforms.json`: 9 reforms — every fiscal cost, effect magnitude and political cost is invented; sources should come from program evaluations (e.g. Taub on core-curriculum outcomes).
 - `defs/economic_models.json`: overlay values are baseline×factor constructions (tax shares ×0.7–1.4, TFP 0.001–0.010, Okun 0.2–0.55, welfare-poverty beta 0.03–0.2) — directionally per spec §10 table, magnitudes invented.
 - `politics.cohesion_base` in stability.json is now unused (cohesion is endogenous); kept for provenance.
+
+## M9 calibration results (priority order for real data)
+- Recalibrated against 2000–2025 history: `macro.tfp_growth_annual` 0.011 (was 0.007), K/Y 2.6 (was 4.0 — froze capital growth), human-capital decay now gated on education underfunding, inflation erosion added to the debt stock.
+- docs/SENSITIVITY.md ranks all 272 constants; top placeholder-confidence dominators needing real data first: `diplomacy.trade_access_ref` + trade weights (drive unemployment via Ω), `politics.cohesion_struct_base`. `participation.def_bridge` (medium) is the single most powerful constant — worth an exact CBS definitional reconciliation.
+- Honest miss (documented in m9_backtest): unemployment MAPE ~41% — the model has no time-varying NAIRU, so the 2000s 9–11% era is unreachable. Candidate fix: era-dependent `macro.natural_unemployment` estimated from BoI series.
+- Backtest driver approximations: budgets track GDP (not line-item history — obudget has 1997+ data for a future replay), era tax level ×1.08.

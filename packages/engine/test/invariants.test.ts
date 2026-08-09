@@ -33,9 +33,11 @@ describe("invariants", () => {
       const nonMinistry = ctx.registry.get("fiscal.non_ministry_spend_annual");
       const residual = totalRevenue(next) - totalSpend(next) - nonMinistry - next.fiscal.periphery_spend - prev.fiscal.debt_service + next.fiscal.deficit;
       expect(Math.abs(residual)).toBeLessThan(1e-6);
-      // Debt issuance matches the deficit exactly.
-      const issued = next.fiscal.debt - prev.fiscal.debt;
-      expect(Math.abs(issued - next.fiscal.deficit / 4)).toBeLessThan(1e-6);
+      // Debt moves exactly by issuance (deficit/4) minus inflation erosion of
+      // the post-issuance stock (real-terms accounting, see marketsStep).
+      const postIssuance = prev.fiscal.debt + next.fiscal.deficit / 4;
+      const expected = postIssuance - (postIssuance * prev.macro.inflation) / 4;
+      expect(Math.abs(next.fiscal.debt - expected)).toBeLessThan(1e-6);
     }
   });
 

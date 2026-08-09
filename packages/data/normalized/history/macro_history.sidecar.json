@@ -1,0 +1,20 @@
+{
+  "id": "history.macro.2000_2025",
+  "source_url": "BoI SDMX NA/CHAINED_GDP_Q_FP_SA + LBM unemployment; debt/GDP and poverty hand-transcribed (MoF Accountant General, NII annual poverty reports)",
+  "retrieved": "2026-08-09",
+  "license": "BoI open data + transcribed published figures",
+  "rows": 26,
+  "schema": {
+    "year": "int",
+    "real_gdp_index": "chained real GDP, annual mean of quarterly SA index | null",
+    "unemployment": "fraction, annual mean | null",
+    "debt_gdp": "fraction (hand, ±2pp)",
+    "poverty": "fraction of persons (hand, ±1pp)"
+  },
+  "known_gaps": [
+    "GDP index missing for years: none.",
+    "Unemployment missing for years: none (LFS methodology break 2012 — pre-2012 uses annual series if available).",
+    "Debt/GDP and poverty are hand tables; replace with MoF debt reports and NII series when fetchable."
+  ],
+  "transform_script": "packages/data/etl/boi_history.ts"
+}
