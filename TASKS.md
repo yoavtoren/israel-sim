@@ -62,10 +62,10 @@
 - [x] GATE: government can fall
 
 ## M8 — Narrator
-- [ ] docs/DESIGN.md (tokens, typography, reference screens) — before any UI work beyond M4 debug views
-- [ ] Ollama adapter + JSON-schema validation + template fallback + cache; `narrator: off` default
-- [ ] Hebrew/English prompt templates, consequence-register constraint for red-line endings
-- [ ] GATE: plays fine with narrator off
+- [x] docs/DESIGN.md (tokens, typography, reference screens) — before any UI work beyond M4 debug views
+- [x] Ollama adapter + JSON-schema validation + template fallback + cache; `narrator: off` default
+- [x] Hebrew/English prompt templates, consequence-register constraint for red-line endings
+- [x] GATE: plays fine with narrator off
 
 ## M9 — Calibration
 - [ ] Backtest 2000→2025 with actual budgets + shocks; MAPE per series

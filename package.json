@@ -4,8 +4,8 @@
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "scripts": {
-    "typecheck": "tsc --noEmit -p packages/engine && node scripts/check-no-any.mjs",
-    "test": "vitest run packages/engine",
+    "typecheck": "tsc --noEmit -p packages/engine && tsc --noEmit -p packages/narrator && node scripts/check-no-any.mjs",
+    "test": "vitest run packages/engine packages/narrator",
     "smoke": "tsx scripts/smoke.ts",
     "etl": "tsx packages/data/etl/boi_macro.ts && tsx packages/data/etl/obudget_budget.ts && tsx packages/data/etl/cbs_localities.ts && tsx packages/data/etl/build_initial_state.ts"
   },
