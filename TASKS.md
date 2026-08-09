@@ -74,15 +74,15 @@
 - [x] GATE: MAPE reported per series
 
 ## M10 — UI: the national situation room (packages/ui, per docs/DESIGN.md + spec UI surface)
-- [ ] ETL: locality coordinates (data.gov.il 2023 file, ITM→WGS84 in-house) → `normalized/locality_coords.json` + sidecar
-- [ ] Scaffold `packages/ui`: Vite + React 18 + Tailwind v4 tokens from DESIGN.md, Heebo + IBM Plex Mono (@fontsource), `dir="rtl"` root, he/en toggle
-- [ ] Engine in a Web Worker via comlink; pure `core.ts` (init/advance/preview/frames/counterfactual) testable without DOM
-- [ ] Zustand store: run history frames, events feed, budget draft, debounced shadow-tick preview
-- [ ] Screen: Budget Chamber — ministry table (editable, rigidity tick, funding-ratio sparkline), live revenue/spend/deficit strip, "מה יישבר" panel from previewBudget
-- [ ] Screen: Map — MapLibre dark canvas, locality circles colored by indicator, hover card, time scrubber with national sparkline, periphery overlays
-- [ ] Screen: Security Board — stockpile gauges + quarters-of-supply, fronts strip, readiness/deterrence dials, threat matrix, event ticker
-- [ ] Panels: overview KPIs + series, pipeline horizon ("investments maturing", cancel-risk), sector cards, reforms/economic-model, run controls 1Q/1Y/2Y/5Y/10Y
-- [ ] Post-mortem on outcome.ended: verdict, human cost, no-change counterfactual replay
-- [ ] Causal trace: any value click → tick-log entries (step, fn, constant id, delta); placeholder-confidence dotted underline
-- [ ] Tests: worker-core (init/advance/preview/counterfactual/frames), playable-decade integration; gate scripts wired into root
-- [ ] GATE: typecheck clean 0-any · tests green · `vite build` succeeds · engine smoke unchanged
+- [x] ETL: locality coordinates (data.gov.il 2023 file, ITM→WGS84 in-house) → `normalized/locality_coords.json` + sidecar
+- [x] Scaffold `packages/ui`: Vite + React 18 + Tailwind v4 tokens from DESIGN.md, Heebo + IBM Plex Mono (@fontsource), `dir="rtl"` root, he/en toggle
+- [x] Engine in a Web Worker via comlink; pure `core.ts` (init/advance/preview/frames/counterfactual) testable without DOM
+- [x] Zustand store: run history frames, events feed, budget draft, debounced shadow-tick preview
+- [x] Screen: Budget Chamber — ministry table (editable, rigidity tick, funding-ratio sparkline), live revenue/spend/deficit strip, "מה יישבר" panel from previewBudget
+- [x] Screen: Map — MapLibre dark canvas, locality circles colored by indicator, hover card, time scrubber with national sparkline, periphery overlays
+- [x] Screen: Security Board — stockpile gauges + quarters-of-supply, fronts strip, readiness/deterrence dials, threat matrix, event ticker
+- [x] Panels: overview KPIs + series, pipeline horizon ("investments maturing", cancel-risk), sector cards, reforms/economic-model, run controls 1Q/1Y/2Y/5Y/10Y
+- [x] Post-mortem on outcome.ended: verdict, human cost, no-change counterfactual replay
+- [x] Causal trace: any value click → tick-log entries (step, fn, constant id, delta); placeholder-confidence dotted underline
+- [x] Tests: worker-core (init/advance/preview/counterfactual/frames), playable-decade integration; gate scripts wired into root
+- [x] GATE: typecheck clean 0-any · tests green · `vite build` succeeds · engine smoke unchanged

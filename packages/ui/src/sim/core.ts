@@ -91,13 +91,13 @@ export class SimCore implements SimApi {
 
   advance(quarters: number, decisions: Decisions): AdvancePayload {
     const frames: HistoryFrame[] = [];
+    if (Object.keys(decisions).length > 0) this.applied.push({ at: this.tickIndex, decisions });
     for (let q = 0; q < quarters; q++) {
       if (this.state.outcome.ended) break;
-      const d = q === 0 ? decisions : {};
-      if (q === 0 && Object.keys(decisions).length > 0) {
-        this.applied.push({ at: this.tickIndex, decisions });
-      }
-      const result: TickResult = tick(this.state, d, this.ctx);
+      // Re-request every quarter of the batch: rigidity floors cap cuts per quarter,
+      // so a deep cut only lands under sustained pressure. Reform/model/periphery
+      // re-application is a no-op once the state matches the request.
+      const result: TickResult = tick(this.state, decisions, this.ctx);
       this.state = result.state;
       this.tickIndex++;
       frames.push(this.project(this.state, result.events.map((e) => ({ id: e.id, note: e.note, count: e.count }))));
