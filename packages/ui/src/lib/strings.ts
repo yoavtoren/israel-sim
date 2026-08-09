@@ -1,0 +1,159 @@
+/** UI strings, Hebrew-first with an English mode (DESIGN §4). */
+
+import type { MinistryId, SectorId } from "@engine";
+
+export type Lang = "he" | "en";
+
+export const MINISTRY_NAMES: Record<MinistryId, { he: string; en: string }> = {
+  defense: { he: "ביטחון", en: "Defense" },
+  education: { he: "חינוך", en: "Education" },
+  health: { he: "בריאות", en: "Health" },
+  welfare: { he: "רווחה", en: "Welfare" },
+  transport: { he: "תחבורה", en: "Transport" },
+  internal_security: { he: "ביטחון פנים", en: "Internal Security" },
+  housing: { he: "בינוי ושיכון", en: "Housing" },
+  justice: { he: "משפטים", en: "Justice" },
+  economy: { he: "כלכלה", en: "Economy" },
+  water_agriculture: { he: "מים וחקלאות", en: "Water & Agriculture" },
+  immigration: { he: "עלייה וקליטה", en: "Immigration" },
+  culture_sport: { he: "תרבות וספורט", en: "Culture & Sport" },
+  religious_services: { he: "שירותי דת", en: "Religious Services" },
+  foreign_affairs: { he: "חוץ", en: "Foreign Affairs" },
+  environment: { he: "הגנת הסביבה", en: "Environment" },
+  science: { he: "מדע", en: "Science" },
+  hasbara: { he: "הסברה", en: "Public Diplomacy" },
+};
+
+export const SECTOR_NAMES: Record<SectorId, { he: string; en: string }> = {
+  secular: { he: "חילוני", en: "Secular" },
+  national_religious: { he: "דתי-לאומי", en: "National Religious" },
+  haredi: { he: "חרדי", en: "Haredi" },
+  arab: { he: "ערבי", en: "Arab" },
+  other: { he: "אחר", en: "Other" },
+};
+
+export const ADVERSARY_NAMES: Record<string, { he: string; en: string }> = {
+  hezbollah: { he: "חזבאללה", en: "Hezbollah" },
+  hamas: { he: "חמאס", en: "Hamas" },
+  iran: { he: "איראן", en: "Iran" },
+  west_bank: { he: "יהודה ושומרון", en: "West Bank" },
+};
+
+export const MUNITION_NAMES: Record<string, { he: string; en: string }> = {
+  interceptors: { he: "מיירטים", en: "Interceptors" },
+  precision_guided: { he: "חימוש מדויק", en: "Precision-guided" },
+  artillery_shells: { he: "פגזי ארטילריה", en: "Artillery shells" },
+};
+
+export const MODEL_NAMES: Record<string, { he: string; en: string }> = {
+  mixed: { he: "מעורב (נוכחי)", en: "Mixed (current)" },
+  libertarian: { he: "ליברטריאני", en: "Libertarian" },
+  capitalist: { he: "קפיטליסטי", en: "Capitalist" },
+  social_democratic: { he: "סוציאל-דמוקרטי", en: "Social Democratic" },
+  socialist: { he: "סוציאליסטי", en: "Socialist" },
+  statist_command: { he: "ריכוזי-פיקודי", en: "Statist Command" },
+};
+
+export const REFORM_NAMES: Record<string, { he: string; en: string }> = {
+  haredi_core_curriculum: { he: "ליבה בחינוך החרדי", en: "Haredi core curriculum" },
+  vocational_colleges: { he: "מכללות מקצועיות", en: "Vocational colleges" },
+  draft_equality_law: { he: "חוק שוויון בגיוס", en: "Draft equality law" },
+  arab_employment_program: { he: "תוכנית תעסוקה בחברה הערבית", en: "Arab employment program" },
+  judicial_reform: { he: "רפורמה משפטית", en: "Judicial reform" },
+  pension_reform: { he: "רפורמת פנסיה", en: "Pension reform" },
+  transit_megaproject: { he: "מגה-פרויקט תחבורה", en: "Transit megaproject" },
+  tax_simplification: { he: "פישוט מס", en: "Tax simplification" },
+  settlement_expansion: { he: "הרחבת התיישבות", en: "Settlement expansion" },
+};
+
+export const UI = {
+  appTitle: { he: "חדר המצב הלאומי", en: "National Situation Room" },
+  overview: { he: "תמונת מצב", en: "Overview" },
+  budget: { he: "חדר התקציב", en: "Budget Chamber" },
+  map: { he: "מפה", en: "Map" },
+  security: { he: "לוח ביטחון", en: "Security Board" },
+  pipeline: { he: "השקעות מבשילות", en: "Investments Maturing" },
+  sectors: { he: "מגזרים", en: "Sectors" },
+  reforms: { he: "רפורמות ומדיניות", en: "Reforms & Policy" },
+  postmortem: { he: "דו\"ח סיום", en: "Post-Mortem" },
+  revenue: { he: "הכנסות", en: "Revenue" },
+  spend: { he: "הוצאות", en: "Spend" },
+  deficit: { he: "גירעון", en: "Deficit" },
+  surplus: { he: "עודף", en: "Surplus" },
+  whatBreaks: { he: "מה יישבר", en: "What breaks" },
+  confirmBudget: { he: "אשר תקציב והתקדם רבעון", en: "Confirm budget, advance a quarter" },
+  ministry: { he: "משרד", en: "Ministry" },
+  current: { he: "נוכחי", en: "Current" },
+  proposed: { he: "מוצע", en: "Proposed" },
+  change: { he: "שינוי", en: "Δ" },
+  fundingRatio12q: { he: "מימון 12 רבעונים", en: "Funding, 12Q" },
+  noBreaks: { he: "ההצעה לא מפעילה כללי שחיקה", en: "No degradation rules activated" },
+  topDiffs: { he: "מה זז (10 המובילים)", en: "What moves (top 10)" },
+  firesAfter: { he: "רבעונים עד הפעלה", en: "quarters to fire" },
+  quartersOfSupply: { he: "רבעונים של מלאי", en: "quarters of supply" },
+  noActiveFronts: { he: "אין חזיתות פעילות", en: "No active fronts" },
+  readiness: { he: "כשירות", en: "Readiness" },
+  deterrence: { he: "הרתעה", en: "Deterrence" },
+  threatMatrix: { he: "מטריצת איומים", en: "Threat matrix" },
+  eventTicker: { he: "אירועים", en: "Events" },
+  gdp: { he: "תוצר", en: "GDP" },
+  debtGdp: { he: "חוב/תוצר", en: "Debt/GDP" },
+  unemployment: { he: "אבטלה", en: "Unemployment" },
+  inflation: { he: "אינפלציה", en: "Inflation" },
+  participation: { he: "השתתפות", en: "Participation" },
+  poverty: { he: "עוני", en: "Poverty" },
+  rating: { he: "דירוג אשראי", en: "Credit rating" },
+  stability: { he: "יציבות קואליציה", en: "Coalition stability" },
+  cohesion: { he: "לכידות חברתית", en: "Social cohesion" },
+  trust: { he: "אמון במוסדות", en: "Institutional trust" },
+  protest: { he: "עוצמת מחאה", en: "Protest intensity" },
+  cwp: { he: "לחץ עימות אזרחי", en: "Civil-war pressure" },
+  grievance: { he: "תרעומת", en: "Grievance" },
+  approval: { he: "תמיכה", en: "Approval" },
+  population: { he: "אוכלוסייה", en: "Population" },
+  employment: { he: "תעסוקה", en: "Employment" },
+  serviceAccess: { he: "נגישות שירותים", en: "Service access" },
+  migration: { he: "מאזן הגירה", en: "Migration balance" },
+  cluster: { he: "אשכול חברתי-כלכלי", en: "SE cluster" },
+  income: { he: "הכנסה חציונית", en: "Median income" },
+  advance: { he: "קדימה", en: "Advance" },
+  causalTrace: { he: "מדוע זה השתנה", en: "Why did this change" },
+  assumption: { he: "הנחה, לא נתון", en: "Assumption, not data" },
+  step: { he: "צעד", en: "Step" },
+  constant: { he: "קבוע", en: "Constant" },
+  periphery: { he: "תוכנית פריפריה", en: "Periphery program" },
+  annualBudget: { he: "תקציב שנתי", en: "Annual budget" },
+  targetClusters: { he: "אשכולות יעד", en: "Target clusters" },
+  economicModel: { he: "מודל כלכלי", en: "Economic model" },
+  transitionWarning: { he: "החלפת מודל גובה מחיר מעבר ביציבות ובאמון", en: "Switching imposes a transition shock to stability and trust" },
+  enact: { he: "חוקק", en: "Enact" },
+  repeal: { he: "בטל", en: "Repeal" },
+  enacted: { he: "בתוקף", en: "Enacted" },
+  repealed: { he: "בוטל", en: "Repealed" },
+  irreversible: { he: "בלתי הפיך", en: "Irreversible" },
+  prereqMissing: { he: "דרישות קדם חסרות", en: "Prerequisites missing" },
+  pendingNextQ: { he: "ייכנס לתוקף בקידום הרבעון הבא", en: "Applies on the next quarter advance" },
+  casualties: { he: "נפגעים", en: "Casualties" },
+  vsNoChange: { he: "לעומת אי-שינוי", en: "vs. no-change baseline" },
+  runEnded: { he: "המשחק הסתיים", en: "The run has ended" },
+  newRun: { he: "התחל ריצה חדשה", en: "Start a new run" },
+  seed: { he: "זרע", en: "Seed" },
+  cancelRisk: { he: "סיכון ביטול", en: "Cancel risk" },
+  maturing20y: { he: "הבשלה על פני 20 שנה, לפי משרד", en: "Maturation over 20 years, by ministry" },
+  largestPending: { he: "ההשקעות התלויות הגדולות", en: "Largest pending effects" },
+  target: { he: "יעד", en: "Target" },
+  loading: { he: "מריץ סימולציה…", en: "Simulating…" },
+  quarter: { he: "רבעון", en: "Quarter" },
+  year: { he: "שנה", en: "Year" },
+  years: { he: "שנים", en: "years" },
+  coalitionSeats: { he: "מושבי קואליציה", en: "Coalition seats" },
+  fronts: { he: "חזיתות", en: "Fronts" },
+  stockpiles: { he: "מלאים", en: "Stockpiles" },
+  otherMinistries: { he: "משרדים אחרים", en: "Other ministries" },
+} as const;
+
+export type UIKey = keyof typeof UI;
+
+export function t(key: UIKey, lang: Lang): string {
+  return UI[key][lang];
+}

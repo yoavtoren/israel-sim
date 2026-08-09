@@ -1,0 +1,157 @@
+/* DESIGN.md tokens — the only colors/spacing/type in the app. */
+@import "tailwindcss";
+
+@theme {
+  /* surfaces (cool ink ramp) */
+  --color-bg0: #0a0e14;
+  --color-bg1: #111722;
+  --color-bg2: #1a2230;
+  --color-bg3: #232d3f;
+  --color-line0: #2a3444;
+  --color-line1: #3a4658;
+
+  /* text */
+  --color-fg0: #e6edf3;
+  --color-fg1: #93a4b5;
+  --color-fg2: #5c6b7a;
+
+  /* semantic ramps */
+  --color-good-dim: #1f6e33;
+  --color-good: #2ea043;
+  --color-good-bright: #3fb950;
+  --color-bad-dim: #8b2e2a;
+  --color-bad: #da3633;
+  --color-bad-bright: #f85149;
+  --color-warn-dim: #7a5b0e;
+  --color-warn: #d29922;
+  --color-warn-bright: #e3b341;
+  --color-info-dim: #1f4e8c;
+  --color-info: #3b82d0;
+  --color-info-bright: #58a6ff;
+
+  /* domain accents */
+  --color-dom-fiscal: #e3b341;
+  --color-dom-macro: #7ee787;
+  --color-dom-security: #e8604c;
+  --color-dom-diplomacy: #58a6ff;
+  --color-dom-social: #d2a8ff;
+  --color-dom-infra: #79c0ff;
+
+  /* fixed sector palette */
+  --color-sec-secular: #4c9be8;
+  --color-sec-national-religious: #2ea98f;
+  --color-sec-haredi: #8b7ec8;
+  --color-sec-arab: #e8a33d;
+  --color-sec-other: #c97ba8;
+
+  --font-sans: "Heebo", "Rubik", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-cell: 2px;
+  --radius-panel: 4px;
+  --radius-modal: 6px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg0);
+  color: var(--color-fg0);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  overflow: hidden;
+}
+
+/* Every number in the app is mono, tabular, LTR-isolated (DESIGN §3/§4). */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* placeholder-confidence values: assumption, not data (DESIGN §7) */
+.assumption {
+  text-decoration: underline dotted var(--color-fg2);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.panel {
+  background: var(--color-bg1);
+  border: 1px solid var(--color-line0);
+  border-radius: var(--radius-panel);
+}
+
+/* overlays are the only shadowed element (DESIGN §2) */
+.overlay {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
+}
+
+/* value pulse in the semantic direction (DESIGN §5) */
+@keyframes pulse-good {
+  0% { color: var(--color-good-bright); }
+  100% { color: inherit; }
+}
+@keyframes pulse-bad {
+  0% { color: var(--color-bad-bright); }
+  100% { color: inherit; }
+}
+.pulse-good { animation: pulse-good 250ms ease-out; }
+.pulse-bad { animation: pulse-bad 250ms ease-out; }
+
+/* dense scrollbars for an instrument panel */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-bg3) transparent;
+}
+
+/* time scrubber */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--color-bg3);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--color-info-bright);
+  border: 1px solid var(--color-line1);
+  cursor: ew-resize;
+}
+
+/* number input cells (budget chamber) */
+input.cell {
+  background: var(--color-bg2);
+  border: 1px solid var(--color-line0);
+  border-radius: var(--radius-cell);
+  color: var(--color-fg0);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  text-align: right;
+  padding: 1px 6px;
+  width: 100%;
+}
+input.cell:focus {
+  border-color: var(--color-info);
+  outline: none;
+}
+input.cell.edited {
+  border-color: var(--color-warn);
+}
+
+.maplibregl-map {
+  font-family: var(--font-sans);
+}

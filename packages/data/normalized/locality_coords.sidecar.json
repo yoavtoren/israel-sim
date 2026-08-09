@@ -1,0 +1,16 @@
+{
+  "id": "locality_coords",
+  "source_url": "https://data.gov.il/api/3/action/datastore_search?resource_id=d47a54ff-87f0-44b3-b33a-f284c0c38e5a",
+  "retrieved": "2026-08-09",
+  "license": "data.gov.il open license",
+  "rows": 1319,
+  "schema": {
+    "<cbs_code>": "[lon, lat] WGS84 degrees (from ITM east/north, in-house inverse TM, ~<100m)"
+  },
+  "known_gaps": [
+    "165 records lacked a parseable coordinate field; 0 fell outside the Israel bounding box.",
+    "3 engine localities have no coordinate and are dropped from the map layer.",
+    "Point coordinates only (locality centroid-ish); no polygons — map renders proportional circles, not choropleth polygons."
+  ],
+  "transform_script": "packages/data/etl/locality_coords.ts"
+}
