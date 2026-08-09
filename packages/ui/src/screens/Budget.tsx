@@ -4,13 +4,14 @@
  */
 
 import { useMemo, useRef } from "react";
-import type { MinistryId } from "@engine";
-import { useStore, draftIsEmpty } from "../store";
-import { MINISTRY_NAMES, t } from "../lib/strings";
-import { fmtBudget, fmtSignedPct, fmtPct, deltaClass, fmtSigned } from "../lib/format";
-import { DOMAIN, SEM } from "../lib/colors";
-import { Chip, GaugeBar, Num, Sparkline } from "../components/ui";
+import type { MinistryId, WorldState } from "@engine";
+import { useStore, draftIsEmpty, type Draft } from "../store";
+import { MINISTRY_NAMES, t, type Lang } from "../lib/strings";
+import { fmtBudget, fmtSignedPct, deltaClass, fmtSigned } from "../lib/format";
+import { DOMAIN, INK, SEM } from "../lib/colors";
+import { Chip, Num, Sparkline } from "../components/ui";
 import { Traceable } from "../components/CausalTrace";
+import type { MinistryMeta } from "../sim/types";
 
 export function Budget() {
   const lang = useStore((s) => s.lang);
@@ -47,17 +48,19 @@ export function Budget() {
   return (
     <div className="flex h-full gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-3">
-        {/* fixed fiscal strip — live, mono, 24px, deficit colored by band (DESIGN §6.1) */}
+        {/* fixed fiscal strip — live, mono, 24px, deficit colored by band (DESIGN §6.1).
+            Values come from the latest frame: at boot the raw state has empty fiscal
+            flows and the frame is seeded from a zero-change shadow tick. */}
         <div className="panel flex items-center gap-8 px-4 py-3">
-          <Strip label={t("revenue", lang)} value={fmtBudget(totalRev(state), 1)} raw={totalRev(state)} dir={1} path="fiscal.revenue" />
-          <Strip label={t("spend", lang)} value={fmtBudget(totalSpendFrame(frames), 1)} raw={totalSpendFrame(frames)} dir={0} path="fiscal.ministries" />
+          <Strip label={t("revenue", lang)} value={fmtBudget(latest(frames).revenue_total, 1)} raw={latest(frames).revenue_total} dir={1} path="fiscal.revenue" />
+          <Strip label={t("spend", lang)} value={fmtBudget(latest(frames).spend_total, 1)} raw={latest(frames).spend_total} dir={0} path="fiscal.ministries" />
           <Strip
-            label={state.fiscal.deficit >= 0 ? t("deficit", lang) : t("surplus", lang)}
-            value={fmtBudget(Math.abs(state.fiscal.deficit), 1)}
-            raw={state.fiscal.deficit}
+            label={latest(frames).deficit >= 0 ? t("deficit", lang) : t("surplus", lang)}
+            value={fmtBudget(Math.abs(latest(frames).deficit), 1)}
+            raw={latest(frames).deficit}
             dir={-1}
             path="fiscal.deficit"
-            color={deficitColor(state.fiscal.deficit, state.macro.gdp_real)}
+            color={deficitColor(latest(frames).deficit, state.macro.gdp_real)}
           />
           {previewedDeficit !== undefined && (
             <span className="flex items-baseline gap-2 text-[12px] text-fg2">
@@ -90,6 +93,9 @@ export function Budget() {
           </span>
         </div>
 
+        {/* live allocation composition — a stacked bar reads better than a pie at 17 slices */}
+        <AllocationBar ministries={meta.ministries} state={state} draft={draft} lang={lang} />
+
         {/* ministry table */}
         <div className="panel min-h-0 flex-1 overflow-y-auto">
           <table className="w-full text-[12px] leading-[16px]">
@@ -99,7 +105,7 @@ export function Budget() {
                 <th className="px-2 py-2 text-end font-medium">{t("current", lang)}</th>
                 <th className="px-2 py-2 text-end font-medium">{t("proposed", lang)}</th>
                 <th className="px-2 py-2 text-end font-medium">{t("change", lang)}</th>
-                <th className="px-2 py-2 font-medium">{lang === "he" ? "קשיחות" : "Rigidity"}</th>
+                <th className="px-2 py-2 font-medium">{lang === "he" ? "גרירה (רצפת קשיחות באדום)" : "Drag (rigidity floor in red)"}</th>
                 <th className="px-3 py-2 text-end font-medium">{t("fundingRatio12q", lang)}</th>
               </tr>
             </thead>
@@ -148,9 +154,14 @@ export function Budget() {
                     <td className={`num px-2 py-1.5 text-end ${changed ? (rel > 0 ? "text-good-bright" : "text-bad-bright") : "text-fg2"}`}>
                       {fmtSignedPct(rel, 1)}
                     </td>
-                    <td className="w-32 px-2 py-1.5">
-                      {/* proposal vs baseline; the red tick is the rigidity floor (uncuttable share) */}
-                      <GaugeBar value={proposed / m.baseline_budget / 1.5} tick={m.rigidity / 1.5} color={changed ? SEM.warnBright : DOMAIN.fiscal} />
+                    <td className="w-44 px-2 py-1.5">
+                      <BudgetSlider
+                        current={st.budget}
+                        baseline={m.baseline_budget}
+                        rigidity={m.rigidity}
+                        proposed={proposed}
+                        onChange={(v) => setBudgetDraft(m.id, v)}
+                      />
                     </td>
                     <td className="px-3 py-1.5 text-end">
                       <Sparkline values={fundingHistory.get(m.id) ?? []} color={SEM.info} refLine={1} width={110} height={18} />
@@ -237,6 +248,106 @@ function Strip(props: { label: string; value: string; raw: number; dir: number; 
   );
 }
 
+/** Draggable budget bar: 50%–150% of the current budget, center line = no change,
+ *  fill left (cut, amber) or right (raise, blue), red tick = rigidity floor —
+ *  the share of the BASELINE budget that sustained cuts cannot go below (spec §5).
+ */
+function BudgetSlider(props: {
+  current: number;
+  baseline: number;
+  rigidity: number;
+  proposed: number;
+  onChange: (value: number | null) => void;
+}) {
+  const pct = (props.proposed / props.current) * 100;
+  const x = (p: number) => Math.max(0, Math.min(100, p - 50)); // 50..150 → 0..100
+  const floorPct = ((props.rigidity * props.baseline) / props.current) * 100;
+  const cut = pct < 100;
+  return (
+    <bdi dir="ltr" className="block w-full">
+      <div className="relative h-4 w-full" title={`${Math.round(pct)}%`}>
+        <div className="absolute inset-0 rounded-[2px] bg-bg2" />
+        <div className="absolute inset-y-0 w-px bg-line1" style={{ left: "50%" }} />
+        <div
+          className="absolute inset-y-[3px] rounded-[1px]"
+          style={{
+            left: `${Math.min(50, x(pct))}%`,
+            width: `${Math.abs(x(pct) - 50)}%`,
+            background: cut ? SEM.warnBright : SEM.info,
+          }}
+        />
+        <div
+          className="absolute inset-y-0 w-[2px]"
+          style={{ left: `${x(floorPct)}%`, background: SEM.badBright, opacity: 0.8 }}
+        />
+        <input
+          type="range"
+          min={50}
+          max={150}
+          step={1}
+          value={Math.max(50, Math.min(150, Math.round(pct)))}
+          onChange={(e) => {
+            const p = Number(e.target.value);
+            props.onChange(p === 100 ? null : Math.round((props.current * p) / 100));
+          }}
+          className="slider-ghost absolute inset-0 w-full"
+          aria-label="budget slider"
+        />
+      </div>
+    </bdi>
+  );
+}
+
+/** Live composition of the proposed budget — top 6 ministries + the rest.
+ *  Colors are fixed by baseline rank (stable identity), 2px gaps between segments.
+ */
+const ALLOC_COLORS = [DOMAIN.security, DOMAIN.fiscal, DOMAIN.macro, DOMAIN.social, DOMAIN.infra, DOMAIN.diplomacy, INK.line1];
+
+function AllocationBar(props: { ministries: MinistryMeta[]; state: WorldState; draft: Draft; lang: Lang }) {
+  const proposed = (id: MinistryId, current: number) => props.draft.budgets[id] ?? current;
+  const ranked = [...props.ministries].sort((a, b) => b.baseline_budget - a.baseline_budget);
+  const top = ranked.slice(0, 6);
+  const rest = ranked.slice(6);
+  const segs = top.map((m, i) => ({
+    id: m.id as string,
+    name: MINISTRY_NAMES[m.id][props.lang],
+    value: proposed(m.id, props.state.fiscal.ministries[m.id].budget),
+    color: ALLOC_COLORS[i],
+  }));
+  segs.push({
+    id: "other",
+    name: t("otherMinistries", props.lang),
+    value: rest.reduce((a, m) => a + proposed(m.id, props.state.fiscal.ministries[m.id].budget), 0),
+    color: ALLOC_COLORS[6],
+  });
+  const total = segs.reduce((a, s) => a + s.value, 0);
+  return (
+    <div className="panel px-3 py-2">
+      <bdi dir="ltr" className="block">
+        <div className="flex h-5 w-full overflow-hidden rounded-[2px]">
+          {segs.map((s) => (
+            <div
+              key={s.id}
+              className="h-full"
+              style={{ width: `calc(${(s.value / total) * 100}% - 2px)`, marginInlineEnd: 2, background: s.color, borderRadius: 1 }}
+              title={`${s.name} · ${fmtBudget(s.value, 1)} · ${((s.value / total) * 100).toFixed(1)}%`}
+            />
+          ))}
+        </div>
+      </bdi>
+      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+        {segs.map((s) => (
+          <span key={s.id} className="flex items-center gap-1.5 text-[11px] leading-[16px] text-fg1">
+            <span className="inline-block h-2 w-3 rounded-[1px]" style={{ background: s.color }} />
+            {s.name}
+            <span className="num text-fg2">{fmtBudget(s.value, 1)}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function deficitColor(deficit: number, gdp: number): string {
   const share = deficit / gdp;
   if (share < 0) return SEM.goodBright;
@@ -244,14 +355,8 @@ function deficitColor(deficit: number, gdp: number): string {
   return SEM.badBright;
 }
 
-import type { WorldState } from "@engine";
 import type { HistoryFrame } from "../sim/types";
 
-function totalRev(s: WorldState): number {
-  const r = s.fiscal.revenue;
-  return r.income + r.vat + r.corporate + r.capital + r.customs;
-}
-
-function totalSpendFrame(frames: HistoryFrame[]): number {
-  return frames.length > 0 ? frames[frames.length - 1].spend_total : 0;
+function latest(frames: HistoryFrame[]): HistoryFrame {
+  return frames[frames.length - 1];
 }

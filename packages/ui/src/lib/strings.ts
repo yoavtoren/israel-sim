@@ -76,6 +76,7 @@ export const UI = {
   sectors: { he: "מגזרים", en: "Sectors" },
   reforms: { he: "רפורמות ומדיניות", en: "Reforms & Policy" },
   postmortem: { he: "דו\"ח סיום", en: "Post-Mortem" },
+  history: { he: "היסטוריה והשוואה", en: "History & Comparison" },
   revenue: { he: "הכנסות", en: "Revenue" },
   spend: { he: "הוצאות", en: "Spend" },
   deficit: { he: "גירעון", en: "Deficit" },

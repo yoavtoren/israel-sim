@@ -3,10 +3,17 @@
  */
 
 import {
-  CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  CartesianGrid, Line, LineChart, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis,
   type TooltipProps,
 } from "recharts";
 import { INK } from "../lib/colors";
+
+/** Shaded historical episode (e.g. second intifada, COVID) behind the series. */
+export interface Episode {
+  from: string;
+  to: string;
+  label: string;
+}
 
 export interface SeriesDef {
   key: string;
@@ -38,6 +45,9 @@ export function SeriesChart(props: {
   series: SeriesDef[];
   format: (v: number) => string;
   height?: number;
+  episodes?: Episode[];
+  /** join lines across missing values (sparse historical anchors) */
+  connectNulls?: boolean;
 }) {
   return (
     <bdi dir="ltr" className="block">
@@ -64,6 +74,17 @@ export function SeriesChart(props: {
               content={(p: TooltipProps<number, string>) => <ChartTooltip {...p} format={props.format} />}
               cursor={{ stroke: INK.line1 }}
             />
+            {props.episodes?.map((ep) => (
+              <ReferenceArea
+                key={ep.label}
+                x1={ep.from}
+                x2={ep.to}
+                fill={INK.bg2}
+                fillOpacity={0.6}
+                stroke="none"
+                label={{ value: ep.label, position: "insideTop", fill: INK.fg2, fontSize: 10 }}
+              />
+            ))}
             {props.series.map((s) => (
               <Line
                 key={s.key}
@@ -74,6 +95,7 @@ export function SeriesChart(props: {
                 strokeWidth={2}
                 strokeDasharray={s.dash === true ? "5 4" : undefined}
                 dot={false}
+                connectNulls={props.connectNulls === true}
                 isAnimationActive={false}
               />
             ))}

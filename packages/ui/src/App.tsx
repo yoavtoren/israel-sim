@@ -13,6 +13,7 @@ import { Security } from "./screens/Security";
 import { Pipeline } from "./screens/Pipeline";
 import { Sectors } from "./screens/Sectors";
 import { Reforms } from "./screens/Reforms";
+import { History } from "./screens/History";
 import { PostMortem } from "./screens/PostMortem";
 
 const NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
@@ -23,6 +24,7 @@ const NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
   { screen: "pipeline", label: "pipeline", accent: DOMAIN.fiscal },
   { screen: "sectors", label: "sectors", accent: DOMAIN.social },
   { screen: "reforms", label: "reforms", accent: DOMAIN.diplomacy },
+  { screen: "history", label: "history", accent: DOMAIN.macro },
 ];
 
 const STEPS: Array<{ label: string; quarters: number }> = [
@@ -150,6 +152,7 @@ export function App() {
           {screen === "pipeline" && <Pipeline />}
           {screen === "sectors" && <Sectors />}
           {screen === "reforms" && <Reforms />}
+          {screen === "history" && <History />}
           {screen === "postmortem" && <PostMortem />}
         </main>
       </div>

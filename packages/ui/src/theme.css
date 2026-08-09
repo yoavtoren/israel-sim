@@ -131,6 +131,21 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: ew-resize;
 }
 
+/* invisible range overlay for the draggable budget bars */
+input[type="range"].slider-ghost {
+  height: 100%;
+  background: transparent;
+  cursor: ew-resize;
+}
+input[type="range"].slider-ghost::-webkit-slider-thumb {
+  width: 6px;
+  height: 16px;
+  background: var(--color-fg1);
+  border: none;
+  border-radius: 1px;
+  opacity: 0.65;
+}
+
 /* number input cells (budget chamber) */
 input.cell {
   background: var(--color-bg2);

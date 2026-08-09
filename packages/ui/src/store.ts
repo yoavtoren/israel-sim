@@ -7,7 +7,7 @@ import type { HistoryFrame, RunMeta } from "./sim/types";
 import type { Lang } from "./lib/strings";
 
 export type Screen =
-  | "overview" | "budget" | "map" | "security" | "pipeline" | "sectors" | "reforms" | "postmortem";
+  | "overview" | "budget" | "map" | "security" | "pipeline" | "sectors" | "reforms" | "history" | "postmortem";
 
 export interface FeedItem {
   tickIndex: number;

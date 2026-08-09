@@ -11,6 +11,30 @@ import eventsJsonRaw from "../../data/defs/events.json";
 import reformsJsonRaw from "../../data/defs/reforms.json";
 import modelsJsonRaw from "../../data/defs/economic_models.json";
 
+import macroHistoryRaw from "../../data/normalized/history/macro_history.json";
+import incidentsRaw from "../../data/normalized/history/incidents.json";
+import participationRaw from "../../data/normalized/history/participation_by_sector.json";
+
+export interface MacroHistoryRow {
+  year: number;
+  /** BoI chained-GDP index, own units — comparable only as growth rates */
+  real_gdp_index: number;
+  unemployment: number;
+  debt_gdp: number;
+  poverty: number;
+}
+
+export const macroHistory = macroHistoryRaw as unknown as MacroHistoryRow[];
+export const incidentsHistory = incidentsRaw as unknown as {
+  years: number[];
+  fatal_terror_attacks: number[];
+  major_protest_waves: number[];
+};
+export const participationHistory = participationRaw as unknown as {
+  years: number[];
+  series: Record<string, number[]>;
+};
+
 export const constantGroups: unknown[][] = Object.values(
   import.meta.glob("../../data/constants/*.json", { eager: true, import: "default" }),
 ) as unknown[][];
