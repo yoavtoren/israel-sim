@@ -9,6 +9,22 @@ import type { Rng } from "../rng";
 import type { TickLogEntry, WorldState } from "../state/types";
 import type { Registry } from "../constants/registry";
 import { totalPopulation } from "./demography";
+import { totalFrontIntensity } from "./security";
+import { tradeWeightedAccess } from "./diplomacy";
+
+/**
+ * Ω disruption multiplier (spec §7.2): war mobilization and active fronts
+ * suppress output; lost trade access scales exports down (normalized to 1 at
+ * the t0 access level). Uses last tick's security/diplomacy state (macro runs
+ * at step 9, security/diplomacy at step 10 — a one-quarter lag by spec order).
+ */
+export function disruptionOmega(s: WorldState, c: Registry): number {
+  const security = Math.min(1, Math.max(0.5,
+    1 - c.get("macro.omega_mobilization") * s.security.reserve_mobilization - c.get("macro.omega_front") * totalFrontIntensity(s)));
+  const exp = c.get("macro.export_share_gdp");
+  const trade = (1 - exp * (1 - tradeWeightedAccess(s, c))) / (1 - exp * (1 - c.get("diplomacy.trade_access_ref")));
+  return security * Math.min(1.05, Math.max(0.4, trade));
+}
 
 /** Employed labour input at unemployment rate u. */
 function labourInput(s: WorldState, c: Registry, u: number): number {
@@ -38,23 +54,26 @@ export function macroStep(s: WorldState, c: Registry, rng: Rng, log: TickLogEntr
   s.macro.productivity_index += dA;
   log.push({ t: s.t, step: 9, fn: "tfp_drift", target: "macro.productivity_index", delta: dA, constant_id: "macro.tfp_growth_annual", note: null });
 
-  // Output gap: AR(1) with a small demand shock.
-  const prevGap = s.macro.gdp_potential > 0 ? s.macro.gdp_real / s.macro.gdp_potential - 1 : 0;
+  // Demand gap: AR(1) with a small shock, stored in state so the Ω disruption
+  // factor never feeds back into it (that would compound the war shock).
   const shock = rng.normal() * c.get("macro.demand_shock_sigma_quarterly");
-  const gap = c.get("macro.output_gap_persistence_quarterly") * prevGap + shock;
+  const gap = c.get("macro.output_gap_persistence_quarterly") * s.macro.output_gap + shock;
+  s.macro.output_gap = gap;
 
   const potential = computePotential(s, c);
   const dPot = potential - s.macro.gdp_potential;
   s.macro.gdp_potential = potential;
   log.push({ t: s.t, step: 9, fn: "potential_output", target: "macro.gdp_potential", delta: dPot, constant_id: "macro.alpha", note: null });
 
-  const gdp = potential * (1 + gap);
+  const omega = disruptionOmega(s, c);
+  const gdp = potential * (1 + gap) * omega;
   const dY = gdp - s.macro.gdp_real;
   s.macro.gdp_real = gdp;
-  log.push({ t: s.t, step: 9, fn: "output_gap", target: "macro.gdp_real", delta: dY, constant_id: "macro.output_gap_persistence_quarterly", note: `gap=${(gap * 100).toFixed(2)}%` });
+  log.push({ t: s.t, step: 9, fn: "output_gap", target: "macro.gdp_real", delta: dY, constant_id: "macro.output_gap_persistence_quarterly", note: `gap=${(gap * 100).toFixed(2)}% Ω=${omega.toFixed(3)}` });
 
-  // Okun's law.
-  const u = Math.max(0.005, c.get("macro.natural_unemployment") - c.get("macro.okun_coefficient") * gap);
+  // Okun's law on the EFFECTIVE gap (demand gap plus war/trade disruption).
+  const gapEff = (1 + gap) * omega - 1;
+  const u = Math.max(0.005, c.get("macro.natural_unemployment") - c.get("macro.okun_coefficient") * gapEff);
   const dU = u - s.macro.unemployment;
   s.macro.unemployment = u;
   log.push({ t: s.t, step: 9, fn: "okun", target: "macro.unemployment", delta: dU, constant_id: "macro.okun_coefficient", note: null });

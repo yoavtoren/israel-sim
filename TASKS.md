@@ -49,10 +49,10 @@
 - [x] GATE: terror/protest rates match historical distribution
 
 ## M6 — Security, diplomacy, red lines
-- [ ] Stockpiles produce/consume, quarters-of-supply, force readiness, deterrence (step 10)
-- [ ] Diplomacy: alignment drift, sanctions, trade_access, US support
-- [ ] Red lines: mass-atrocity, nuclear (terminal), debt spiral → IMF, civil-conflict absorbing state (per C6)
-- [ ] GATE: isolation scenario terminates coherently (stockpile exhaustion → computable defeat)
+- [x] Stockpiles produce/consume, quarters-of-supply, force readiness, deterrence (step 10)
+- [x] Diplomacy: alignment drift, sanctions, trade_access, US support
+- [x] Red lines: mass-atrocity, nuclear (terminal), debt spiral → IMF, civil-conflict absorbing state (per C6)
+- [x] GATE: isolation scenario terminates coherently (stockpile exhaustion → computable defeat)
 
 ## M7 — Reforms, economic models, coalition
 - [ ] Reform system (prerequisites, pipeline non-refund on repeal)

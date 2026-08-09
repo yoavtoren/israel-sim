@@ -7,6 +7,9 @@ export { sectorsStep, participationCurve, aggregateParticipation, aggregatePover
 export { localitiesStep, nationalServiceIndex } from "./modules/localities";
 export { parseEventDefs, type EventDef, type HazardDef, type EffectDef } from "./events/defs";
 export { evalHazard, poisson } from "./events/hazards";
+export { securityStep, quartersOfSupply, totalFrontIntensity } from "./modules/security";
+export { diplomacyStep, tradeWeightedAccess } from "./modules/diplomacy";
+export { disruptionOmega } from "./modules/macro";
 export type { LocalityInitRow, InitOptions } from "./state/init";
 export { tick, tickIndexOf, type EngineContext } from "./tick";
 export { buildInitialState, type InitialStateJson } from "./state/init";

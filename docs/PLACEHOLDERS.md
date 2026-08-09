@@ -68,3 +68,6 @@ All 31 entries are `placeholder` confidence (transport road/rail costs, welfare 
 - `constants/hazards.json`: 32 base rates + 26 betas. `base_terror_incident` and `base_mass_protest` are medium (calibrated to incidents.json 2021–25 regime mean); everything else placeholder — the real ACLED/GTD fit (API key/license needed) replaces them in M9.
 - `constants/stability.json`: politics approval/grievance/cohesion bases + reversion, security threat bases + reversion, water deficit relief — all placeholder stubs that M6/M7 replace with endogenous dynamics.
 - `normalized/history/incidents.json`: hand-transcribed annual counts ±30% on intifada years.
+
+## Added in M6 — packages/data/constants/conflict.json
+45 entries, nearly all placeholder: munition consumption per front intensity (order-of-magnitude from 2023-24 war reporting), mobilization/wear/deterrence params, casualties per intensity-quarter, embargo production penalty, Ω coefficients (mobilization/front), export share (medium), trade weights (needs UN Comtrade), alignment/trade bases and drift, US aid base (medium, MoU), debt-spiral threshold, IMF austerity factor, civil-war-pressure weights + t0 variance reference. Replace with SIPRI/Comtrade/V-Dem-informed fits in M9.

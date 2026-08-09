@@ -1,0 +1,370 @@
+[
+ {
+  "id": "security.consumption_interceptors_per_intensity",
+  "value": 800,
+  "unit": "units/quarter per 1.0 front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; order of magnitude from 2023-24 war reporting"
+ },
+ {
+  "id": "security.consumption_precision_per_intensity",
+  "value": 2500,
+  "unit": "units/quarter per 1.0 front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; order of magnitude from 2023-24 war reporting"
+ },
+ {
+  "id": "security.consumption_shells_per_intensity",
+  "value": 60000,
+  "unit": "units/quarter per 1.0 front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; order of magnitude from 2023-24 war reporting"
+ },
+ {
+  "id": "security.mobilization_per_intensity",
+  "value": 0.35,
+  "unit": "reserve share mobilized per 1.0 total front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.mobilization_adjust_quarterly",
+  "value": 0.3,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.readiness_wear_per_intensity",
+  "value": 0.04,
+  "unit": "readiness loss per quarter per 1.0 total intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.deterrence_base",
+  "value": 0.75,
+  "unit": "deterrence level at full readiness and supply",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.deterrence_readiness_exp",
+  "value": 0.7,
+  "unit": "deterrence exponent on force readiness",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.deterrence_supply_exp",
+  "value": 0.4,
+  "unit": "deterrence exponent on supply coverage",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.deterrence_adjust_quarterly",
+  "value": 0.1,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.supply_ref_quarters",
+  "value": 8,
+  "unit": "quarters-of-supply at which coverage counts as full",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.casualties_per_intensity_quarter",
+  "value": 350,
+  "unit": "persons per quarter per 1.0 total front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; order of magnitude from 2023-24 war"
+ },
+ {
+  "id": "security.embargo_production_penalty",
+  "value": 0.4,
+  "unit": "multiplier on domestic production under arms embargo (imported components)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "security.exhaustion_intensity_threshold",
+  "value": 0.5,
+  "unit": "total front intensity above which running dry is defeat",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "macro.omega_mobilization",
+  "value": 0.15,
+  "unit": "output loss per unit reserve mobilization",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; BoI 2023-24 war-cost estimates suggest order"
+ },
+ {
+  "id": "macro.omega_front",
+  "value": 0.08,
+  "unit": "output loss per 1.0 total front intensity",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "macro.export_share_gdp",
+  "value": 0.3,
+  "unit": "exports share of GDP",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "CBS national accounts approx"
+ },
+ {
+  "id": "diplomacy.trade_access_ref",
+  "value": 0.9025,
+  "unit": "trade-weighted access at t0 (normalization reference)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "computed from t0 trade_access and region weights"
+ },
+ {
+  "id": "diplomacy.trade_weight_europe",
+  "value": 0.35,
+  "unit": "share of exports",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs UN Comtrade shares"
+ },
+ {
+  "id": "diplomacy.trade_weight_north_america",
+  "value": 0.25,
+  "unit": "share of exports",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs UN Comtrade shares"
+ },
+ {
+  "id": "diplomacy.trade_weight_asia",
+  "value": 0.3,
+  "unit": "share of exports",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs UN Comtrade shares"
+ },
+ {
+  "id": "diplomacy.trade_weight_middle_east",
+  "value": 0.1,
+  "unit": "share of exports",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented, needs UN Comtrade shares"
+ },
+ {
+  "id": "diplomacy.alignment_drift_quarterly",
+  "value": 0.05,
+  "unit": "fraction of gap to target closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_un_coupling",
+  "value": 0.3,
+  "unit": "alignment-target shift per unit UN standing",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_usa",
+  "value": 0.8,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_eu",
+  "value": 0.3,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_china",
+  "value": 0.0,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_russia",
+  "value": -0.2,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_egypt",
+  "value": 0.3,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_jordan",
+  "value": 0.25,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_saudi_arabia",
+  "value": 0.1,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.alignment_base_uae",
+  "value": 0.4,
+  "unit": "-1..1",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.trade_base_europe",
+  "value": 0.95,
+  "unit": "0-1 export multiplier",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.trade_base_north_america",
+  "value": 1.0,
+  "unit": "0-1 export multiplier",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.trade_base_asia",
+  "value": 0.9,
+  "unit": "0-1 export multiplier",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.trade_base_middle_east",
+  "value": 0.5,
+  "unit": "0-1 export multiplier",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "diplomacy.aid_base",
+  "value": 14000,
+  "unit": "₪M/yr US military aid at full alignment",
+  "lag_kernel": "immediate",
+  "confidence": "medium",
+  "source": "US MoU ~$3.8B/yr at ~3.0-3.7 ₪/$"
+ },
+ {
+  "id": "diplomacy.aid_adjust_quarterly",
+  "value": 0.1,
+  "unit": "fraction of gap closed per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "fiscal.debt_spiral_threshold",
+  "value": 1.3,
+  "unit": "debt/GDP above which the spiral red line arms",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; sovereign-crisis literature range"
+ },
+ {
+  "id": "fiscal.imf_austerity_factor",
+  "value": 0.85,
+  "unit": "forced multiplier on all ministry budgets under an IMF program",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; typical program consolidation size"
+ },
+ {
+  "id": "politics.cwp_cohesion_weight",
+  "value": 0.6,
+  "unit": "civil-war-pressure inflow per unit cohesion shortfall below 0.5, per yr",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented; V-Dem/Polity literature needed"
+ },
+ {
+  "id": "politics.cwp_grievance_var_weight",
+  "value": 8.0,
+  "unit": "civil-war-pressure inflow per unit cross-sector grievance variance, per yr",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "politics.cwp_trust_weight",
+  "value": 0.5,
+  "unit": "civil-war-pressure inflow per unit trust shortfall below 0.3, per yr",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "politics.cwp_decay_quarterly",
+  "value": 0.05,
+  "unit": "fraction of civil-war pressure decaying per quarter",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "politics.civil_war_threshold",
+  "value": 0.8,
+  "unit": "civil-war pressure at which the absorbing state triggers",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "invented"
+ },
+ {
+  "id": "politics.cwp_grievance_var_ref",
+  "value": 0.008,
+  "unit": "t0 structural cross-sector grievance variance (pressure counts only the excess)",
+  "lag_kernel": "immediate",
+  "confidence": "placeholder",
+  "source": "t0 calibration reference"
+ }
+]

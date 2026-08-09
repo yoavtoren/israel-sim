@@ -13,7 +13,7 @@ import { aggregatePoverty, participationCurve, SECTOR_IDS } from "../modules/sec
 
 export interface InitialStateJson {
   start_year: number;
-  macro: WorldState["macro"];
+  macro: Omit<WorldState["macro"], "output_gap">;
   fiscal: {
     tax_policy: TaxPolicy;
     /** fraction/yr */ debt_effective_rate: number;
@@ -92,7 +92,7 @@ export function buildInitialState(
   const state: WorldState = {
     t: { year: startYear, quarter: 1 },
     seed,
-    macro: { ...raw.macro },
+    macro: { ...raw.macro, output_gap: 0 },
     fiscal: {
       revenue: { income: 0, vat: 0, corporate: 0, capital: 0, customs: 0 },
       tax_policy: { ...raw.fiscal.tax_policy },
@@ -107,13 +107,14 @@ export function buildInitialState(
     },
     sectors: structuredClone(raw.sectors),
     localities: { count: 0, code: [], name_he: [], cluster: [], population: [], employment: [], emp_base: [], service_access: [], service_base: [], migration_balance: [] },
-    security: structuredClone(raw.security),
+    security: { ...structuredClone(raw.security), war_casualties: 0 },
     diplomacy: structuredClone(raw.diplomacy),
     politics: structuredClone(raw.politics),
     infrastructure: structuredClone(raw.infrastructure),
     environment: structuredClone(raw.environment),
     reforms: {},
     economic_model: raw.economic_model,
+    outcome: { ended: false, kind: null, note: null },
     pipeline: [],
     pending_events: [],
     event_cooldowns: {},

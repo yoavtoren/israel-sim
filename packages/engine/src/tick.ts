@@ -19,6 +19,9 @@ import { demographyStep } from "./modules/demography";
 import { sectorsStep } from "./modules/sectors";
 import { localitiesStep } from "./modules/localities";
 import { macroStep } from "./modules/macro";
+import { securityStep } from "./modules/security";
+import { diplomacyStep } from "./modules/diplomacy";
+import { redlinesStep } from "./modules/redlines";
 import { eventsStep } from "./events/resolver";
 import { politicsStep } from "./modules/politics";
 
@@ -36,6 +39,10 @@ export function tickIndexOf(s: WorldState, startYear: number): number {
 }
 
 export function tick(prev: WorldState, decisions: Decisions, ctx: EngineContext): TickResult {
+  // A terminated run (red line / collapse) is frozen: tick is a no-op.
+  if (prev.outcome.ended) {
+    return { state: structuredClone(prev), events: [], log: [] };
+  }
   const s: WorldState = structuredClone(prev);
   const log: TickLogEntry[] = [];
   const events: EngineEvent[] = [];
@@ -53,9 +60,11 @@ export function tick(prev: WorldState, decisions: Decisions, ctx: EngineContext)
   sectorsStep(s, ctx.registry, log);                            // 7b sector dynamics
   localitiesStep(s, ctx.registry, log);                         // 8
   macroStep(s, ctx.registry, streams("macro"), log);            // 9
-  // 10 security & diplomacy — M6
+  securityStep(s, ctx.registry, events, log);                   // 10a
+  diplomacyStep(s, ctx.registry, log);                          // 10b
+  redlinesStep(s, decisions, ctx.registry, idx, events, log);   // 10c
   eventsStep(s, ctx.events, ctx.registry, streams("hazards"), idx, events, log); // 11
-  politicsStep(s, ctx.registry, log);                           // 12 (mean-reversion stub until M7)
+  politicsStep(s, ctx.registry, events, log);                   // 12 (reversion stub + civil-war pressure; coalition in M7)
 
   // 13 log & advance clock.
   s.log = log;

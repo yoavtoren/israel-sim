@@ -128,6 +128,7 @@ export interface WorldState {
     /** 0–20 (20 = AAA-equivalent) */ credit_rating: number;
     /** ₪ per USD */ shekel_usd: number;
     /** ₪M */ fx_reserves: number;
+    /** demand-side output gap (fraction of potential), excludes the Ω disruption factor */ output_gap: number;
     /** TFP level A (index; also mirrored as production-function A) */ productivity_index: number;
     /** ₪M */ capital_stock: number;
     /** human capital index H, 1.0 at t0 */ human_capital: number;
@@ -160,6 +161,7 @@ export interface WorldState {
     active_fronts: Front[];
     /** 0–1 */ deterrence_index: number;
     /** 0–1 per adversary */ threat_level: Record<string, number>;
+    /** persons, cumulative war casualties this run (CONTRACT C6 post-mortem) */ war_casualties: number;
   };
 
   diplomacy: {
@@ -207,6 +209,9 @@ export interface WorldState {
   reforms: Record<string, ReformState>;
   economic_model: EconomicModelId;
 
+  /** run termination (red lines §8.3, coalition collapse M7). Once ended, tick() is a no-op. */
+  outcome: { ended: boolean; kind: string | null; note: string | null };
+
   pipeline: PendingEffect[];
   /** event ids force-fired next tick (escalation spawns, spec §8.2) */ pending_events: string[];
   /** per event id: absolute tick index before which it may not refire */ event_cooldowns: Record<string, number>;
@@ -218,6 +223,11 @@ export interface Decisions {
   /** ₪M/yr, proposed annual budget per ministry */ budgets?: Partial<Record<MinistryId, number>>;
   /** Periphery incentive program: targeted flow to localities in the given clusters. annual_budget 0 cancels. */
   periphery?: { annual_budget: number; target_clusters: number[] };
+  /** Policy orders with step-function consequences (spec §8.3). */
+  orders?: {
+    /** Crossing IHL thresholds — catastrophic failure state, not a strategy. */ mass_atrocity_order?: boolean;
+    /** Terminal branch. */ nuclear_use?: boolean;
+  };
 }
 
 export interface EngineEvent {
