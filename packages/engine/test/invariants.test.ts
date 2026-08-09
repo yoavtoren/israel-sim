@@ -112,10 +112,12 @@ describe("invariants", () => {
   it("doubling a ministry's budget never worsens its own headline indicator", () => {
     const { ctx, initial } = loadContext();
     const base = run(ctx, initial, {}).at(-1)!;
+    const twice = (id: "education" | "health" | "defense"): number =>
+      2 * ctx.ministries.find((d) => d.id === id)!.baseline_budget;
     const cases: Array<{ decisions: Decisions; headline: (s: WorldState) => number }> = [
-      { decisions: { budgets: { education: 170000 } }, headline: (s) => s.infrastructure.teachers },
-      { decisions: { budgets: { health: 120000 } }, headline: (s) => s.infrastructure.hospital_beds },
-      { decisions: { budgets: { defense: 220000 } }, headline: (s) => s.security.force_readiness },
+      { decisions: { budgets: { education: twice("education") } }, headline: (s) => s.infrastructure.teachers },
+      { decisions: { budgets: { health: twice("health") } }, headline: (s) => s.infrastructure.hospital_beds },
+      { decisions: { budgets: { defense: twice("defense") } }, headline: (s) => s.security.force_readiness },
     ];
     for (const { decisions, headline } of cases) {
       const doubled = run(ctx, initial, decisions).at(-1)!;

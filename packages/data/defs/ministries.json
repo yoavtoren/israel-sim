@@ -1,209 +1,182 @@
 [
  {
-  "id": "education",
-  "baseline_budget": 106445,
-  "rigidity": 0.85,
-  "crowding": 0.7,
-  "political_weight": {
-   "secular": 0.8,
-   "national_religious": 0.7,
-   "haredi": 0.9,
-   "arab": 0.8,
-   "other": 0.5
-  },
+  "id": "education", "baseline_budget": 106445, "rigidity": 0.85, "crowding": 0.7,
+  "political_weight": { "secular": 0.8, "national_religious": 0.7, "haredi": 0.9, "arab": 0.8, "other": 0.5 },
   "outputs": [
-   {
-    "kind": "funded_stock",
-    "target": "infrastructure.teachers",
-    "budget_share_id": "education.teacher_budget_share",
-    "cost_per_unit_id": "education.cost_per_teacher_annual",
-    "adjust_rate_id": "education.teacher_adjustment_quarterly",
-    "max_growth_id": "education.teacher_max_growth_quarterly"
-   },
-   {
-    "kind": "pipeline",
-    "target": "macro.human_capital",
-    "elasticity_id": "education.spend_to_hc",
-    "decays_below": 0.8
-   }
+   { "kind": "funded_stock", "target": "infrastructure.teachers", "budget_share_id": "education.teacher_budget_share", "cost_per_unit_id": "education.cost_per_teacher_annual", "adjust_rate_id": "education.teacher_adjustment_quarterly", "max_growth_id": "education.teacher_max_growth_quarterly" },
+   { "kind": "pipeline", "target": "macro.human_capital", "elasticity_id": "education.spend_to_hc", "decays_below": 0.8 }
+  ],
+  "degradation": [
+   { "below": 0.9, "effect": "infrastructure.teacher_quality_index", "rate": -0.02, "surfaces_as": "Class sizes grow; substitute coverage thins; teacher quality erodes" },
+   { "below": 0.75, "for_quarters": 8, "effect": "politics.approval_by_sector.*", "rate": -0.05, "surfaces_as": "Parents strike; school year shortened", "triggers_event": "education_system_crisis" }
   ]
  },
  {
-  "id": "health",
-  "baseline_budget": 63076,
-  "rigidity": 0.85,
-  "crowding": 0.7,
-  "political_weight": {
-   "secular": 0.8,
-   "national_religious": 0.7,
-   "haredi": 0.7,
-   "arab": 0.9,
-   "other": 0.7
-  },
+  "id": "health", "baseline_budget": 63076, "rigidity": 0.85, "crowding": 0.7,
+  "political_weight": { "secular": 0.8, "national_religious": 0.7, "haredi": 0.7, "arab": 0.9, "other": 0.7 },
   "outputs": [
-   {
-    "kind": "funded_stock",
-    "target": "infrastructure.hospital_beds",
-    "budget_share_id": "health.bed_budget_share",
-    "cost_per_unit_id": "health.cost_per_bed_annual",
-    "adjust_rate_id": "health.bed_adjustment_quarterly",
-    "max_growth_id": "health.bed_max_growth_quarterly"
-   },
-   {
-    "kind": "derived_stock",
-    "target": "infrastructure.icu_beds",
-    "source_path": "infrastructure.hospital_beds",
-    "share_id": "health.icu_share",
-    "adjust_rate_id": "health.icu_adjustment_quarterly"
-   }
+   { "kind": "funded_stock", "target": "infrastructure.hospital_beds", "budget_share_id": "health.bed_budget_share", "cost_per_unit_id": "health.cost_per_bed_annual", "adjust_rate_id": "health.bed_adjustment_quarterly", "max_growth_id": "health.bed_max_growth_quarterly" },
+   { "kind": "derived_stock", "target": "infrastructure.icu_beds", "source_path": "infrastructure.hospital_beds", "share_id": "health.icu_share", "adjust_rate_id": "health.icu_adjustment_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.9, "effect": "infrastructure.icu_beds", "rate": -0.03, "surfaces_as": "Waiting times rise; elective surgeries deferred" },
+   { "below": 0.75, "for_quarters": 8, "effect": "politics.approval_by_sector.*", "rate": -0.05, "surfaces_as": "Corridor beds return; nurses strike", "triggers_event": "health_system_crisis" }
   ]
  },
  {
-  "id": "defense",
-  "baseline_budget": 129928,
-  "rigidity": 0.7,
-  "crowding": 0.5,
-  "political_weight": {
-   "secular": 0.7,
-   "national_religious": 0.9,
-   "haredi": 0.3,
-   "arab": 0.2,
-   "other": 0.6
-  },
+  "id": "defense", "baseline_budget": 129928, "rigidity": 0.7, "crowding": 0.5,
+  "political_weight": { "secular": 0.7, "national_religious": 0.9, "haredi": 0.3, "arab": 0.2, "other": 0.6 },
   "outputs": [
-   {
-    "kind": "readiness",
-    "target": "security.force_readiness",
-    "base_id": "defense.readiness_base",
-    "adjust_rate_id": "defense.readiness_adjustment_quarterly"
-   },
-   {
-    "kind": "production",
-    "munition_class": "interceptors",
-    "baseline_id": "defense.production_interceptors_quarterly"
-   },
-   {
-    "kind": "production",
-    "munition_class": "precision_guided",
-    "baseline_id": "defense.production_precision_guided_quarterly"
-   },
-   {
-    "kind": "production",
-    "munition_class": "artillery_shells",
-    "baseline_id": "defense.production_artillery_shells_quarterly"
-   }
+   { "kind": "readiness", "target": "security.force_readiness", "base_id": "defense.readiness_base", "adjust_rate_id": "defense.readiness_adjustment_quarterly" },
+   { "kind": "production", "munition_class": "interceptors", "baseline_id": "defense.production_interceptors_quarterly" },
+   { "kind": "production", "munition_class": "precision_guided", "baseline_id": "defense.production_precision_guided_quarterly" },
+   { "kind": "production", "munition_class": "artillery_shells", "baseline_id": "defense.production_artillery_shells_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.85, "effect": "security.force_readiness", "rate": -0.05, "surfaces_as": "Training days cut; reserve call-ups deferred; spare-part cannibalization" },
+   { "below": 0.7, "for_quarters": 4, "effect": "security.deterrence_index", "rate": -0.06, "surfaces_as": "Adversaries probe more aggressively along the borders", "triggers_event": "deterrence_erosion" }
   ]
  },
  {
-  "id": "welfare",
-  "baseline_budget": 85737,
-  "rigidity": 0.9,
-  "crowding": 0.7,
-  "political_weight": {},
-  "outputs": []
+  "id": "welfare", "baseline_budget": 85737, "rigidity": 0.9, "crowding": 0.7,
+  "political_weight": { "secular": 0.4, "national_religious": 0.5, "haredi": 0.9, "arab": 0.9, "other": 0.6 },
+  "outputs": [
+   { "kind": "inverse_level", "target": "macro.poverty_rate", "base_id": "welfare.poverty_base", "elasticity_id": "welfare.poverty_elasticity", "adjust_rate_id": "welfare.poverty_adjust_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.9, "effect": "macro.poverty_rate", "rate": 0.03, "surfaces_as": "Allowances lag inflation; food-security caseloads rise" },
+   { "below": 0.8, "for_quarters": 4, "effect": "sectors.haredi.grievance", "rate": 0.08, "surfaces_as": "Haredi street protests over allowance cuts", "triggers_event": "welfare_protests" },
+   { "below": 0.8, "for_quarters": 4, "effect": "sectors.arab.grievance", "rate": 0.08, "surfaces_as": "Arab-sector welfare offices overwhelmed" }
+  ]
  },
  {
-  "id": "transport",
-  "baseline_budget": 38108,
-  "rigidity": 0.6,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "transport", "baseline_budget": 38108, "rigidity": 0.6, "crowding": 0.6,
+  "political_weight": { "secular": 0.7, "national_religious": 0.6, "haredi": 0.5, "arab": 0.6, "other": 0.6 },
+  "outputs": [
+   { "kind": "funded_stock", "target": "infrastructure.road_capacity", "budget_share_id": "transport.road_budget_share", "cost_per_unit_id": "transport.cost_per_road_index", "adjust_rate_id": "transport.road_adjustment_quarterly", "max_growth_id": "transport.road_max_growth_quarterly" },
+   { "kind": "funded_stock", "target": "infrastructure.rail_km", "budget_share_id": "transport.rail_budget_share", "cost_per_unit_id": "transport.cost_per_rail_km", "adjust_rate_id": "transport.rail_adjustment_quarterly", "max_growth_id": "transport.rail_max_growth_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.85, "effect": "infrastructure.road_capacity", "rate": -0.02, "surfaces_as": "Maintenance backlog: potholes, closed lanes" },
+   { "below": 0.85, "effect": "infrastructure.congestion_index", "rate": 0.03, "surfaces_as": "Commute times lengthen" }
+  ]
  },
  {
-  "id": "internal_security",
-  "baseline_budget": 27610,
-  "rigidity": 0.8,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "internal_security", "baseline_budget": 27610, "rigidity": 0.8, "crowding": 0.6,
+  "political_weight": { "secular": 0.6, "national_religious": 0.7, "haredi": 0.4, "arab": 0.5, "other": 0.6 },
+  "outputs": [
+   { "kind": "inverse_level", "target": "politics.protest_intensity", "base_id": "internal_security.protest_base", "elasticity_id": "internal_security.protest_elasticity", "adjust_rate_id": "internal_security.protest_adjust_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.85, "effect": "politics.protest_intensity", "rate": 0.05, "surfaces_as": "Policing thins out; response times rise; organized crime expands" },
+   { "below": 0.7, "for_quarters": 4, "effect": "politics.institutional_trust", "rate": -0.04, "surfaces_as": "Public loses confidence in personal safety", "triggers_event": "public_safety_crisis" }
+  ]
  },
  {
-  "id": "housing",
-  "baseline_budget": 9415,
-  "rigidity": 0.5,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "housing", "baseline_budget": 9415, "rigidity": 0.5, "crowding": 0.6,
+  "political_weight": { "secular": 0.7, "national_religious": 0.7, "haredi": 0.8, "arab": 0.7, "other": 0.8 },
+  "outputs": [
+   { "kind": "funded_flow", "target": "infrastructure.housing_starts", "base_id": "housing.starts_base", "budget_share_id": "housing.subsidy_budget_share", "cost_per_unit_id": "housing.cost_per_subsidized_start" }
+  ],
+  "degradation": [
+   { "below": 0.8, "effect": "politics.approval_by_sector.secular", "rate": -0.02, "surfaces_as": "Housing affordability protests among young families" }
+  ]
  },
  {
-  "id": "economy",
-  "baseline_budget": 5673,
-  "rigidity": 0.6,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "justice", "baseline_budget": 4828, "rigidity": 0.8, "crowding": 0.6,
+  "political_weight": { "secular": 0.7, "national_religious": 0.4, "haredi": 0.3, "arab": 0.6, "other": 0.6 },
+  "outputs": [
+   { "kind": "readiness", "target": "politics.institutional_trust", "base_id": "justice.trust_base", "adjust_rate_id": "justice.trust_adjust_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.8, "effect": "politics.institutional_trust", "rate": -0.03, "surfaces_as": "Court backlogs stretch to years; legal-aid queues grow" }
+  ]
  },
  {
-  "id": "justice",
-  "baseline_budget": 4828,
-  "rigidity": 0.8,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "economy", "baseline_budget": 5673, "rigidity": 0.6, "crowding": 0.6,
+  "political_weight": { "secular": 0.6, "national_religious": 0.5, "haredi": 0.4, "arab": 0.6, "other": 0.6 },
+  "outputs": [
+   { "kind": "pipeline", "target": "macro.productivity_index", "elasticity_id": "economy.spend_to_tfp", "decays_below": 0.8 }
+  ],
+  "degradation": [
+   { "below": 0.8, "for_quarters": 8, "effect": "macro.productivity_index", "rate": -0.003, "surfaces_as": "SME support and export promotion wither" }
+  ]
  },
  {
-  "id": "water_agriculture",
-  "baseline_budget": 2722,
-  "rigidity": 0.6,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "water_agriculture", "baseline_budget": 2722, "rigidity": 0.6, "crowding": 0.6,
+  "political_weight": { "secular": 0.4, "national_religious": 0.6, "haredi": 0.3, "arab": 0.6, "other": 0.5 },
+  "outputs": [
+   { "kind": "funded_stock", "target": "infrastructure.desalination_capacity_mcm", "budget_share_id": "water.desal_budget_share", "cost_per_unit_id": "water.cost_per_mcm", "adjust_rate_id": "water.desal_adjustment_quarterly", "max_growth_id": "water.desal_max_growth_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.85, "effect": "infrastructure.desalination_capacity_mcm", "rate": -0.02, "surfaces_as": "Membrane replacement deferred; plant availability drops" },
+   { "below": 0.85, "effect": "infrastructure.water_deficit", "rate": 40, "additive": true, "surfaces_as": "Agricultural allocations cut; aquifer over-pumping resumes" }
+  ]
  },
  {
-  "id": "immigration",
-  "baseline_budget": 1635,
-  "rigidity": 0.6,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "immigration", "baseline_budget": 1635, "rigidity": 0.6, "crowding": 0.6,
+  "political_weight": { "secular": 0.5, "national_religious": 0.5, "haredi": 0.3, "arab": 0.1, "other": 0.9 },
+  "outputs": [],
+  "degradation": [
+   { "below": 0.8, "effect": "politics.approval_by_sector.other", "rate": -0.04, "surfaces_as": "Absorption baskets shrink; ulpan waiting lists grow" }
+  ]
  },
  {
-  "id": "culture_sport",
-  "baseline_budget": 1404,
-  "rigidity": 0.5,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "culture_sport", "baseline_budget": 1404, "rigidity": 0.5, "crowding": 0.6,
+  "political_weight": { "secular": 0.7, "national_religious": 0.5, "haredi": 0.2, "arab": 0.5, "other": 0.6 },
+  "outputs": [
+   { "kind": "pipeline", "target": "politics.social_cohesion", "elasticity_id": "culture.spend_to_cohesion", "decays_below": 0.7 }
+  ],
+  "degradation": [
+   { "below": 0.7, "effect": "politics.social_cohesion", "rate": -0.01, "surfaces_as": "Community centers and youth leagues close in the periphery" }
+  ]
  },
  {
-  "id": "religious_services",
-  "baseline_budget": 799,
-  "rigidity": 0.5,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "religious_services", "baseline_budget": 799, "rigidity": 0.5, "crowding": 0.6,
+  "political_weight": { "secular": 0.1, "national_religious": 0.8, "haredi": 0.9, "arab": 0.3, "other": 0.2 },
+  "outputs": [],
+  "degradation": [
+   { "below": 0.8, "effect": "politics.approval_by_sector.haredi", "rate": -0.05, "surfaces_as": "Religious-council services curtailed; coalition partners protest" },
+   { "below": 0.8, "effect": "politics.approval_by_sector.national_religious", "rate": -0.03, "surfaces_as": "Mikveh and synagogue maintenance deferred" }
+  ]
  },
  {
-  "id": "foreign_affairs",
-  "baseline_budget": 2596,
-  "rigidity": 0.7,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "foreign_affairs", "baseline_budget": 2596, "rigidity": 0.7, "crowding": 0.6,
+  "political_weight": { "secular": 0.6, "national_religious": 0.4, "haredi": 0.2, "arab": 0.4, "other": 0.5 },
+  "outputs": [
+   { "kind": "pipeline", "target": "diplomacy.un_standing", "elasticity_id": "foreign_affairs.spend_to_un_standing", "decays_below": 0.8 }
+  ],
+  "degradation": [
+   { "below": 0.8, "effect": "diplomacy.un_standing", "rate": -0.05, "additive": true, "surfaces_as": "Embassies close; consular queues explode; fewer friends in the room when it matters" }
+  ]
  },
  {
-  "id": "environment",
-  "baseline_budget": 367,
-  "rigidity": 0.5,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "environment", "baseline_budget": 367, "rigidity": 0.5, "crowding": 0.6,
+  "political_weight": { "secular": 0.6, "national_religious": 0.4, "haredi": 0.2, "arab": 0.5, "other": 0.6 },
+  "outputs": [
+   { "kind": "readiness", "target": "environment.air_quality_index", "base_id": "environment.air_quality_base", "adjust_rate_id": "environment.aq_adjust_quarterly" }
+  ],
+  "degradation": [
+   { "below": 0.8, "effect": "environment.air_quality_index", "rate": -0.02, "surfaces_as": "Enforcement lapses; industrial emissions rise unchecked" },
+   { "below": 0.8, "effect": "environment.emissions", "rate": 0.02, "surfaces_as": "Polluter inspections stop" }
+  ]
  },
  {
-  "id": "science",
-  "baseline_budget": 1552,
-  "rigidity": 0.5,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "science", "baseline_budget": 1552, "rigidity": 0.5, "crowding": 0.6,
+  "political_weight": { "secular": 0.7, "national_religious": 0.5, "haredi": 0.2, "arab": 0.4, "other": 0.7 },
+  "outputs": [
+   { "kind": "pipeline", "target": "macro.productivity_index", "elasticity_id": "science.spend_to_tfp", "decays_below": 0.7 }
+  ],
+  "degradation": [
+   { "below": 0.7, "for_quarters": 8, "effect": "macro.productivity_index", "rate": -0.005, "surfaces_as": "Grant cycles skipped; labs emigrate with their PIs" }
+  ]
  },
  {
-  "id": "hasbara",
-  "baseline_budget": 500,
-  "rigidity": 0.3,
-  "crowding": 0.6,
-  "political_weight": {},
-  "outputs": []
+  "id": "hasbara", "baseline_budget": 500, "rigidity": 0.3, "crowding": 0.6,
+  "political_weight": { "secular": 0.4, "national_religious": 0.6, "haredi": 0.3, "arab": 0.1, "other": 0.4 },
+  "outputs": [
+   { "kind": "pipeline", "target": "diplomacy.un_standing", "elasticity_id": "hasbara.spend_to_un_standing", "decays_below": 0.5 }
+  ],
+  "degradation": []
  }
 ]

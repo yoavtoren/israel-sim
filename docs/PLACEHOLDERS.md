@@ -54,3 +54,6 @@ All five `fiscal.revenue_share_*` (see wholesale note above) — Open Budget / M
 
 ## packages/data/constants/defense.json
 All six entries (readiness base/adjustment, three production baselines, expiry) — SIPRI, defense-industry reports; some have no public source and will stay expert-judgment with wide CI.
+
+## Added in M3 — packages/data/constants/ministry_outputs.json
+All 31 entries are `placeholder` confidence (transport road/rail costs, welfare poverty elasticity, housing starts/subsidy, water desal costs, environment/justice/internal-security level anchors, science/economy TFP elasticities, culture cohesion, hasbara/FA UN-standing). Costs marked "calibrated" are set so baseline funding exactly sustains current stocks — replace alongside their stocks in the M9 pass. Degradation thresholds/rates live inline in packages/data/defs/ministries.json (spec §5 style), all invented.

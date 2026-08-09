@@ -19,6 +19,11 @@ export function stocksStep(s: WorldState, c: Registry, log: TickLogEntry[]): voi
   s.macro.human_capital += dH;
   log.push({ t: s.t, step: 6, fn: "hc_decay", target: "macro.human_capital", delta: dH, constant_id: "macro.hc_decay_annual", note: null });
 
+  // Housing: starts accumulate into the stock net of demolition.
+  const dHousing = (s.infrastructure.housing_starts - c.get("housing.demolition_annual") * s.infrastructure.housing_stock) / 4;
+  s.infrastructure.housing_stock += dHousing;
+  log.push({ t: s.t, step: 6, fn: "housing_accumulation", target: "infrastructure.housing_stock", delta: dHousing, constant_id: "housing.demolition_annual", note: null });
+
   // Munitions expire (shelf life / training consumption).
   const expiry = c.get("defense.munition_expiry_quarterly");
   for (const cls of Object.keys(s.security.stockpiles) as MunitionClass[]) {

@@ -28,11 +28,11 @@
 - [x] GATE: initial state matches published figures within 1%
 
 ## M3 — All 17 ministries + degradation
-- [ ] 14 remaining MinistryDefs as data rows (outputs, stocks, rigidity, crowding, political_weight)
-- [ ] Degradation engine: `when`-expr evaluation, rates, `surfaces_as`, `triggers_event`
-- [ ] Shadow-tick diff API (budget preview) in engine
-- [ ] Constants for all ministry elasticities (placeholder-marked where invented)
-- [ ] GATE: budget preview works (engine-level test: propose budget → diff of what moves/breaks)
+- [x] 14 remaining MinistryDefs as data rows (outputs, stocks, rigidity, crowding, political_weight)
+- [x] Degradation engine: `when`-expr evaluation, rates, `surfaces_as`, `triggers_event`
+- [x] Shadow-tick diff API (budget preview) in engine
+- [x] Constants for all ministry elasticities (placeholder-marked where invented)
+- [x] GATE: budget preview works (engine-level test: propose budget → diff of what moves/breaks)
 
 ## M4 — Sectors + localities + migration
 - [ ] Sector states + response functions from constants; demography (step 7)

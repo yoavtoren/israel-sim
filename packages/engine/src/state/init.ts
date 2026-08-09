@@ -35,7 +35,11 @@ export function buildInitialState(
 ): WorldState {
   const ministries = {} as WorldState["fiscal"]["ministries"];
   for (const def of defs) {
-    ministries[def.id] = { budget: def.baseline_budget, funding_ratio: 1 };
+    ministries[def.id] = {
+      budget: def.baseline_budget,
+      funding_ratio: 1,
+      degradation_counters: def.degradation.map(() => 0),
+    };
   }
 
   const debt = raw.macro.debt_gdp * raw.macro.gdp_real;

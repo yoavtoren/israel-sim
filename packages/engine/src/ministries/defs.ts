@@ -47,12 +47,49 @@ export interface PipelineOutput {
   /** cancel remainder if funding_ratio falls below this */ decays_below: number;
 }
 
+/** Flow set each tick: target = base + budget·share/cost (e.g. housing starts). */
+export interface FundedFlowOutput {
+  kind: "funded_flow";
+  target: string;
+  /** flow that exists regardless of this budget */ base_id: string;
+  budget_share_id: string;
+  cost_per_unit_id: string;
+}
+
+/** Level falls as funding rises: level = base·fr^(−elasticity) (e.g. poverty, protest). */
+export interface InverseLevelOutput {
+  kind: "inverse_level";
+  target: string;
+  base_id: string;
+  elasticity_id: string;
+  adjust_rate_id: string;
+}
+
 export type OutputDef =
   | FundedStockOutput
   | DerivedStockOutput
   | ReadinessOutput
   | ProductionOutput
-  | PipelineOutput;
+  | PipelineOutput
+  | FundedFlowOutput
+  | InverseLevelOutput;
+
+/**
+ * Failure mode when underfunded (spec §5). `rate` is per-year: multiplicative
+ * (fraction of current value) unless `additive`, then absolute target units.
+ * Fires each quarter while funding_ratio < below has held for `for_quarters`
+ * consecutive quarters (default 1). `effect` may end in ".*" to hit every key
+ * of a record (e.g. "politics.approval_by_sector.*").
+ */
+export interface DegradationDef {
+  below: number;
+  for_quarters?: number;
+  effect: string;
+  rate: number;
+  additive?: boolean;
+  surfaces_as: string;
+  triggers_event?: string | null;
+}
 
 export interface MinistryDef {
   id: MinistryId;
@@ -61,6 +98,7 @@ export interface MinistryDef {
   /** diminishing-returns exponent, 0–1 */ crowding: number;
   political_weight: Record<string, number>;
   outputs: OutputDef[];
+  degradation: DegradationDef[];
 }
 
 const MINISTRY_IDS: ReadonlySet<string> = new Set([
@@ -72,6 +110,7 @@ const MINISTRY_IDS: ReadonlySet<string> = new Set([
 
 const OUTPUT_KINDS: ReadonlySet<string> = new Set([
   "funded_stock", "derived_stock", "readiness", "production", "pipeline",
+  "funded_flow", "inverse_level",
 ]);
 
 function requireString(o: Record<string, unknown>, field: string, ctx: string): string {
@@ -123,6 +162,22 @@ function parseOutput(raw: unknown, ctx: string): OutputDef {
       }
       return { kind, munition_class: cls, baseline_id: requireString(o, "baseline_id", ctx) };
     }
+    case "funded_flow":
+      return {
+        kind,
+        target: requireString(o, "target", ctx),
+        base_id: requireString(o, "base_id", ctx),
+        budget_share_id: requireString(o, "budget_share_id", ctx),
+        cost_per_unit_id: requireString(o, "cost_per_unit_id", ctx),
+      };
+    case "inverse_level":
+      return {
+        kind,
+        target: requireString(o, "target", ctx),
+        base_id: requireString(o, "base_id", ctx),
+        elasticity_id: requireString(o, "elasticity_id", ctx),
+        adjust_rate_id: requireString(o, "adjust_rate_id", ctx),
+      };
     default:
       return {
         kind: "pipeline",
@@ -131,6 +186,21 @@ function parseOutput(raw: unknown, ctx: string): OutputDef {
         decays_below: requireNumber(o, "decays_below", ctx),
       };
   }
+}
+
+function parseDegradation(raw: unknown, ctx: string): DegradationDef {
+  if (typeof raw !== "object" || raw === null) throw new Error(`${ctx}: degradation rule is not an object`);
+  const o = raw as Record<string, unknown>;
+  const rule: DegradationDef = {
+    below: requireNumber(o, "below", ctx),
+    effect: requireString(o, "effect", ctx),
+    rate: requireNumber(o, "rate", ctx),
+    surfaces_as: requireString(o, "surfaces_as", ctx),
+  };
+  if (typeof o.for_quarters === "number") rule.for_quarters = o.for_quarters;
+  if (typeof o.additive === "boolean") rule.additive = o.additive;
+  if (typeof o.triggers_event === "string") rule.triggers_event = o.triggers_event;
+  return rule;
 }
 
 export function parseMinistryDefs(raw: unknown): MinistryDef[] {
@@ -154,6 +224,7 @@ export function parseMinistryDefs(raw: unknown): MinistryDef[] {
         if (typeof v === "number") political_weight[k] = v;
       }
     }
+    const degradationRaw = o.degradation;
     defs.push({
       id: id as MinistryId,
       baseline_budget: requireNumber(o, "baseline_budget", ctx),
@@ -161,6 +232,9 @@ export function parseMinistryDefs(raw: unknown): MinistryDef[] {
       crowding: requireNumber(o, "crowding", ctx),
       political_weight,
       outputs: outputsRaw.map((out, i) => parseOutput(out, `${ctx} output[${i}]`)),
+      degradation: Array.isArray(degradationRaw)
+        ? degradationRaw.map((d, i) => parseDegradation(d, `${ctx} degradation[${i}]`))
+        : [],
     });
   }
   if (defs.length !== MINISTRY_IDS.size) {

@@ -5,7 +5,8 @@ export type {
 export { tick, tickIndexOf, type EngineContext } from "./tick";
 export { buildInitialState, type InitialStateJson } from "./state/init";
 export { buildRegistry, type Registry, type ConstantEntry, type Confidence } from "./constants/registry";
-export { parseMinistryDefs, type MinistryDef, type OutputDef } from "./ministries/defs";
+export { parseMinistryDefs, type MinistryDef, type OutputDef, type DegradationDef } from "./ministries/defs";
+export { previewBudget, type BudgetPreview, type PreviewDiff, type PreviewBreak } from "./preview";
 export { getPath, addPath, setPath } from "./state/paths";
 export { parseKernelShares, KERNEL_HORIZON_QUARTERS } from "./modules/kernels";
 export { hashState } from "./hash";

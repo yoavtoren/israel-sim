@@ -6,7 +6,7 @@
 import type { PendingEffect, TickLogEntry, WorldState } from "../state/types";
 import type { MinistryDef } from "./defs";
 import type { Registry } from "../constants/registry";
-import { addPath, getPath } from "../state/paths";
+import { addPath, getPath, setPath } from "../state/paths";
 import { parseKernelShares } from "../modules/kernels";
 
 export function ministriesStep(
@@ -53,6 +53,21 @@ export function ministriesStep(
           s.security.domestic_production[out.munition_class] = rate;
           s.security.stockpiles[out.munition_class] += rate;
           log.push({ t: s.t, step: 4, fn: `${def.id}.production`, target: `security.stockpiles.${out.munition_class}`, delta: rate, constant_id: out.baseline_id, note: null });
+          break;
+        }
+        case "funded_flow": {
+          const flow = c.get(out.base_id) + (ms.budget * c.get(out.budget_share_id)) / c.get(out.cost_per_unit_id);
+          const cur = getPath(s, out.target);
+          setPath(s, out.target, flow);
+          log.push({ t: s.t, step: 4, fn: `${def.id}.funded_flow`, target: out.target, delta: flow - cur, constant_id: out.cost_per_unit_id, note: null });
+          break;
+        }
+        case "inverse_level": {
+          const level = c.get(out.base_id) * Math.pow(Math.max(fr, 1e-6), -c.get(out.elasticity_id));
+          const cur = getPath(s, out.target);
+          const delta = c.get(out.adjust_rate_id) * (level - cur);
+          setPath(s, out.target, Math.max(0, cur + delta));
+          log.push({ t: s.t, step: 4, fn: `${def.id}.inverse_level`, target: out.target, delta, constant_id: out.elasticity_id, note: null });
           break;
         }
         case "pipeline": {

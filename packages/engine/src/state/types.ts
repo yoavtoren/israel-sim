@@ -34,6 +34,7 @@ export interface TaxPolicy {
 export interface MinistryState {
   /** ₪M/yr, approved annual budget */ budget: number;
   /** budget / baseline_budget, dimensionless */ funding_ratio: number;
+  /** consecutive quarters below each degradation rule's threshold, aligned with MinistryDef.degradation */ degradation_counters: number[];
 }
 
 export interface SectorState {

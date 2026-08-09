@@ -23,3 +23,12 @@
 - Imputed (flagged): debt/GDP 0.69, K/Y 4.0, pop growth 1.5%/yr since census, sector classification by area-majority (national_religious undercounted 6.5% vs ~11%), tax splits. Parquet skipped — JSON sufficient at this scale (deviation from plan).
 - ETL rerun: `corepack pnpm@10 etl` (network). Tests/smoke run offline from committed normalized/.
 - Next: M3 — 14 remaining ministry outputs, degradation engine, shadow-tick budget preview.
+
+## M3 — 2026-08-09 — GATE GREEN (round 1 of 3)
+- Exists: all 17 ministries have output rows and/or degradation rules in defs/ministries.json. Two new output kinds in the generic executor: funded_flow (housing starts) and inverse_level (welfare→poverty, police→protest). New engine module modules/degradation.ts (step 6b): consecutive-quarter counters in MinistryState.degradation_counters, wildcard "….*" effect paths, additive|multiplicative rates, triggers_event emitted once on activation via TickResult.events. Housing stock accumulation added to stocks step.
+- Public interface additions: previewBudget(state, decisions, ctx) → { diffs (shadow-tick numeric diff vs zero-change tick, sorted by relative size), breaks (rules activated by the REQUESTED funding level, with fires_after_quarters), events }. DegradationDef exported.
+- Behavior change: rigidity is now a per-quarter cut floor on the CURRENT budget (rigidity^(1/4)) so multi-year cuts compound below one-year limits — this makes deep-cut degradation rules reachable and is truer to spec §5.
+- Gate: tsc clean 0-any; 16/16 tests (new m3_preview.test.ts: no-op preview is empty; education cut surfaces quality break + 8q approval delay + negative teacher/deficit diffs; defense 0.75 activates readiness but not deterrence; health raise has no breaks; sustained internal-security cut compounds through rigidity and fires public_safety_crisis exactly once). Smoke unchanged vs M2 (baseline calibrated to steady state).
+- Constants: +31 placeholder entries (ministry_outputs.json); registry now 95 entries.
+- Stubbed still: localities (M4), hazards/events beyond degradation triggers (M5), security/diplomacy dynamics (M6), politics step (M7).
+- Next: M4 — sector response functions, locality SoA agents, migration, participation backtest.

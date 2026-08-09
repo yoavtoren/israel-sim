@@ -18,7 +18,10 @@ export function resolveDecisions(
     const ms = s.fiscal.ministries[def.id];
     const proposed = decisions.budgets?.[def.id];
     if (proposed !== undefined) {
-      const floor = def.baseline_budget * def.rigidity;
+      // Rigidity = share that cannot be cut within one year (spec §5); per
+      // quarter that is rigidity^(1/4) of the CURRENT budget, so multi-year
+      // sustained cuts compound below it while one-year cuts cannot.
+      const floor = ms.budget * Math.pow(def.rigidity, 0.25);
       const applied = Math.max(proposed, floor);
       if (applied !== ms.budget) {
         log.push({
