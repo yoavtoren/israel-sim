@@ -1,0 +1,79 @@
+[
+ {
+  "id": "haredi_core_curriculum", "prerequisites": [], "fiscal_cost": 1500, "reversible": true,
+  "effects": [ { "target": "sectors.haredi.grievance", "delta": 0.1, "clamp": [0, 1] } ],
+  "pipeline_effects": [
+   { "target": "sectors.haredi.vocational_share", "magnitude": 0.15, "kernel": "gamma(shape=4, scale=2.2)" },
+   { "target": "sectors.haredi.education_years", "magnitude": 0.8, "kernel": "gamma(shape=4, scale=2.2)" }
+  ],
+  "political_cost_by_sector": { "haredi": -0.15, "secular": 0.03, "national_religious": -0.02 }
+ },
+ {
+  "id": "vocational_colleges", "prerequisites": ["haredi_core_curriculum"], "fiscal_cost": 1200, "reversible": true,
+  "effects": [],
+  "pipeline_effects": [ { "target": "sectors.haredi.vocational_share", "magnitude": 0.08, "kernel": "gamma(shape=3, scale=2)" } ],
+  "political_cost_by_sector": { "haredi": 0.02 }
+ },
+ {
+  "id": "draft_equality_law", "prerequisites": [], "fiscal_cost": 800, "reversible": true,
+  "effects": [
+   { "target": "sectors.haredi.grievance", "delta": 0.15, "clamp": [0, 1] },
+   { "target": "sectors.secular.grievance", "delta": -0.05, "clamp": [0, 1] }
+  ],
+  "pipeline_effects": [
+   { "target": "security.force_readiness", "magnitude": 0.05, "kernel": "step(k=2)" },
+   { "target": "sectors.haredi.military_service_rate", "magnitude": 0.2, "kernel": "gamma(shape=3, scale=2)" }
+  ],
+  "political_cost_by_sector": { "haredi": -0.2, "secular": 0.05, "national_religious": -0.05 }
+ },
+ {
+  "id": "arab_employment_program", "prerequisites": [], "fiscal_cost": 2500, "reversible": true,
+  "effects": [ { "target": "sectors.arab.grievance", "delta": -0.05, "clamp": [0, 1] } ],
+  "pipeline_effects": [
+   { "target": "sectors.arab.vocational_share", "magnitude": 0.1, "kernel": "gamma(shape=3, scale=2)" },
+   { "target": "sectors.arab.education_years", "magnitude": 0.5, "kernel": "gamma(shape=3, scale=2)" }
+  ],
+  "political_cost_by_sector": { "arab": 0.1, "national_religious": -0.03 }
+ },
+ {
+  "id": "judicial_reform", "prerequisites": [], "fiscal_cost": 0, "reversible": true,
+  "effects": [
+   { "target": "politics.institutional_trust", "delta": -0.1, "clamp": [0, 1] },
+   { "target": "politics.protest_intensity", "delta": 0.15, "clamp": [0, 1] },
+   { "target": "politics.social_cohesion", "delta": -0.05, "clamp": [0, 1] }
+  ],
+  "pipeline_effects": [],
+  "political_cost_by_sector": { "national_religious": 0.08, "haredi": 0.05, "secular": -0.12, "arab": -0.05 }
+ },
+ {
+  "id": "pension_reform", "prerequisites": [], "fiscal_cost": -3000, "reversible": false,
+  "effects": [],
+  "pipeline_effects": [],
+  "political_cost_by_sector": { "secular": -0.03, "national_religious": -0.03, "haredi": -0.03, "arab": -0.03, "other": -0.03 }
+ },
+ {
+  "id": "transit_megaproject", "prerequisites": [], "fiscal_cost": 8000, "reversible": true,
+  "effects": [],
+  "pipeline_effects": [
+   { "target": "infrastructure.rail_km", "magnitude": 300, "kernel": "gamma(shape=4, scale=2.5)" },
+   { "target": "infrastructure.congestion_index", "magnitude": -0.1, "kernel": "gamma(shape=4, scale=2.5)" }
+  ],
+  "political_cost_by_sector": { "secular": 0.05, "arab": 0.03 }
+ },
+ {
+  "id": "tax_simplification", "prerequisites": [], "fiscal_cost": 500, "reversible": true,
+  "effects": [],
+  "pipeline_effects": [ { "target": "macro.productivity_index", "magnitude": 0.01, "kernel": "gamma(shape=3, scale=2)" } ],
+  "political_cost_by_sector": { "secular": 0.01, "other": 0.01 }
+ },
+ {
+  "id": "settlement_expansion", "prerequisites": [], "fiscal_cost": 2000, "reversible": true,
+  "effects": [
+   { "target": "diplomacy.un_standing", "delta": -0.1, "clamp": [-1, 1] },
+   { "target": "security.threat_level.west_bank", "delta": 0.05, "clamp": [0, 1] },
+   { "target": "sectors.arab.grievance", "delta": 0.08, "clamp": [0, 1] }
+  ],
+  "pipeline_effects": [],
+  "political_cost_by_sector": { "national_religious": 0.15, "haredi": 0.03, "secular": -0.05, "arab": -0.15 }
+ }
+]

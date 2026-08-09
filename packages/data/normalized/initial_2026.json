@@ -193,7 +193,38 @@
  "politics": {
   "coalition": {
    "seats": 64,
-   "parties": [],
+   "parties": [
+    {
+     "id": "main_gov",
+     "seats": 32,
+     "aligned_sector": "secular",
+     "key_ministries": [
+      "defense",
+      "economy",
+      "justice"
+     ]
+    },
+    {
+     "id": "national_religious_bloc",
+     "seats": 14,
+     "aligned_sector": "national_religious",
+     "key_ministries": [
+      "education",
+      "housing",
+      "religious_services"
+     ]
+    },
+    {
+     "id": "haredi_bloc",
+     "seats": 18,
+     "aligned_sector": "haredi",
+     "key_ministries": [
+      "religious_services",
+      "education",
+      "welfare"
+     ]
+    }
+   ],
    "stability": 0.6
   },
   "approval_by_sector": {

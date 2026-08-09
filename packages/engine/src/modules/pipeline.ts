@@ -11,8 +11,8 @@ import { addPath } from "../state/paths";
 export function pipelineStep(s: WorldState, log: TickLogEntry[]): void {
   const kept: typeof s.pipeline = [];
   for (const effect of s.pipeline) {
-    const fr = s.fiscal.ministries[effect.origin.ministry].funding_ratio;
-    if (effect.decays_if !== null && fr < effect.decays_if.ministry_funding_below) {
+    const fr = effect.origin.ministry !== null ? s.fiscal.ministries[effect.origin.ministry].funding_ratio : 1;
+    if (effect.decays_if !== null && effect.origin.ministry !== null && fr < effect.decays_if.ministry_funding_below) {
       const forfeited = effect.remaining.reduce((a, b) => a + b, 0);
       log.push({ t: s.t, step: 5, fn: "pipeline_decay", target: effect.target, delta: -forfeited, constant_id: null, note: `origin ${effect.origin.ministry} funding below ${effect.decays_if.ministry_funding_below}` });
       continue;

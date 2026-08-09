@@ -1,0 +1,14 @@
+[
+ { "id": "politics.stability_adjust_quarterly", "value": 0.15, "unit": "fraction of gap to target stability closed per quarter", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.stability_intercept", "value": 0.35, "unit": "stability target intercept", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.stability_approval_weight", "value": 0.5, "unit": "stability per unit seat-weighted coalition-sector approval", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented; Knesset voting-record fit needed" },
+ { "id": "politics.stability_budget_weight", "value": 0.8, "unit": "stability loss per unit seat-weighted budget distance from party preferences", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.stability_protest_weight", "value": 0.3, "unit": "stability loss per unit protest intensity", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.fall_threshold", "value": 0.15, "unit": "stability below which the government falls", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.post_election_stability", "value": 0.55, "unit": "stability of a freshly elected coalition", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.election_cohesion_cost", "value": 0.02, "unit": "cohesion cost of an election cycle", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented" },
+ { "id": "politics.cohesion_struct_base", "value": 0.75, "unit": "cohesion structural ceiling before divergence penalties", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented (spec §9)" },
+ { "id": "politics.cohesion_participation_var_weight", "value": 8, "unit": "cohesion loss per unit cross-sector participation variance", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented (spec §9 outcome-divergence term)" },
+ { "id": "politics.cohesion_service_spread_weight", "value": 0.15, "unit": "cohesion loss per unit military-service-rate spread", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented (spec §9 service-burden asymmetry)" },
+ { "id": "politics.cohesion_trust_weight", "value": 0.1, "unit": "cohesion loss per unit (1 − institutional trust)", "lag_kernel": "immediate", "confidence": "placeholder", "source": "invented (spec §9)" }
+]

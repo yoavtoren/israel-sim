@@ -71,3 +71,9 @@ All 31 entries are `placeholder` confidence (transport road/rail costs, welfare 
 
 ## Added in M6 — packages/data/constants/conflict.json
 45 entries, nearly all placeholder: munition consumption per front intensity (order-of-magnitude from 2023-24 war reporting), mobilization/wear/deterrence params, casualties per intensity-quarter, embargo production penalty, Ω coefficients (mobilization/front), export share (medium), trade weights (needs UN Comtrade), alignment/trade bases and drift, US aid base (medium, MoU), debt-spiral threshold, IMF austerity factor, civil-war-pressure weights + t0 variance reference. Replace with SIPRI/Comtrade/V-Dem-informed fits in M9.
+
+## Added in M7
+- `constants/governance.json`: 12 coalition/cohesion parameters, all placeholder (stability weights need a Knesset voting-record fit; cohesion divergence weights are the spec §9 terms with invented magnitudes).
+- `defs/reforms.json`: 9 reforms — every fiscal cost, effect magnitude and political cost is invented; sources should come from program evaluations (e.g. Taub on core-curriculum outcomes).
+- `defs/economic_models.json`: overlay values are baseline×factor constructions (tax shares ×0.7–1.4, TFP 0.001–0.010, Okun 0.2–0.55, welfare-poverty beta 0.03–0.2) — directionally per spec §10 table, magnitudes invented.
+- `politics.cohesion_base` in stability.json is now unused (cohesion is endogenous); kept for provenance.

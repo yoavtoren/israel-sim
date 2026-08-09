@@ -49,6 +49,29 @@ function validateEntry(raw: unknown, ordinal: number): ConstantEntry {
   return entry;
 }
 
+/**
+ * Economic-model overlay (spec §10): a model is a set of constant overrides
+ * merged over the base registry. Returns the base registry unchanged when the
+ * override set is empty (the "mixed" model).
+ */
+export function withOverrides(base: Registry, overrides: Record<string, number>): Registry {
+  if (Object.keys(overrides).length === 0) return base;
+  return {
+    get(id: string): number {
+      const v = overrides[id];
+      return v !== undefined ? v : base.get(id);
+    },
+    entry(id: string): ConstantEntry {
+      const e = base.entry(id);
+      const v = overrides[id];
+      return v !== undefined ? { ...e, value: v, source: e.source + " [economic-model override]" } : e;
+    },
+    all(): ConstantEntry[] {
+      return base.all().map((e) => (overrides[e.id] !== undefined ? { ...e, value: overrides[e.id] } : e));
+    },
+  };
+}
+
 export function buildRegistry(groups: unknown[][]): Registry {
   const map = new Map<string, ConstantEntry>();
   let ordinal = 0;

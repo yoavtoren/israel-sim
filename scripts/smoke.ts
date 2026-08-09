@@ -6,7 +6,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  buildInitialState, buildRegistry, parseEventDefs, parseMinistryDefs, tick, totalPopulation, totalSpend,
+  buildInitialState, buildRegistry, parseEventDefs, parseMinistryDefs, parseModelDefs, parseReformDefs,
+  tick, totalPopulation, totalSpend,
   type InitialStateJson, type LocalityInitRow, type WorldState,
 } from "../packages/engine/src/index";
 import type { EngineContext } from "../packages/engine/src/tick";
@@ -23,7 +24,9 @@ const initialRaw = JSON.parse(readFileSync(join(dataDir, "normalized", "initial_
 const localityRows = JSON.parse(readFileSync(join(dataDir, "normalized", "localities.json"), "utf8")) as LocalityInitRow[];
 const initial = buildInitialState(initialRaw, ministries, registry, "smoke-seed", { localities: localityRows });
 const eventDefs = parseEventDefs(JSON.parse(readFileSync(join(dataDir, "defs", "events.json"), "utf8")));
-const ctx: EngineContext = { registry, ministries, events: eventDefs, start_year: initialRaw.start_year };
+const reformDefs = parseReformDefs(JSON.parse(readFileSync(join(dataDir, "defs", "reforms.json"), "utf8")));
+const modelDefs = parseModelDefs(JSON.parse(readFileSync(join(dataDir, "defs", "economic_models.json"), "utf8")));
+const ctx: EngineContext = { registry, ministries, events: eventDefs, reforms: reformDefs, models: modelDefs, start_year: initialRaw.start_year };
 
 let violations = 0;
 function check(ok: boolean, msg: string): void {

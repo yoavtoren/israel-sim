@@ -58,7 +58,7 @@ export function totalRevenue(s: WorldState): number {
   return r.income + r.vat + r.corporate + r.capital + r.customs;
 }
 
-export function fiscalStep(s: WorldState, c: Registry, log: TickLogEntry[]): void {
+export function fiscalStep(s: WorldState, c: Registry, reformCostAnnual: number, log: TickLogEntry[]): void {
   const gdp = s.macro.gdp_real;
   const mult = s.fiscal.tax_policy.revenue_multiplier;
   const prevDeficit = s.fiscal.deficit;
@@ -72,7 +72,7 @@ export function fiscalStep(s: WorldState, c: Registry, log: TickLogEntry[]): voi
   const revenue = totalRevenue(s);
   // Non-ministry spend (pensions, Knesset, local-authority grants, reserves…)
   // is a published aggregate the player cannot currently steer; M3+ decomposes it.
-  const spend = totalSpend(s) + c.get("fiscal.non_ministry_spend_annual") + s.fiscal.periphery_spend;
+  const spend = totalSpend(s) + c.get("fiscal.non_ministry_spend_annual") + s.fiscal.periphery_spend + reformCostAnnual;
   s.fiscal.deficit = spend + s.fiscal.debt_service - revenue;
 
   // Quarterly debt issuance covers a quarter of the annualized deficit.

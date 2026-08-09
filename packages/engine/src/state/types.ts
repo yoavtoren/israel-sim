@@ -85,6 +85,8 @@ export interface Sanction {
 export interface PartyState {
   id: string;
   seats: number;
+  /** sector whose approval this party answers to */ aligned_sector?: SectorId;
+  /** budget lines the party defends; cuts there strain the coalition */ key_ministries?: MinistryId[];
 }
 
 export interface ReformState {
@@ -94,7 +96,7 @@ export interface ReformState {
 
 /** CONTRACT §7.3 — delayed-payoff pipeline entry. */
 export interface PendingEffect {
-  origin: { /** absolute tick index */ tick: number; ministry: MinistryId; decision: string };
+  origin: { /** absolute tick index */ tick: number; /** null for non-ministry origins (reforms) */ ministry: MinistryId | null; decision: string };
   /** dot StatePath, must resolve to a number */ target: string;
   /** total effect, in target's unit */ magnitude: number;
   /** kernel spec string, e.g. "gamma(shape=4, scale=2.2)" */ kernel: string;
@@ -228,6 +230,10 @@ export interface Decisions {
     /** Crossing IHL thresholds — catastrophic failure state, not a strategy. */ mass_atrocity_order?: boolean;
     /** Terminal branch. */ nuclear_use?: boolean;
   };
+  /** Reform toggles (spec §10): enact checks prerequisites; repeal requires reversible. */
+  reforms?: Record<string, "enact" | "repeal">;
+  /** Switch the economic model (constants overlay); imposes a transition shock. */
+  economic_model?: EconomicModelId;
 }
 
 export interface EngineEvent {

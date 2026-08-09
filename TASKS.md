@@ -55,11 +55,11 @@
 - [x] GATE: isolation scenario terminates coherently (stockpile exhaustion → computable defeat)
 
 ## M7 — Reforms, economic models, coalition
-- [ ] Reform system (prerequisites, pipeline non-refund on repeal)
-- [ ] Economic-model overlays as constants merges + transition costs
-- [ ] Coalition module: party budget preferences → stability → collapse/elections (step 12)
-- [ ] Social-cohesion aggregation feeding readiness/emigration/civil_war_pressure
-- [ ] GATE: government can fall
+- [x] Reform system (prerequisites, pipeline non-refund on repeal)
+- [x] Economic-model overlays as constants merges + transition costs
+- [x] Coalition module: party budget preferences → stability → collapse/elections (step 12)
+- [x] Social-cohesion aggregation feeding readiness/emigration/civil_war_pressure
+- [x] GATE: government can fall
 
 ## M8 — Narrator
 - [ ] docs/DESIGN.md (tokens, typography, reference screens) — before any UI work beyond M4 debug views

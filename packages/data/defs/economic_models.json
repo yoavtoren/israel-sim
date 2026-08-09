@@ -1,0 +1,48 @@
+[
+ { "id": "mixed", "overrides": {}, "transition": { "stability_shock": 0.1, "cohesion_shock": 0.03, "trust_shock": 0.02 } },
+ {
+  "id": "libertarian",
+  "overrides": {
+   "fiscal.revenue_share_income": 0.05818, "fiscal.revenue_share_vat": 0.05041, "fiscal.revenue_share_corporate": 0.02628,
+   "fiscal.revenue_share_capital": 0.00939, "fiscal.revenue_share_customs": 0.02277,
+   "macro.tfp_growth_annual": 0.01, "macro.okun_coefficient": 0.55, "sectors.poverty_welfare_beta": 0.2
+  },
+  "transition": { "stability_shock": 0.2, "cohesion_shock": 0.08, "trust_shock": 0.05 }
+ },
+ {
+  "id": "capitalist",
+  "overrides": {
+   "fiscal.revenue_share_income": 0.07065, "fiscal.revenue_share_vat": 0.06122, "fiscal.revenue_share_corporate": 0.03191,
+   "fiscal.revenue_share_capital": 0.0114, "fiscal.revenue_share_customs": 0.02765,
+   "macro.tfp_growth_annual": 0.009, "macro.okun_coefficient": 0.5, "sectors.poverty_welfare_beta": 0.15
+  },
+  "transition": { "stability_shock": 0.12, "cohesion_shock": 0.04, "trust_shock": 0.03 }
+ },
+ {
+  "id": "social_democratic",
+  "overrides": {
+   "fiscal.revenue_share_income": 0.09559, "fiscal.revenue_share_vat": 0.08282, "fiscal.revenue_share_corporate": 0.04317,
+   "fiscal.revenue_share_capital": 0.01542, "fiscal.revenue_share_customs": 0.03741,
+   "macro.tfp_growth_annual": 0.005, "macro.okun_coefficient": 0.3, "sectors.poverty_welfare_beta": 0.06
+  },
+  "transition": { "stability_shock": 0.12, "cohesion_shock": 0.04, "trust_shock": 0.03 }
+ },
+ {
+  "id": "socialist",
+  "overrides": {
+   "fiscal.revenue_share_income": 0.10806, "fiscal.revenue_share_vat": 0.09363, "fiscal.revenue_share_corporate": 0.0488,
+   "fiscal.revenue_share_capital": 0.01743, "fiscal.revenue_share_customs": 0.04229,
+   "macro.tfp_growth_annual": 0.003, "macro.okun_coefficient": 0.25, "sectors.poverty_welfare_beta": 0.04
+  },
+  "transition": { "stability_shock": 0.2, "cohesion_shock": 0.08, "trust_shock": 0.05 }
+ },
+ {
+  "id": "statist_command",
+  "overrides": {
+   "fiscal.revenue_share_income": 0.11637, "fiscal.revenue_share_vat": 0.10083, "fiscal.revenue_share_corporate": 0.05256,
+   "fiscal.revenue_share_capital": 0.01877, "fiscal.revenue_share_customs": 0.04554,
+   "macro.tfp_growth_annual": 0.001, "macro.okun_coefficient": 0.2, "sectors.poverty_welfare_beta": 0.03
+  },
+  "transition": { "stability_shock": 0.3, "cohesion_shock": 0.12, "trust_shock": 0.1 }
+ }
+]

@@ -58,8 +58,10 @@ export function securityStep(s: WorldState, c: Registry, events: EngineEvent[], 
     }
   }
 
-  // Reserve mobilization follows front demand.
-  const mobTarget = Math.min(1, c.get("security.mobilization_per_intensity") * intensity);
+  // Reserve mobilization follows front demand, scaled by willingness — social
+  // cohesion feeds force readiness through turnout (spec §9).
+  const willingness = 0.5 + 0.5 * s.politics.social_cohesion;
+  const mobTarget = Math.min(1, c.get("security.mobilization_per_intensity") * intensity * willingness);
   const dMob = c.get("security.mobilization_adjust_quarterly") * (mobTarget - s.security.reserve_mobilization);
   s.security.reserve_mobilization = Math.min(1, Math.max(0, s.security.reserve_mobilization + dMob));
   log.push({ t: s.t, step: 10, fn: "mobilization", target: "security.reserve_mobilization", delta: dMob, constant_id: "security.mobilization_per_intensity", note: null });

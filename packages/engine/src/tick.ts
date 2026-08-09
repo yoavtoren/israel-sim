@@ -24,12 +24,18 @@ import { diplomacyStep } from "./modules/diplomacy";
 import { redlinesStep } from "./modules/redlines";
 import { eventsStep } from "./events/resolver";
 import { politicsStep } from "./modules/politics";
+import { enactedReformCost, reformsStep, type ModelDef, type ReformDef } from "./modules/reforms";
+import { withOverrides } from "./constants/registry";
 
 export interface EngineContext {
   registry: Registry;
   ministries: MinistryDef[];
   /** declarative event definitions (empty array → no events) */
   events: EventDef[];
+  /** reform definitions (empty array → no reforms available) */
+  reforms: ReformDef[];
+  /** economic-model overlays (spec §10); "mixed" needs no entry */
+  models: ModelDef[];
   /** t0 of the run; defines the absolute tick index */
   start_year: number;
 }
@@ -49,22 +55,26 @@ export function tick(prev: WorldState, decisions: Decisions, ctx: EngineContext)
   const idx = tickIndexOf(s, ctx.start_year);
   const streams = makeTickStreams(s.seed, `t${idx}`);
 
-  resolveDecisions(s, decisions, ctx.ministries, log);          // 1
-  fiscalStep(s, ctx.registry, log);                             // 2
-  marketsStep(s, ctx.registry, log);                            // 3
-  ministriesStep(s, ctx.ministries, ctx.registry, idx, log);    // 4
+  resolveDecisions(s, decisions, ctx.ministries, log);          // 1a budgets, periphery
+  reformsStep(s, decisions, ctx.reforms, ctx.models, idx, events, log); // 1b reforms + model switch
+  // The economic model is a constants overlay (spec §10) for everything downstream.
+  const model = ctx.models.find((m) => m.id === s.economic_model);
+  const c = withOverrides(ctx.registry, model?.overrides ?? {});
+  fiscalStep(s, c, enactedReformCost(s, ctx.reforms), log);     // 2
+  marketsStep(s, c, log);                                       // 3
+  ministriesStep(s, ctx.ministries, c, idx, log);               // 4
   pipelineStep(s, log);                                         // 5
-  stocksStep(s, ctx.registry, log);                             // 6
+  stocksStep(s, c, log);                                        // 6
   degradationStep(s, ctx.ministries, events, log);              // 6b
-  demographyStep(s, ctx.registry, log);                         // 7a demography
-  sectorsStep(s, ctx.registry, log);                            // 7b sector dynamics
-  localitiesStep(s, ctx.registry, log);                         // 8
-  macroStep(s, ctx.registry, streams("macro"), log);            // 9
-  securityStep(s, ctx.registry, events, log);                   // 10a
-  diplomacyStep(s, ctx.registry, log);                          // 10b
-  redlinesStep(s, decisions, ctx.registry, idx, events, log);   // 10c
-  eventsStep(s, ctx.events, ctx.registry, streams("hazards"), idx, events, log); // 11
-  politicsStep(s, ctx.registry, events, log);                   // 12 (reversion stub + civil-war pressure; coalition in M7)
+  demographyStep(s, c, log);                                    // 7a demography
+  sectorsStep(s, c, log);                                       // 7b sector dynamics
+  localitiesStep(s, c, log);                                    // 8
+  macroStep(s, c, streams("macro"), log);                       // 9
+  securityStep(s, c, events, log);                              // 10a
+  diplomacyStep(s, c, log);                                     // 10b
+  redlinesStep(s, decisions, c, idx, events, log);              // 10c
+  eventsStep(s, ctx.events, c, streams("hazards"), idx, events, log); // 11
+  politicsStep(s, c, events, log);                              // 12 coalition, cohesion, civil-war pressure
 
   // 13 log & advance clock.
   s.log = log;
