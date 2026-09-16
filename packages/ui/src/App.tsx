@@ -15,6 +15,14 @@ import { Sectors } from "./screens/Sectors";
 import { Reforms } from "./screens/Reforms";
 import { History } from "./screens/History";
 import { PostMortem } from "./screens/PostMortem";
+import { Cabinet } from "./screens/Cabinet";
+import { Tactical } from "./screens/Tactical";
+import { StrategicStrip } from "./components/StrategicStrip";
+
+const STRATEGY_NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
+  { screen: "cabinet", label: "cabinet", accent: DOMAIN.security },
+  { screen: "tactical", label: "tactical", accent: DOMAIN.diplomacy },
+];
 
 const NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
   { screen: "overview", label: "overview", accent: DOMAIN.macro },
@@ -60,6 +68,20 @@ export function App() {
   }
 
   const ended = state.outcome.ended;
+  const strategicScreen = screen === "cabinet" || screen === "tactical";
+  const navButton = (n: { screen: Screen; label: UIKey; accent: string }) => (
+    <button
+      key={n.screen}
+      type="button"
+      onClick={() => setScreen(n.screen)}
+      className={`flex w-full items-center gap-2 px-4 py-2 text-start text-[13px] leading-[20px] ${
+        screen === n.screen ? "bg-bg3 text-fg0" : "text-fg1 hover:bg-bg2"
+      }`}
+    >
+      <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: n.accent }} />
+      {t(n.label, lang)}
+    </button>
+  );
 
   return (
     <div className="flex h-full bg-bg0">
@@ -70,19 +92,10 @@ export function App() {
           <div className="num text-[11px] text-fg2">israel-sim</div>
         </div>
         <nav className="flex-1 overflow-y-auto py-2">
-          {NAV.map((n) => (
-            <button
-              key={n.screen}
-              type="button"
-              onClick={() => setScreen(n.screen)}
-              className={`flex w-full items-center gap-2 px-4 py-2 text-start text-[13px] leading-[20px] ${
-                screen === n.screen ? "bg-bg3 text-fg0" : "text-fg1 hover:bg-bg2"
-              }`}
-            >
-              <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: n.accent }} />
-              {t(n.label, lang)}
-            </button>
-          ))}
+          <div className="px-4 pt-1 pb-1 text-[11px] text-fg2">{t("strategySection", lang)}</div>
+          {STRATEGY_NAV.map(navButton)}
+          <div className="mt-2 border-t border-line0 px-4 pt-3 pb-1 text-[11px] text-fg2">{t("economySection", lang)}</div>
+          {NAV.map(navButton)}
           {ended && (
             <button
               type="button"
@@ -108,7 +121,7 @@ export function App() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* top strip: clock, headline KPIs, run controls */}
-        <header className="flex items-center gap-6 border-b border-line0 bg-bg1 px-4 py-2">
+        {strategicScreen ? <StrategicStrip /> : <header className="flex items-center gap-6 border-b border-line0 bg-bg1 px-4 py-2">
           <Num value={fmtQuarter(state.t.year, state.t.quarter)} className="text-[24px] leading-[32px] font-medium" />
           <div className="flex items-baseline gap-1 text-[12px] text-fg1">
             {t("gdp", lang)}
@@ -136,15 +149,17 @@ export function App() {
               </button>
             ))}
           </div>
-        </header>
+        </header>}
 
-        {ended && screen !== "postmortem" && (
+        {ended && !strategicScreen && screen !== "postmortem" && (
           <div className="border-b border-bad bg-bad-dim/30 px-4 py-1.5 text-[13px] text-bad-bright">
             {t("runEnded", lang)} — {state.outcome.kind}
           </div>
         )}
 
-        <main className={`min-h-0 flex-1 ${screen === "map" ? "" : "overflow-y-auto p-4"}`}>
+        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" ? "relative" : "overflow-y-auto p-4"}`}>
+          {screen === "cabinet" && <Cabinet />}
+          {screen === "tactical" && <Tactical />}
           {screen === "overview" && <Overview />}
           {screen === "budget" && <Budget />}
           {screen === "map" && <MapScreen />}

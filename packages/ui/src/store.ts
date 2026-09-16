@@ -7,7 +7,7 @@ import type { HistoryFrame, RunMeta } from "./sim/types";
 import type { Lang } from "./lib/strings";
 
 export type Screen =
-  | "overview" | "budget" | "map" | "security" | "pipeline" | "sectors" | "reforms" | "history" | "postmortem";
+  | "cabinet" | "tactical" | "overview" | "budget" | "map" | "security" | "pipeline" | "sectors" | "reforms" | "history" | "postmortem";
 
 export interface FeedItem {
   tickIndex: number;
@@ -92,7 +92,7 @@ export const useStore = create<UIStore>((set, get) => ({
   busy: false,
   seed: "situation-room",
   lang: "he",
-  screen: "overview",
+  screen: "cabinet",
   meta: null,
   state: null,
   frames: [],
@@ -119,7 +119,7 @@ export const useStore = create<UIStore>((set, get) => ({
       draft: EMPTY_DRAFT,
       preview: null,
       counterfactual: null,
-      screen: "overview",
+      screen: get().screen === "postmortem" ? "overview" : get().screen,
     });
   },
 

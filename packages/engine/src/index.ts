@@ -23,3 +23,4 @@ export { hashState } from "./hash";
 export { streamRng, makeTickStreams, type Rng } from "./rng";
 export { totalPopulation } from "./modules/demography";
 export { totalRevenue, totalSpend } from "./modules/fiscal";
+export * as strategic from "./strategic/index";
