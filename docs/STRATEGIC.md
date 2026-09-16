@@ -107,3 +107,30 @@ battle (IAF wings, Sa'ar corvettes, US carrier group East Med, US destroyer Red 
 contouring stylized), drones fly in swarms, ballistic missiles loft then accelerate hard in the terminal phase, heavy
 impacts shake the camera while playing. Base layer: Natural Earth 1:50m outlines (`region-geo.json`). Per-crisis scenes
 and per-option aftermaths: `strategic/crisisScripts.ts`. Dev builds expose `window.__tactical` for headless QA.
+
+## Prime Minister campaign (M13) — the app's main screen
+`packages/engine/src/strategic/campaign/` (parties, dilemmas, reducer) + `ui/src/screens/Game.tsx`, `components/game/*`.
+
+Flow: **welcome → pick a party → form a coalition (≥61 seats, no mutual refusals) → doctrine popup ("choose the
+government's policy on the Israeli–Palestinian conflict") → the doctrine's first dilemma (radical right: "what will you
+do in Gaza?") → consequence popups → next dilemma …** until an ending.
+
+- Parties: seats as elected in November 2022 (Religious Zionism list split into its three factions). Security positions,
+  refusals and frictions are game assumptions from public positions.
+- Coalition: each partner has 0–100 patience. Doctrines and options move patience by party group (far right / right /
+  Haredi / center / left / Arab parties); ≤25 → threat popup, ≤0 → the party quits; below 61 seats → the government falls.
+  The coalition-stability metric is the seat-weighted patience.
+- Dilemmas: 5 doctrine openers, 14 follow-ups (Jordan treaty, settler violence, ICC warrants, EU boycott, Hezbollah,
+  Houthis, US arms hold, reservist refusal, mass protests, civil revolt, downgrade, terror attack, Saudi deal, ceasefire
+  talks), plus the 5 crisis-engine crises adapted as dilemmas. `next` chains are forced; otherwise a weighted draw over
+  eligible dilemmas (weights from metrics and narrative flags, with cooldowns).
+- Consequences carry metric deltas, per-country stance shifts (an additive overlay on the stances model —
+  `campaignStances`), partner reactions, flags, a camera focus (world, Europe, US, Gulf, Red Sea, Sinai, Gaza…) and a
+  visual (salvo, strike, ground move, protest, crisis scene, nuclear detonation) drawn by the tactical renderer over the
+  world map.
+- Endings: government fell (<61 seats); state collapse — external (threat ≥95; US aid ≤5 with threat ≥75; economy ≤10;
+  total isolation incl. US aid ≤20; nuclear use; carrying out the forced transfer under fire) or internal (cohesion ≤10);
+  term completed after 16 quarters **only if no war is going on** (war = Lebanon front, a transfer war with Egypt, or
+  threat ≥70). At the end of the term during a war, elections are postponed and ceasefire talks are forced.
+- World map: `ui/src/strategic/world-geo.json` (230 countries, Natural Earth 1:50m, `scripts/build-world-geo.mjs`),
+  colored by stance; EU members, US, UK, China and India now have territory on the map.
