@@ -49,7 +49,6 @@ const L = {
   preview: { he: "תחזית ההכרעה", en: "Decision preview" },
   decide: { he: "הכרע", en: "Decide" },
   endsRun: { he: "ההכרעה מסיימת את הקדנציה", en: "This decision ends the term" },
-  opensCrisis: { he: "ההכרעה פותחת משבר אזורי — יוצג במפה הטקטית", en: "This decision opens a regional crisis — shown on the tactical map" },
   checkpoints: { he: "נקודות בדיקה · מסלול מדורג", en: "Checkpoints · staged track" },
   rollback: { he: "מנגנון נסיגה: פיגוע או התחמשות מחודשת מקפיאים את התהליך ומחזירים את הסמכויות לצה\"ל.", en: "Withdrawal mechanism: an attack or rearmament freezes the process and returns powers to the IDF." },
   rollbackRisk: { he: "סיכון הקפאה בתור הבא", en: "Freeze risk next turn" },
@@ -135,6 +134,7 @@ export function Cabinet() {
 
   const locked = sim.gameOver || sim.pendingCrisis !== null;
   const preview = useMemo(() => (locked ? null : S.previewPolicyDecision(sim, draft)), [sim, draft, locked]);
+  const risks = useMemo(() => (locked ? [] : S.previewCrisisRisks(sim, draft)), [sim, draft, locked]);
   const newLogs = preview === null ? [] : preview.historyLogs.slice(sim.historyLogs.length);
   const trackDef = S.TRACK_DEFS[draft.track];
   const reaction = S.COALITION_REACTION[sim.coalition][draft.track];
@@ -210,7 +210,10 @@ export function Cabinet() {
       <div className="flex min-w-0 flex-col gap-4">
         {sim.pendingCrisis !== null && (
           <div className="flex items-center justify-between rounded-[4px] border border-bad bg-bad-dim/30 px-3 py-2 text-[13px] text-bad-bright">
-            {tr(L.crisisPending, lang)}
+            <span>
+              {tr(L.crisisPending, lang)}
+              <span className="ms-1 font-medium">· {tr(S.CRISIS_DEFS[sim.pendingCrisis.id].title, lang)}</span>
+            </span>
             <button
               type="button"
               className="rounded-[2px] border border-bad px-2 py-1 text-[12px] hover:bg-bad-dim/40"
@@ -321,7 +324,21 @@ export function Cabinet() {
                   {trackDef.transition.source === "assumption" && <Chip tone="muted"><span className="assumption" title={tr(L.assumptionNote, lang)}>{tr(L.assumption, lang)} · {lang === "he" ? "זעזוע מעבר" : "transition"}</span></Chip>}
                   {reaction.source === "assumption" && <Chip tone="muted"><span className="assumption" title={tr(L.assumptionNote, lang)}>{tr(L.assumption, lang)} · {lang === "he" ? "תגובה קואליציונית" : "coalition reaction"}</span></Chip>}
                 </div>
-                {preview.pendingCrisis !== null && <Chip tone="bad">{tr(L.opensCrisis, lang)}</Chip>}
+                {risks.length > 0 && (
+                  <div className="rounded-[2px] border border-bad/50 bg-bad-dim/15 px-2 py-1.5">
+                    <div className="text-[11px] font-medium text-bad-bright">{lang === "he" ? "סיכון משבר (יעצור את ציר הזמן)" : "Crisis risk (halts the timeline)"}</div>
+                    <ul className="mt-0.5 flex flex-col gap-0.5 text-[12px] leading-[17px]">
+                      {risks.map((r) => (
+                        <li key={r.id} className="flex items-baseline justify-between gap-2">
+                          <span className="text-fg0" title={tr(r.why, lang)}>{tr(S.CRISIS_DEFS[r.id].title, lang)}</span>
+                          <span className={`num shrink-0 ${r.p >= 1 ? "text-bad-bright" : "text-warn-bright"}`}>
+                            <span className="assumption" title={tr(L.assumptionNote, lang)}>{r.p >= 1 ? (lang === "he" ? "ודאי" : "certain") : `${Math.round(r.p * 100)}%`}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {preview.gameOver && preview.pendingCrisis === null && <Chip tone="bad">{tr(L.endsRun, lang)}</Chip>}
                 <ul className="flex max-h-[180px] flex-col gap-1 overflow-y-auto text-[12px] leading-[18px]">
                   {newLogs.map((l, i) => (

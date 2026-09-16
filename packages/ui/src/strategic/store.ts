@@ -3,7 +3,9 @@
 
 import { create } from "zustand";
 import { strategic } from "@engine";
-import { buildCrisisScript, buildTurnScript, type TacticalScript } from "./scenarios";
+import { buildTurnScript, type TacticalScript } from "./scenarios";
+import { buildCrisisScript } from "./crisisScripts";
+import { sound } from "./sound";
 import type { FocusId } from "./geo";
 
 /** simulated seconds per real second at 1× */
@@ -56,7 +58,7 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
   t: 0,
   playing: false,
   speed: 1,
-  soundOn: false,
+  soundOn: true,
   modalOpen: false,
   cameraMode: "auto",
   trackedId: null,
@@ -75,6 +77,7 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
   },
 
   decide() {
+    sound.unlock(); // called from the Decide click — lets the crisis chime play
     const { sim, draft } = get();
     const next = strategic.executePolicyDecision(sim, draft);
     if (next === sim) return false;
@@ -89,8 +92,11 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
   resolve(option) {
     const { sim, t } = get();
     if (sim.pendingCrisis === null) return;
-    const script = buildCrisisScript(sim, option); // same key as the halted script + the aftermath
-    set({ sim: strategic.resolveCrisis(sim, option), prevSim: sim, script, t: Math.max(t, 0), playing: true, modalOpen: false });
+    const next = strategic.resolveCrisis(sim, option);
+    const branch = next.turns[next.turns.length - 1]?.crisisBranch ?? null;
+    // keyed on the pending state, so the pre-halt picture is unchanged and playback continues from the halt
+    const script = buildCrisisScript(sim, option, branch);
+    set({ sim: next, prevSim: sim, script, t: Math.max(t, 0), playing: true, modalOpen: false, trackedId: null });
   },
 
   setT(t) {
@@ -121,3 +127,8 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
     set({ trackedId });
   },
 }));
+
+// Dev-only QA hook: lets a headless browser open any crisis directly. Stripped from production builds.
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  (window as unknown as Record<string, unknown>).__tactical = { useStrategic, buildCrisisScript, strategic };
+}

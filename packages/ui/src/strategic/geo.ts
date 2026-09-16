@@ -222,7 +222,7 @@ export interface Camera {
 export type FocusId = "theater" | "israel" | "tel_aviv" | "west_bank" | "gaza" | "sinai";
 
 const FOCUS_BOUNDS: Record<FocusId, [LonLat, LonLat]> = {
-  theater: [[29.5, 24.5], [53.5, 38.2]],
+  theater: [[29.5, 24.5], [57.5, 38.4]],
   israel: [[31.2, 29.2], [37.8, 33.6]],
   tel_aviv: [[33.6, 31.35], [35.9, 32.75]],
   west_bank: [[34.3, 31.25], [36.1, 32.75]],

@@ -63,6 +63,13 @@ export const sound = {
     noiseBurst(0.6, 0.5, 400);
     tone(70, 0.6, "sine", 0.2, 35);
   },
+  /** low-frequency crisis alert: two descending sub-bass pulses over a soft bell */
+  crisisChime(): void {
+    tone(98, 1.1, "sine", 0.35, 82);
+    tone(196, 0.9, "triangle", 0.06, 164);
+    setTimeout(() => tone(82, 1.3, "sine", 0.35, 65), 650);
+    setTimeout(() => tone(392, 1.4, "sine", 0.03), 650);
+  },
   decision(): void {
     tone(520, 0.12, "triangle", 0.06);
     setTimeout(() => tone(390, 0.25, "triangle", 0.06), 130);
@@ -72,6 +79,8 @@ export const sound = {
     else if (kind === "launch" || kind === "strike") this.launch();
     else if (kind === "intercept") this.intercept();
     else if (kind === "impact") this.impact();
-    else if (kind === "halt") this.decision();
+    else if (kind === "halt") this.crisisChime();
+    else if (kind === "crisis" || kind === "failure") this.alert();
+    else if (kind === "success" || kind === "ceasefire") this.decision();
   },
 };

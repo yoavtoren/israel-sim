@@ -5,7 +5,7 @@ import { useStore } from "../../store";
 import { useStrategic } from "../../strategic/store";
 import { BATTERIES } from "../../strategic/geo";
 import {
-  FACTION_COLORS, FACTION_NAMES, INTERCEPTOR_COLOR, KIND_NAMES, endTime, speedKmS,
+  AFFILIATION, FACTION_COLORS, FACTION_NAMES, INTERCEPTOR_COLOR, KIND_NAMES, endTime, speedKmS,
   type Faction, type Launch,
 } from "../../strategic/scenarios";
 
@@ -32,12 +32,15 @@ export function Telemetry() {
   const trackedId = useStrategic((s) => s.trackedId);
   const setTracked = useStrategic((s) => s.setTracked);
 
-  const incoming = script.launches.filter((l) => l.faction !== "idf");
+  const incoming = script.launches.filter((l) => AFFILIATION[l.faction] !== "friend");
   const active = incoming.filter((l) => t >= l.t0 && t < endTime(l));
   const launched = incoming.filter((l) => t >= l.t0).length;
   const intercepted = incoming.filter((l) => l.intercept?.success === true && t >= l.intercept.tHit).length;
   const impacts = incoming.filter((l) => l.intercept?.success !== true && t >= l.t0 + l.flight).length;
-  const strikes = script.launches.filter((l) => l.faction === "idf" && t >= l.t0 + l.flight).length;
+  const strikes = script.launches.filter((l) => AFFILIATION[l.faction] === "friend" && t >= l.t0 + l.flight).length;
+  const units = script.units.filter((u) => t >= u.t0 && t < u.until);
+  const hostileUnits = units.filter((u) => AFFILIATION[u.faction] === "hostile" && u.type !== "naval" && u.type !== "air").length;
+  const moving = units.filter((u) => t >= u.t0 && t < u.t1).length;
 
   const tracked: Launch | undefined =
     script.launches.find((l) => l.id === trackedId) ??
@@ -68,7 +71,7 @@ export function Telemetry() {
             const status =
               t < l.t0 ? (he ? "טרם שוגר" : "not launched")
               : ic?.success === true && t >= ic.tHit ? (he ? "יורט" : "intercepted")
-              : t >= tImpact ? (l.faction === "idf" ? (he ? "פגיעה במטרה" : "on target") : he ? "פגיעה" : "impact")
+              : t >= tImpact ? (AFFILIATION[l.faction] === "friend" ? (he ? "פגיעה במטרה" : "on target") : he ? "פגיעה" : "impact")
               : he ? "בטיסה" : "in flight";
             const statusColor = status === (he ? "יורט" : "intercepted") ? "text-good-bright" : status === (he ? "פגיעה" : "impact") ? "text-bad-bright" : "text-warn-bright";
             return (
@@ -112,11 +115,13 @@ export function Telemetry() {
         <Row label={he ? "באוויר" : "Airborne"}><span className="num text-warn-bright">{active.length}</span></Row>
         <Row label={he ? "יורטו" : "Intercepted"}><span className="num text-good-bright">{intercepted}</span></Row>
         <Row label={he ? "פגיעות" : "Impacts"}><span className="num text-bad-bright">{impacts}</span></Row>
-        {strikes > 0 && <Row label={he ? "תקיפות צה\"ל" : "IDF strikes"}><span className="num text-info-bright">{strikes}</span></Row>}
+        <Row label={he ? "תקיפות שלנו" : "Our strikes"}><span className="num text-info-bright">{strikes}</span></Row>
+        <Row label={he ? "כוחות עוינים" : "Hostile units"}><span className="num text-bad-bright">{hostileUnits}</span></Row>
+        <Row label={he ? "כוחות בתנועה" : "Units moving"}><span className="num">{moving}</span></Row>
       </div>
 
       <div className="overlay rounded-[6px] border border-line0 bg-bg1/95 p-3 text-[11px] leading-[18px] text-fg1">
-        {(["egypt", "gaza", "iran", "hezbollah", "idf"] as Faction[]).map((f) => (
+        {(["egypt", "gaza", "iran", "hezbollah", "militants", "idf"] as Faction[]).map((f) => (
           <div key={f} className="flex items-center gap-2">
             <span className="inline-block h-[3px] w-4 rounded" style={{ background: FACTION_COLORS[f] }} />
             {f === "iran" ? (he ? "איראן / עיראק" : "Iran / Iraq") : FACTION_NAMES[f][lang]}
@@ -126,7 +131,12 @@ export function Telemetry() {
           <span className="inline-block h-[3px] w-4 rounded" style={{ background: INTERCEPTOR_COLOR }} />
           {he ? "מיירטים · מעטפות הגנה" : "Interceptors · defense envelopes"}
         </div>
-        <div className="mt-1 text-fg2">{he ? "קווי מתאר סכמטיים · מסלולים מסוגננים" : "Schematic outlines · stylized trajectories"}</div>
+        <div className="mt-1 flex items-center gap-3">
+          <span className="inline-block h-3 w-4 border-[1.5px] border-[#80E0FF]" /> {he ? "ידידותי" : "Friendly"}
+          <span className="inline-block h-3 w-3 rotate-45 border-[1.5px] border-[#FF8080]" /> {he ? "עוין" : "Hostile"}
+          <span className="inline-block h-3 w-3 border-[1.5px] border-[#AAFFAA]" /> {he ? "ניטרלי" : "Neutral"}
+        </div>
+        <div className="mt-1 text-fg2">{he ? "גבולות Natural Earth · מסלולים מסוגננים · כטב\"מים ושיוט בדחיסת זמן" : "Natural Earth borders · stylized trajectories · drones & cruise time-compressed"}</div>
       </div>
     </div>
   );

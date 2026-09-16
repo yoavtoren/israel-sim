@@ -73,3 +73,37 @@ The app opens on a regional map; every relevant state or armed actor is filled b
 - Actors: 20 on the map (Lebanon = Hezbollah, Yemen = Houthis, Iraq = pro-Iran militias, Gaza = Hamas, West Bank = PA) and 6 off the map (US, EU, UK, China, India, Morocco).
 - Geography: Natural Earth 1:50m (public domain), cut by `scripts/build-region-geo.mjs` into `packages/ui/src/strategic/region-geo.json`. It uses the same equirectangular projection as the tactical map.
 - Trend arrows compare against the state before the last decision (`prevSim` in the strategic store).
+
+## Crisis engine (M12)
+`packages/engine/src/strategic/crisisEngine.ts` — five crises, each with a historical precedent card, ≥3 options
+(objective, pros, cons, the brief's metric deltas) and trigger rules. Crises halt the timeline and open the
+`CrisisDecisionModal`; at most one per turn, highest priority first; no crisis once the coalition has already fallen.
+
+| Crisis | Trigger (probabilities are assumptions) | Cooldown | Precedent |
+|---|---|---|---|
+| EGYPTIAN_BALLISTIC_ATTACK | forced-transfer directive (certain; "pre" phase — resolves against pre-directive metrics) | — | 1979 treaty; Egypt's Oct 2023 red line; Geneva IV Art. 49 |
+| PA_SECURITY_COLLAPSE | PA return + PA/no Gaza control + no IDF freedom: certain when rule 2 first fires, else 35%/turn | 2 | Oslo 1996/2000, Defensive Shield 2002, Gaza 2007 |
+| TUNNEL_NETWORK_EXPOSED | a trusteeship checkpoint passes: 50% | 3 | EUBAM/Rafah 2005–06, Protective Edge 2014 |
+| EGYPT_TREATY_BREACH | annexation with military government: 60% on adoption / 20% sustained; any track with regional ≤ 20: 15% | 3 | Annex I zones A–D, MFO 1981, Philadelphi 2005/2024 |
+| IRAN_COMBINED_BARRAGE | post-decision threat ≥ 60: 10% + (threat−60)/80 | 3 | April & October 2024 |
+
+- "post" crises suspend the turn AFTER the decision applied; the option's deltas add to those metrics, then the end check runs.
+- `TUN_ULTIMATUM_48H` is a seeded 60/40 gamble; the modal previews both branches (`resolveCrisis(state, id, { branch })`).
+- Option side-effects: Defensive Shield 2 restores IDF control (stops terror-infrastructure growth); freezing funds pauses
+  the staged process and Gulf money; US-brokered exits impose US conditions; A/D of the transfer crisis abandon the track.
+- `previewCrisisRisks(state, action)` lists what the drafted decision could open (shown in the Cabinet preview).
+- Bug fixed on the way: `finish()` never persisted `rngState`, so every random draw in a term reused the same number.
+
+With default parameters and crises resolved by always taking the first / last option (300 seeds), crises open ~0.4–1.25
+times per term and the choice matters: e.g. center-left PA return ends in security collapse 95% of the time taking the
+first options, and completes the term 100% taking the last.
+
+## Tactical renderer (M12)
+`strategic/renderer.ts` draws everything procedurally from simulation time (smoke puffs, debris, shockwaves are recomputed
+from emission time + hash noise), so scrubbing backwards is exact. Radar sweep with blips, pulsing envelopes, target-lock
+reticles on threatened cities, NATO/APP-6-style unit frames (friendly rectangle/circle/dome, hostile diamond, neutral
+square; armor/mech/infantry/SOF/engineer/supply/police/MFO/air/naval/carrier icons; echelon marks), standing order of
+battle (IAF wings, Sa'ar corvettes, US carrier group East Med, US destroyer Red Sea), cruise missiles weave (terrain
+contouring stylized), drones fly in swarms, ballistic missiles loft then accelerate hard in the terminal phase, heavy
+impacts shake the camera while playing. Base layer: Natural Earth 1:50m outlines (`region-geo.json`). Per-crisis scenes
+and per-option aftermaths: `strategic/crisisScripts.ts`. Dev builds expose `window.__tactical` for headless QA.

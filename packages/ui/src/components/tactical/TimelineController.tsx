@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useStore } from "../../store";
 import { SIM_RATE, SPEEDS, useStrategic } from "../../strategic/store";
-import { endTime, type MarkerKind } from "../../strategic/scenarios";
+import { AFFILIATION, endTime, type MarkerKind } from "../../strategic/scenarios";
 import { sound } from "../../strategic/sound";
 
 const MARKER_COLOR: Record<MarkerKind, string> = {
@@ -17,6 +17,9 @@ const MARKER_COLOR: Record<MarkerKind, string> = {
   halt: "#F85149",
   strike: "#58A6FF",
   ceasefire: "#3FB950",
+  crisis: "#F85149",
+  success: "#3FB950",
+  failure: "#F85149",
 };
 
 /** rAF playback clock; mount once while the tactical screen is visible. */
@@ -38,16 +41,17 @@ export function usePlaybackDriver(): void {
           t = halt;
           playing = false;
           modalOpen = true;
+          if (s.soundOn) sound.crisisChime();
         }
         if (t >= s.script.duration) {
           t = s.script.duration;
           playing = false;
         }
         if (s.soundOn) {
-          for (const m of s.script.markers) if (m.t > prev && m.t <= t) sound.forMarker(m.kind);
+          for (const m of s.script.markers) if (m.kind !== "halt" && m.t > prev && m.t <= t) sound.forMarker(m.kind);
           const crossed = (x: number) => x > prev && x <= t;
           if (s.script.launches.some((l) => l.intercept?.success === true && crossed(l.intercept.tHit))) sound.intercept();
-          if (s.script.launches.some((l) => l.faction !== "idf" && l.intercept?.success !== true && crossed(l.t0 + l.flight))) sound.impact();
+          if (s.script.launches.some((l) => AFFILIATION[l.faction] !== "friend" && l.intercept?.success !== true && crossed(l.t0 + l.flight))) sound.impact();
         }
         useStrategic.setState({ t, playing, modalOpen });
       }
@@ -85,7 +89,7 @@ export function TimelineController() {
   const setModalOpen = useStrategic((s) => s.setModalOpen);
 
   const halted = script.haltAt !== null && sim.pendingCrisis !== null && t >= script.haltAt;
-  const active = script.launches.filter((l) => l.faction !== "idf" && t >= l.t0 && t < endTime(l)).length;
+  const active = script.launches.filter((l) => AFFILIATION[l.faction] !== "friend" && t >= l.t0 && t < endTime(l)).length;
 
   return (
     <div className="overlay rounded-[6px] border border-line0 bg-bg1/95 px-3 py-2">
