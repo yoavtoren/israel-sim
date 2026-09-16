@@ -55,10 +55,20 @@ export function usePlaybackDriver(): void {
         }
         useStrategic.setState({ t, playing, modalOpen });
       }
+      raf = useStrategic.getState().playing ? requestAnimationFrame(loop) : 0;
+    };
+    // the clock is an event too: it stops when playback stops and restarts on play
+    const wake = () => {
+      if (raf !== 0 || !useStrategic.getState().playing) return;
+      last = performance.now();
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    wake();
+    const unsub = useStrategic.subscribe(wake);
+    return () => {
+      if (raf !== 0) cancelAnimationFrame(raf);
+      unsub();
+    };
   }, []);
 }
 

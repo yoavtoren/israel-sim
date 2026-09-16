@@ -45,6 +45,21 @@ export function ambientFromGame(game: strategic.CampaignState): AmbientWorld {
   };
 }
 
+/** Does anything on the map have a reason to move right now?
+ *
+ *  Motion is for events, not for wallpaper: before a government is formed the
+ *  world is a still picture, and a quiet term is a still picture too. The maps
+ *  run their animation loop only while this is true — a tactical script is
+ *  playing, a crisis is open, or the country itself is in an event (war,
+ *  protests, emergency rule, blockade). The camera flight is handled
+ *  separately, since it settles on its own. */
+export function ambientMotionActive(world: AmbientWorld, live: { playing: boolean; crisisOpen: boolean }): boolean {
+  if (live.playing || live.crisisOpen) return true;
+  if (!world.active) return false;
+  const f = world.flags;
+  return world.atWar || f.massProtests || f.emergencyRule || f.redSeaBlockade || f.lebanonWar;
+}
+
 // ---------------------------------------------------------------------------
 // palette
 // ---------------------------------------------------------------------------

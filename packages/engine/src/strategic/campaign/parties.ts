@@ -320,20 +320,136 @@ export const TAG_LABELS: Record<PartyTag, Bi> = {
   arab: { he: "מפלגות ערביות", en: "Arab parties" },
 };
 
+/** The questions a coalition actually has to agree on. Security alone (hawk)
+ *  never explained why a government broke: the 2021-22 coalition died on
+ *  religion-and-state and the Palestinian question, not on hawkishness. */
+export type Axis = "security" | "religion_state" | "judiciary" | "economy" | "palestinian";
+export const AXES: Axis[] = ["security", "religion_state", "judiciary", "economy", "palestinian"];
+
+export const AXIS_LABELS: Record<Axis, Bi> = {
+  security: { he: "ביטחון", en: "Security" },
+  religion_state: { he: "דת ומדינה", en: "Religion and state" },
+  judiciary: { he: "מערכת המשפט", en: "The judiciary" },
+  economy: { he: "כלכלה", en: "Economy" },
+  palestinian: { he: "השאלה הפלסטינית", en: "The Palestinian question" },
+};
+
+/** How much each axis moves coalition stability (weights sum to 1). */
+const AXIS_WEIGHT: Record<Axis, number> = {
+  security: 0.22, religion_state: 0.26, judiciary: 0.22, economy: 0.12, palestinian: 0.18,
+};
+
+/** Position on each axis, -2 … +2 (assumption):
+ *  security       dovish … hawkish
+ *  religion_state secular … religious control
+ *  judiciary      strengthen the courts … curb them
+ *  economy        welfare … free market
+ *  palestinian    two states … annexation */
+export const POSITIONS: Record<PartyId, Record<Axis, number>> = {
+  likud: { security: 1.2, religion_state: 0.6, judiciary: 1.4, economy: 1.0, palestinian: 1.0 },
+  national_unity: { security: 0.6, religion_state: 0, judiciary: -0.6, economy: 0.6, palestinian: 0.2 },
+  yisrael_beiteinu: { security: 1.3, religion_state: -1.8, judiciary: 0.2, economy: 0.8, palestinian: 0.8 },
+  yesh_atid: { security: 0, religion_state: -1.2, judiciary: -1.0, economy: 0.4, palestinian: -0.4 },
+  democrats: { security: -1.4, religion_state: -1.4, judiciary: -1.6, economy: -1.0, palestinian: -1.6 },
+  shas: { security: 0.7, religion_state: 2.0, judiciary: 0.8, economy: -0.8, palestinian: 0.6 },
+  otzma_yehudit: { security: 2.0, religion_state: 1.4, judiciary: 2.0, economy: 0.4, palestinian: 2.0 },
+  utj: { security: 0.5, religion_state: 2.0, judiciary: 0.6, economy: -0.6, palestinian: 0.4 },
+  raam: { security: -1.0, religion_state: 1.2, judiciary: -0.6, economy: -0.6, palestinian: -1.4 },
+  hadash_taal: { security: -2.0, religion_state: -1.0, judiciary: -1.4, economy: -1.6, palestinian: -2.0 },
+  religious_zionism: { security: 1.9, religion_state: 1.6, judiciary: 1.8, economy: 0.8, palestinian: 2.0 },
+  balad: { security: -2.0, religion_state: -0.6, judiciary: -1.2, economy: -1.2, palestinian: -2.0 },
+  noam: { security: 1.8, religion_state: 2.0, judiciary: 1.6, economy: 0.2, palestinian: 1.6 },
+  yashar: { security: 0.6, religion_state: -0.8, judiciary: -0.8, economy: 0.6, palestinian: 0 },
+  together: { security: 1.0, religion_state: -0.6, judiciary: -0.4, economy: 0.8, palestinian: 0.4 },
+  joint_list: { security: -2.0, religion_state: -0.8, judiciary: -1.2, economy: -1.4, palestinian: -2.0 },
+  amcha_yisrael: { security: 1.7, religion_state: 1.2, judiciary: 1.2, economy: 0.4, palestinian: 1.6 },
+  miluimnikim_calcalit: { security: 0.9, religion_state: -1.0, judiciary: -0.2, economy: 1.2, palestinian: 0.4 },
+};
+
+/** The senior portfolios parties fight over. Two claimants on one chair is a
+ *  coalition crisis before the government is even sworn in. */
+export type Portfolio = "finance" | "defence" | "interior" | "justice" | "foreign";
+export const PORTFOLIOS: Portfolio[] = ["finance", "defence", "interior", "justice", "foreign"];
+
+export const PORTFOLIO_LABELS: Record<Portfolio, Bi> = {
+  finance: { he: "האוצר", en: "Finance" },
+  defence: { he: "הביטחון", en: "Defence" },
+  interior: { he: "הפנים", en: "Interior" },
+  justice: { he: "המשפטים", en: "Justice" },
+  foreign: { he: "החוץ", en: "Foreign Affairs" },
+};
+
+/** What each list demands as its price for joining (assumption). */
+export const PORTFOLIO_DEMANDS: Record<PartyId, Portfolio[]> = {
+  likud: ["defence", "foreign"],
+  national_unity: ["defence", "justice"],
+  yisrael_beiteinu: ["finance", "interior"],
+  yesh_atid: ["finance", "foreign"],
+  democrats: ["justice"],
+  shas: ["interior", "finance"],
+  otzma_yehudit: ["interior"],
+  utj: ["interior"],
+  raam: [],
+  hadash_taal: [],
+  religious_zionism: ["finance", "defence"],
+  balad: [],
+  noam: [],
+  yashar: ["defence"],
+  together: ["foreign", "finance"],
+  joint_list: [],
+  amcha_yisrael: ["defence"],
+  miluimnikim_calcalit: ["finance"],
+};
+
 export const MAJORITY = 61;
 
 export type FrictionLevel = "friction" | "deep";
 export const FRICTION_WEIGHT: Record<FrictionLevel, number> = { friction: 1, deep: 3 };
 
-export interface CoalitionCheck {
+/** Distance between the two furthest partners on one question. */
+export interface AxisStrain {
+  axis: Axis;
+  /** 0 … 4 */ spread: number;
+  /** the two parties holding the poles */ poles: [PartyId, PartyId] | null;
+}
+
+export interface PortfolioClash {
+  portfolio: Portfolio;
+  parties: PartyId[];
+}
+
+/** Gamson's law: portfolios split roughly in proportion to seats brought in. */
+export interface PortfolioSplit {
+  party: PartyId;
   seats: number;
+  /** share of the coalition's seats, 0 … 1 */ share: number;
+  /** senior portfolios this party is expected to take */ takes: Portfolio[];
+}
+
+export interface StabilityPart {
+  key: string;
+  label: Bi;
+  /** signed contribution to the stability score */ delta: number;
+}
+
+export interface CoalitionCheck {
+  /** seats of the parties sitting in the government */ seats: number;
+  /** seats promised from outside without joining */ supportSeats: number;
   /** refusals inside the proposed coalition: [refuser, refused] */ vetoes: Array<[PartyId, PartyId]>;
   /** unordered pairs, each listed once with its worst level */ frictions: Array<{ a: PartyId; b: PartyId; level: FrictionLevel }>;
   majority: boolean;
   valid: boolean;
   /** 0–100 starting coalition stability */ stability: number;
+  /** how the stability score was arrived at */ stabilityParts: StabilityPart[];
   /** seat-weighted hawkishness −2 … +2 */ hawk: number;
   type: CoalitionType;
+  /** disagreement per question, worst first */ axes: AxisStrain[];
+  /** partners whose exit alone costs the majority — they can topple it */ pivotal: PartyId[];
+  /** seats above 61 */ surplus: number;
+  /** no member can leave without losing the majority */ minimalWinning: boolean;
+  /** two or more claimants on the same senior portfolio */ portfolioClashes: PortfolioClash[];
+  /** expected split of the senior portfolios */ portfolios: PortfolioSplit[];
+  /** how long the government is expected to last, in months (max 48) */ durabilityMonths: number;
 }
 
 /** The friction level between two parties, whichever side declares it. */
@@ -349,10 +465,66 @@ export function refusesEachOther(a: PartyId, b: PartyId, roster: SeatRoster = "p
   return relationsOf(a, roster).refuses.includes(b) || relationsOf(b, roster).refuses.includes(a);
 }
 
-export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls"): CoalitionCheck {
+/** Disagreement on one question: the gap between the two furthest partners. */
+export function axisStrain(members: PartyId[], axis: Axis): AxisStrain {
+  if (members.length === 0) return { axis, spread: 0, poles: null };
+  let lo = members[0];
+  let hi = members[0];
+  for (const p of members) {
+    if (POSITIONS[p][axis] < POSITIONS[lo][axis]) lo = p;
+    if (POSITIONS[p][axis] > POSITIONS[hi][axis]) hi = p;
+  }
+  const spread = POSITIONS[hi][axis] - POSITIONS[lo][axis];
+  return { axis, spread, poles: spread === 0 ? null : [lo, hi] };
+}
+
+/** Who gets the senior chairs, by seats brought in (Gamson's law). */
+function splitPortfolios(members: PartyId[], roster: SeatRoster): PortfolioSplit[] {
+  const total = members.reduce((s, p) => s + SEATS[roster][p], 0);
+  const byWeight = [...members].sort((a, b) => SEATS[roster][b] - SEATS[roster][a]);
+  const taken = new Set<Portfolio>();
+  const takes = new Map<PartyId, Portfolio[]>();
+  // the strongest partner picks first, among the chairs it actually demands
+  for (const p of byWeight) {
+    const got: Portfolio[] = [];
+    for (const f of PORTFOLIO_DEMANDS[p]) {
+      if (taken.has(f)) continue;
+      taken.add(f);
+      got.push(f);
+      if (got.length >= 2) break;
+    }
+    takes.set(p, got);
+  }
+  return byWeight.map((p) => ({
+    party: p,
+    seats: SEATS[roster][p],
+    share: total === 0 ? 0 : SEATS[roster][p] / total,
+    takes: takes.get(p) ?? [],
+  }));
+}
+
+/** Two or more partners demanding the same chair. */
+function portfolioClashesOf(members: PartyId[]): PortfolioClash[] {
+  const out: PortfolioClash[] = [];
+  for (const f of PORTFOLIOS) {
+    const claim = members.filter((p) => PORTFOLIO_DEMANDS[p].includes(f));
+    if (claim.length > 1) out.push({ portfolio: f, parties: claim });
+  }
+  return out;
+}
+
+/** `support` are lists that keep the government alive from outside without
+ *  joining it — the 2021 arrangement. They carry seats and take no portfolios,
+ *  and refusals do not apply to them: refusing to SIT with a party is not the
+ *  same as refusing to keep it in power. */
+export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls", support: PartyId[] = []): CoalitionCheck {
   const list = [...new Set(members)];
   const set = new Set(list);
+  const backers = [...new Set(support)].filter((p) => !set.has(p));
   const seats = list.reduce((s, p) => s + SEATS[roster][p], 0);
+  const supportSeats = backers.reduce((s, p) => s + SEATS[roster][p], 0);
+  const total = seats + supportSeats;
+
   const vetoes: Array<[PartyId, PartyId]> = [];
   for (const p of list) for (const r of relationsOf(p, roster).refuses) if (set.has(r)) vetoes.push([p, r]);
   const frictions: CoalitionCheck["frictions"] = [];
@@ -362,13 +534,44 @@ export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls")
       if (level !== null) frictions.push({ a: list[i], b: list[j], level });
     }
   }
+
   const hawk = seats === 0 ? 0 : list.reduce((s, p) => s + PARTIES[p].hawk * SEATS[roster][p], 0) / seats;
-  const spread = list.length === 0 ? 0 : Math.max(...list.map((p) => PARTIES[p].hawk)) - Math.min(...list.map((p) => PARTIES[p].hawk));
+  const axes = AXES.map((a) => axisStrain(list, a)).sort((a, b) => b.spread - a.spread);
+  const axisPenalty = axes.reduce((s, a) => s + a.spread * AXIS_WEIGHT[a.axis], 0);
   const strain = frictions.reduce((s, f) => s + FRICTION_WEIGHT[f.level], 0);
-  const majority = seats >= MAJORITY;
-  const stability = Math.round(Math.max(15, Math.min(85, 60 + Math.min(8, seats - 61) * 2 - spread * 5 - strain * 3)));
+
+  const majority = total >= MAJORITY;
+  const pivotal = majority ? list.filter((p) => total - SEATS[roster][p] < MAJORITY) : [];
+  const surplus = Math.max(0, total - MAJORITY);
+  const minimalWinning = majority && list.length > 0 && pivotal.length === list.length;
+  const clashes = portfolioClashesOf(list);
+  const portfolios = splitPortfolios(list, roster);
+
+  const parts: StabilityPart[] = [
+    { key: "base", label: { he: "בסיס", en: "Base" }, delta: 60 },
+    { key: "cushion", label: { he: "כרית מנדטים מעל 61", en: "Seat cushion above 61" }, delta: Math.min(8, surplus) * 2 },
+    { key: "axes", label: { he: "פערים אידאולוגיים", en: "Ideological distance" }, delta: -Math.round(axisPenalty * 12) },
+    { key: "friction", label: { he: "חיכוך בין שותפים", en: "Friction between partners" }, delta: -strain * 3 },
+    { key: "pivotal", label: { he: "שותפים שיכולים להפיל לבד", en: "Partners who can topple it alone" }, delta: -pivotal.length * 2 },
+    { key: "portfolios", label: { he: "מריבות על תיקים בכירים", en: "Fights over senior portfolios" }, delta: -clashes.length * 3 },
+    { key: "outside", label: { he: "תמיכה מבחוץ", en: "Support from outside" }, delta: -backers.length * 4 },
+  ].filter((p) => p.delta !== 0);
+
+  const raw = parts.reduce((s, p) => s + p.delta, 0);
+  const stability = Math.round(Math.max(15, Math.min(85, raw)));
+  const durabilityMonths = Math.max(
+    4,
+    Math.min(48, Math.round(48 * (stability / 85) * (1 - 0.05 * pivotal.length) * (1 - 0.08 * clashes.length))),
+  );
   const type: CoalitionType = hawk >= 1.1 ? "RIGHT_WING_BLOC" : hawk <= 0.1 ? "CENTER_LEFT_BLOC" : "BENNETT_LIEBERMAN_GOLAN_ABBAS";
-  return { seats, vetoes, frictions, majority, valid: majority && vetoes.length === 0, stability, hawk, type };
+
+  return {
+    seats, supportSeats, vetoes, frictions, majority,
+    valid: majority && vetoes.length === 0,
+    stability, stabilityParts: parts, hawk, type,
+    axes, pivotal, surplus, minimalWinning,
+    portfolioClashes: clashes, portfolios, durabilityMonths,
+  };
 }
 
 /** Friction strain a partner carries inside a coalition (for its starting patience). */

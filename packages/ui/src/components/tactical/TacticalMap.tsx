@@ -11,7 +11,7 @@ import {
 } from "../../strategic/geo";
 import { COUNTRY_SHAPES, ringsPath } from "../../strategic/regionGeo";
 import { drawFrame, launchPos, shakeOffset } from "../../strategic/renderer";
-import { ambientFromGame, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { ambientFromGame, ambientMotionActive, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
 import { useCampaign } from "../../strategic/campaignStore";
 import { crisisFocus } from "../../strategic/crisisScripts";
 import { endTime, focusAt, type Launch } from "../../strategic/scenarios";
@@ -119,6 +119,17 @@ export function TacticalMap() {
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
+    let camSettled = false;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const needsMotion = (): boolean => {
+      if (reduced) return false;
+      if (!camSettled) return true;
+      const st = useStrategic.getState();
+      return ambientMotionActive(ambientFromGame(useCampaign.getState().game), {
+        playing: st.playing,
+        crisisOpen: st.sim.pendingCrisis !== null,
+      });
+    };
     const frame = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
@@ -135,6 +146,7 @@ export function TacticalMap() {
       if (camRef.current === null) camRef.current = target;
       if (!manualRef.current) camRef.current = lerpCam(camRef.current, target, 1 - Math.exp(-dt * 2.2));
       const cam = camRef.current;
+      camSettled = Math.abs(cam.cx - target.cx) < 0.3 && Math.abs(cam.cy - target.cy) < 0.3 && Math.abs(cam.scale - target.scale) < 0.004;
       const shake = shakeOffset(script, t, now, st.playing);
       gRef.current?.setAttribute(
         "transform",
@@ -156,10 +168,21 @@ export function TacticalMap() {
         drawFrame(ctx, { script, t, cam, w, h, lang: langRef.current, nowMs: now, trackedId: st.trackedId });
         drawAmbientAir(ctx, amb);
       }
+      raf = needsMotion() ? requestAnimationFrame(frame) : 0;
+    };
+    const wake = () => {
+      if (raf !== 0) return;
+      last = performance.now();
       raf = requestAnimationFrame(frame);
     };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    wake();
+    const unsubStrategic = useStrategic.subscribe(wake);
+    const unsubCampaign = useCampaign.subscribe(wake);
+    return () => {
+      if (raf !== 0) cancelAnimationFrame(raf);
+      unsubStrategic();
+      unsubCampaign();
+    };
   }, []);
 
   const local = (e: React.MouseEvent | React.WheelEvent) => {

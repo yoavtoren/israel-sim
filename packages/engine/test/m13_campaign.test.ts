@@ -128,6 +128,64 @@ describe("M13 Prime Minister campaign", () => {
     }
   });
 
+  it("reads a coalition beyond the seat count: pivots, chairs, axes, outside support", () => {
+    const R: S.SeatRoster = "poll_2026_09_n12";
+
+    // the veto triangle is minimal winning: every one of the six can topple it
+    const triangle = S.checkCoalition(["yashar", "together", "shas", "utj", "joint_list", "raam"], R);
+    expect(triangle.minimalWinning).toBe(true);
+    expect(triangle.pivotal.length).toBe(6);
+    expect(triangle.surplus).toBe(2);
+
+    // an oversized government has at least one partner it can lose
+    const wide = S.checkCoalition(CHANGE);
+    expect(wide.minimalWinning).toBe(false);
+    expect(wide.pivotal.length).toBeLessThan(CHANGE.length);
+    expect(wide.surplus).toBeGreaterThan(0);
+
+    // two partners demanding the same chair is a fight before the swearing-in
+    const finance = wide.portfolioClashes.find((c) => c.portfolio === "finance");
+    expect(finance).toBeDefined();
+    expect(finance?.parties).toContain("yisrael_beiteinu");
+    // and the chairs themselves go by weight: the largest partner is served first
+    expect(wide.portfolios[0].party).toBe("yashar");
+    expect(wide.portfolios[0].share).toBeGreaterThan(wide.portfolios[1].share);
+    const seatsOf = wide.portfolios.reduce((a, x) => a + x.seats, 0);
+    expect(seatsOf).toBe(wide.seats);
+
+    // the widest gap in the change bloc is religion and state, Lieberman at one pole
+    expect(wide.axes[0].spread).toBeGreaterThanOrEqual(wide.axes[1].spread);
+    const religion = wide.axes.find((a) => a.axis === "religion_state");
+    expect(religion?.poles).not.toBeNull();
+    expect(religion?.poles).toContain("yisrael_beiteinu");
+
+    // support from outside: the Joint List keeps it alive without sitting in it,
+    // so Lieberman's refusal to SIT with it never fires
+    const short = S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], R);
+    expect(short.seats).toBe(58);
+    expect(short.majority).toBe(false);
+    const propped = S.checkCoalition(
+      ["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], R, ["joint_list"],
+    );
+    expect(propped.supportSeats).toBe(8);
+    expect(propped.majority).toBe(true);
+    expect(propped.vetoes).toEqual([]);
+    expect(propped.valid).toBe(true);
+    // but leaning on outside votes costs stability
+    expect(propped.stabilityParts.some((x) => x.key === "outside")).toBe(true);
+    expect(propped.stability).toBeLessThan(propped.stabilityParts.reduce((a, x) => (x.key === "outside" ? a : a + x.delta), 0));
+
+    // the score is the sum of its stated parts (clamped), so the UI can explain it
+    const sum = wide.stabilityParts.reduce((a, x) => a + x.delta, 0);
+    expect(wide.stability).toBe(Math.round(Math.max(15, Math.min(85, sum))));
+
+    // a homogeneous bloc outlasts a coalition stitched across the map
+    const right2022 = S.checkCoalition(RIGHT, "election_2022");
+    expect(right2022.durabilityMonths).toBeGreaterThan(wide.durabilityMonths);
+    expect(wide.durabilityMonths).toBeGreaterThanOrEqual(4);
+    expect(right2022.durabilityMonths).toBeLessThanOrEqual(48);
+  });
+
   it("forming a government opens the doctrine popup with patient partners", () => {
     const s = started2022(RIGHT);
     expect(s.phase).toBe("policy");

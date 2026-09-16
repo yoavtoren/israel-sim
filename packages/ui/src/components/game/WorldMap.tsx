@@ -11,7 +11,7 @@ import { toMap, toScreen, type Camera } from "../../strategic/geo";
 import { TIER_COLORS } from "../../strategic/regionGeo";
 import { COUNTRY_HE, WORLD_ACTOR, WORLD_COUNTRIES, WORLD_LABELS, WORLD_NAME, fitWorld, ringsToPath, type WorldFocus } from "../../strategic/worldGeo";
 import { drawFrame, shakeOffset } from "../../strategic/renderer";
-import { ambientFromGame, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { ambientFromGame, ambientMotionActive, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
 import { useCampaign } from "../../strategic/campaignStore";
 
 type Stances = Record<strategic.ActorId, strategic.ActorStance>;
@@ -41,7 +41,7 @@ const Outlines = memo(function Outlines(props: { fills: Map<string, string>; hig
         const hot = props.highlight.has(c.key);
         return (
           <path
-            key={c.key}
+            key={hot ? `${c.key}:hot` : c.key}
             data-key={c.key}
             d={PATHS.get(c.key)}
             fill={props.fills.get(c.key) ?? CONTEXT}
@@ -75,6 +75,8 @@ export function WorldMap(props: {
   const sizeRef = useRef(size);
   const camRef = useRef<Camera | null>(null);
   const manual = useRef(false);
+  /** repaints the map once when something changed while the loop was idle */
+  const wakeRef = useRef<(() => void) | null>(null);
   const drag = useRef<{ x: number; y: number; cam: Camera } | null>(null);
   const targetRef = useRef({ focus, inset });
   const langRef = useRef(lang);
@@ -122,6 +124,17 @@ export function WorldMap(props: {
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
+    let camSettled = false;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+    const needsMotion = (): boolean => {
+      if (reduced) return false;
+      if (!camSettled) return true;
+      const st = useStrategic.getState();
+      return ambientMotionActive(ambientFromGame(useCampaign.getState().game), {
+        playing: st.playing,
+        crisisOpen: st.sim.pendingCrisis !== null,
+      });
+    };
     const frame = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
@@ -130,6 +143,7 @@ export function WorldMap(props: {
       if (camRef.current === null) camRef.current = fitWorld("world", w, h, targetRef.current.inset);
       if (!manual.current) camRef.current = lerpCam(camRef.current, target, 1 - Math.exp(-dt * 1.6));
       const cam = camRef.current;
+      camSettled = Math.abs(cam.cx - target.cx) < 0.3 && Math.abs(cam.cy - target.cy) < 0.3 && Math.abs(cam.scale - target.scale) < 0.004;
       const st = useStrategic.getState();
       const shake = shakeOffset(st.script, st.t, now, st.playing);
       gRef.current?.setAttribute("transform", `translate(${w / 2 - cam.cx * cam.scale + shake.x} ${h / 2 - cam.cy * cam.scale + shake.y}) scale(${cam.scale})`);
@@ -178,11 +192,31 @@ export function WorldMap(props: {
         drawFrame(ctx, { script: st.script, t: st.t, cam, w, h, lang: L, nowMs: now, trackedId: st.trackedId, chrome: cam.scale > 1.4 });
         drawAmbientAir(ctx, amb);
       }
+      raf = needsMotion() ? requestAnimationFrame(frame) : 0;
+    };
+    // Motion is for events, not for wallpaper: the loop runs while the camera is
+    // still flying, while a tactical script plays, or while the world itself is
+    // in motion (war, crisis, protests, blockade, emergency rule). Otherwise it
+    // draws one frame and stops until something actually changes.
+    const wake = () => {
+      if (raf !== 0) return;
+      last = performance.now();
       raf = requestAnimationFrame(frame);
     };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    wakeRef.current = wake;
+    wake();
+    const unsubStrategic = useStrategic.subscribe(wake);
+    const unsubCampaign = useCampaign.subscribe(wake);
+    return () => {
+      if (raf !== 0) cancelAnimationFrame(raf);
+      wakeRef.current = null;
+      unsubStrategic();
+      unsubCampaign();
+    };
   }, []);
+
+  // a new focus, inset, highlight or language needs one repaint
+  useEffect(() => { wakeRef.current?.(); }, [props.focus, props.inset, props.highlight, props.lang, props.stances]);
 
   const local = (e: React.MouseEvent | React.WheelEvent) => {
     const r = wrapRef.current?.getBoundingClientRect();

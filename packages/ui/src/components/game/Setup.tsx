@@ -228,6 +228,45 @@ export function CoalitionBuilder(props: { lang: Lang }) {
           </div>
         </div>
 
+        {check.majority && check.vetoes.length === 0 && (
+          <div className="border-t border-line0 px-8 py-4">
+            <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[13px]">
+              <span className="text-fg1">
+                {he ? "צפי שרידות: " : "Expected to last: "}
+                <span className={`num font-medium ${check.durabilityMonths >= 30 ? "text-good-bright" : check.durabilityMonths >= 18 ? "text-warn-bright" : "text-bad-bright"}`}>{check.durabilityMonths}</span>
+                {he ? " חודשים מתוך 48" : " of 48 months"}
+              </span>
+              {check.minimalWinning
+                ? <span className="text-warn-bright">{he ? "רוב מינימלי — כל שותף יכול להפיל את הממשלה לבד" : "Minimal winning — every partner can topple it alone"}</span>
+                : check.pivotal.length > 0 && <span className="text-warn-bright">{he ? "יכולים להפיל לבד: " : "Can topple it alone: "}{check.pivotal.map(name).join(", ")}</span>}
+              {check.supportSeats > 0 && (
+                <span className="text-fg1">{he ? "תמיכה מבחוץ: " : "Outside support: "}<span className="num">{check.supportSeats}</span></span>
+              )}
+            </div>
+            {check.portfolioClashes.length > 0 && (
+              <div className="mt-2 text-[12.5px] text-bad-bright">
+                {he ? "מריבה על תיקים בכירים: " : "Fights over senior portfolios: "}
+                {check.portfolioClashes.map((c) => `${tr(S.PORTFOLIO_LABELS[c.portfolio], lang)} — ${c.parties.map(name).join(" / ")}`).join(" · ")}
+              </div>
+            )}
+            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] text-fg2">
+              {check.axes.filter((a) => a.spread > 0).slice(0, 3).map((a) => (
+                <span key={a.axis}>
+                  {tr(S.AXIS_LABELS[a.axis], lang)} <span className="num">{a.spread.toFixed(1)}</span>
+                  {a.poles !== null && <span> · {name(a.poles[0])}–{name(a.poles[1])}</span>}
+                </span>
+              ))}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-fg2">
+              {check.stabilityParts.filter((x) => x.key !== "base").map((x) => (
+                <span key={x.key}>
+                  {tr(x.label, lang)} <span className={`num ${x.delta > 0 ? "text-good-bright" : "text-bad-bright"}`}>{x.delta > 0 ? `+${x.delta}` : x.delta}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line0 px-8 py-4">
           <button type="button" className="btn btn-ghost px-3 py-2 text-[13px]" onClick={back}>
             {he ? "← בחירת מפלגה אחרת" : "← Pick another party"}

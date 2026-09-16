@@ -282,7 +282,7 @@ input.cell.edited {
   0%, 100% { stroke-opacity: 1; }
   50% { stroke-opacity: 0.25; }
 }
-.country-pulse { animation: country-pulse 1.1s ease-in-out infinite; }
+.country-pulse { animation: country-pulse 1.1s ease-in-out 3; }
 
 /* campaign: cards arrive softly */
 @keyframes consequence-in {
