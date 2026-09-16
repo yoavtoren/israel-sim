@@ -23,7 +23,7 @@ const item = (spec: SceneSpec, caption: Bi | null = null, delay = 0): SceneItem 
 // dilemmas: shown when the question is put to the Prime Minister
 // ---------------------------------------------------------------------------
 
-export const DILEMMA_SCENES: Record<string, SceneItem[]> = {
+const BASE_DILEMMA_SCENES: Record<string, SceneItem[]> = {
   HEZBOLLAH_FRONT: [
     item({ kind: "barrage", front: "lebanon", count: 14, weapon: "rocket", targets: ["kiryat_shmona", "nahariya", "metula", "shlomi", "haifa"] }, { he: "חזבאללה פותח חזית בצפון", en: "Hezbollah opens a northern front" }),
     item({ kind: "infiltration", front: "lebanon", squads: 1, tunnel: false }, null, 6),
@@ -49,7 +49,7 @@ export const DILEMMA_SCENES: Record<string, SceneItem[]> = {
 // options: the decision itself
 // ---------------------------------------------------------------------------
 
-export const OPTION_SCENES: Record<string, SceneItem[]> = {
+const BASE_OPTION_SCENES: Record<string, SceneItem[]> = {
   // doctrine
   D_RADICAL_RIGHT: [item({ kind: "diplomacy", links: [{ from: "jerusalem", to: "new_york", tone: -1, icon: "warning" }, { from: "brussels", to: "jerusalem", tone: -1, icon: "warning" }] }, { he: "מדיניות: הכרעה צבאית ודחיקת אוכלוסייה", en: "Policy: military decision, pushing the population out" })],
   D_ANNEXATION: [item({ kind: "settlers", mode: "build" }, { he: "מדיניות: שליטה, סיפוח והתיישבות", en: "Policy: control, annexation, settlement" })],
@@ -139,6 +139,85 @@ export const OPTION_SCENES: Record<string, SceneItem[]> = {
   CF_FIGHT_ON: [item({ kind: "airstrike", area: "lebanon", sorties: 6, bombs: 10, wide: false }, { he: "הלחימה נמשכת עד הכרעה", en: "Fighting on to a decision" }), item({ kind: "barrage", front: "lebanon", count: 12, weapon: "rocket", targets: ["haifa", "kiryat_shmona", "nahariya"] }, null, 6)],
   CF_UNILATERAL: [item({ kind: "ceasefire" }, { he: "הפסקת אש חד-צדדית", en: "Unilateral ceasefire" })],
 };
+
+// ---------------------------------------------------------------------------
+// the road to a settlement
+// ---------------------------------------------------------------------------
+
+const sign = (links: Array<[PlaceId, PlaceId]>, caption: Bi | null, tone: -1 | 0 | 1 = 1): SceneItem =>
+  item({ kind: "diplomacy", links: links.map(([from, to]) => ({ from, to, tone, icon: tone > 0 ? "pen" : tone < 0 ? "warning" : "envelope" })) }, caption);
+
+const RESOLUTION_OPTION_SCENES: Record<string, SceneItem[]> = {
+  // regional
+  REG_GF_HANDOVER: [item({ kind: "pa_forces", mode: "enter_gaza" }, { he: "כוח ערבי נכנס לעזה", en: "An Arab force enters Gaza" }), item({ kind: "ground", theater: "gaza", mode: "pullback" }, null, 6)],
+  REG_GF_JOINT: [item({ kind: "pa_forces", mode: "enter_gaza" }, { he: "פיקוד משותף בעזה", en: "Joint command in Gaza" })],
+  REG_GF_DELAY: [sign([["cairo", "jerusalem"], ["abu_dhabi", "jerusalem"]], { he: "המדינות הערביות מאוכזבות", en: "Arab states are disappointed" }, -1)],
+  REG_RC_CONDITIONAL: [item({ kind: "siege", mode: "aid" }, { he: "שיקום בשלבים תמורת איסוף נשק", en: "Staged reconstruction for weapons collection" }), sign([["riyadh", "jerusalem"], ["abu_dhabi", "jerusalem"]], null)],
+  REG_RC_OPEN: [item({ kind: "siege", mode: "aid" }, { he: "שיקום מהיר של עזה", en: "Fast reconstruction of Gaza" })],
+  REG_RC_REFUSE: [item({ kind: "siege", mode: "close" }, { he: "השיקום נחסם", en: "Reconstruction blocked" })],
+  REG_PR_ELECTIONS: [item({ kind: "knesset", mode: "election", color: "#2456B5" }, { he: "בחירות פלסטיניות בתנאי סף", en: "Palestinian elections with entry conditions" })],
+  REG_PR_TECHNOCRATS: [sign([["cairo", "ramallah"], ["riyadh", "ramallah"]], { he: "ממשלת מומחים ברמאללה", en: "A technocratic government in Ramallah" })],
+  REG_PR_BYPASS: [sign([["ramallah", "jerusalem"]], { he: "הרשות נעקפת", en: "The PA is bypassed" }, -1)],
+  REG_NM_PATH: [item({ kind: "flights", count: 1, mode: "riyadh" }, { he: "נורמליזציה ומסלול למדינה", en: "Normalization and a path to a state" }), sign([["riyadh", "jerusalem"], ["washington", "riyadh"]], null)],
+  REG_NM_VAGUE: [sign([["jerusalem", "riyadh"]], { he: "הצהרה עמומה לריאד", en: "A vague statement to Riyadh" }, 0)],
+  REG_NM_DECLINE: [sign([["riyadh", "jerusalem"]], { he: "הנורמליזציה ירדה מהשולחן", en: "Normalization is off the table" }, -1)],
+  REG_FN_REFERENDUM: [sign([["jerusalem", "washington"], ["ramallah", "washington"], ["riyadh", "washington"]], { he: "חתימה על הסכם המסגרת", en: "Signing the framework agreement" }), item({ kind: "knesset", mode: "election", color: "#2456B5" }, { he: "משאל עם על ההסכם", en: "Referendum on the deal" }, 6)],
+  REG_FN_KNESSET: [sign([["jerusalem", "washington"], ["ramallah", "washington"]], { he: "חתימה ואשרור בכנסת", en: "Signing and Knesset ratification" }), item({ kind: "crowd", place: "jerusalem", size: 60, mode: "right_rally" }, null, 5)],
+  REG_FN_WAIT: [sign([["washington", "jerusalem"]], { he: "החתימה נדחית", en: "The signing is postponed" }, -1)],
+  // two states
+  TS_CO_FULL: [item({ kind: "pa_forces", mode: "enter_gaza" }, { he: "כוחות הרשות לוקחים אחריות", en: "PA forces take responsibility" })],
+  TS_CO_PARTIAL: [sign([["jerusalem", "ramallah"]], { he: "תיאום ביטחוני מחודש", en: "Security coordination renewed" })],
+  TS_CO_REFUSE: [sign([["ramallah", "jerusalem"]], { he: "הכספים נשארים מוקפאים", en: "The funds stay frozen" }, -1)],
+  TS_BD_BLOCS: [item({ kind: "withdrawal", mode: "staged" }, { he: "מפת הגושים: פינוי התנחלויות מבודדות", en: "The blocs map: isolated settlements evacuated" })],
+  TS_BD_MAX: [sign([["jerusalem", "ramallah"]], { he: "דרישה ל-10% כולל הבקעה", en: "A demand for 10% including the valley" }, 0)],
+  TS_BD_PAUSE: [sign([["washington", "jerusalem"]], { he: "דיוני המפות מושהים", en: "Map talks paused" }, -1)],
+  TS_JR_NEIGHBORHOODS: [sign([["amman", "jerusalem"], ["riyadh", "jerusalem"], ["ramallah", "jerusalem"]], { he: "הסדר בירושלים ובאגן הקדוש", en: "A Jerusalem and Holy Basin arrangement" }), item({ kind: "crowd", place: "jerusalem", size: 50, mode: "right_rally" }, null, 5)],
+  TS_JR_SUBURBS: [sign([["jerusalem", "ramallah"]], { he: "הצעה: בירה באבו דיס", en: "Offer: a capital in Abu Dis" }, 0)],
+  TS_JR_DEFER: [sign([["jerusalem", "washington"]], { he: "ירושלים נדחית לסוף", en: "Jerusalem left for last" }, 0)],
+  TS_RS_PACKAGE: [sign([["washington", "jerusalem"], ["jerusalem", "ramallah"]], { he: "פליטים וביטחון: חבילה מוסכמת", en: "Refugees and security: an agreed package" })],
+  TS_RS_NO_RETURN: [sign([["jerusalem", "ramallah"]], { he: "הקווים האדומים הישראליים", en: "Israel's red lines" }, 0)],
+  TS_FN_REFERENDUM: [sign([["jerusalem", "washington"], ["ramallah", "washington"]], { he: "טקס חתימה על הסכם הקבע", en: "Signing the permanent-status agreement" }), item({ kind: "knesset", mode: "election", color: "#2456B5" }, { he: "משאל עם", en: "Referendum" }, 6)],
+  TS_FN_KNESSET: [sign([["jerusalem", "washington"], ["ramallah", "washington"]], { he: "הסכם הקבע נחתם", en: "The permanent-status agreement is signed" }), item({ kind: "crowd", place: "jerusalem", size: 60, mode: "right_rally" }, null, 5)],
+  TS_FN_WAIT: [sign([["washington", "jerusalem"]], { he: "החתימה נדחית", en: "The signing is delayed" }, -1)],
+  // unilateral
+  UN_ST_FORCE: [item({ kind: "withdrawal", mode: "un" }, { he: "כוח ייצוב בינלאומי נפרס", en: "An international stabilization force deploys" })],
+  UN_ST_PA: [item({ kind: "pa_forces", mode: "enter_gaza" }, { he: "כוחות הרשות נבנים", en: "PA forces are built up" })],
+  UN_ST_RETURN: [item({ kind: "ground", theater: "west_bank", mode: "sweep" }, { he: "צה\"ל חוזר לערים", en: "The IDF returns to the cities" })],
+  UN_BR_OPEN: [item({ kind: "barrier", mode: "seal" }, { he: "הגדר הופכת לגבול עם מעברים", en: "The barrier becomes a border with crossings" })],
+  UN_BR_TIGHT: [item({ kind: "barrier", mode: "seal" }, { he: "גבול הרמטי", en: "A sealed border" })],
+  UN_RC_MUTUAL: [sign([["new_york", "jerusalem"], ["new_york", "ramallah"], ["brussels", "ramallah"]], { he: "הכרה הדדית באו\"ם", en: "Mutual recognition at the UN" })],
+  UN_RC_WAIT: [sign([["jerusalem", "new_york"]], { he: "הכרה מותנית", en: "Conditional recognition" }, 0)],
+  UN_FN_SIGN: [sign([["jerusalem", "new_york"], ["ramallah", "new_york"]], { he: "הסכם שלום בין שתי מדינות", en: "A peace treaty between two states" })],
+  UN_FN_WAIT: [sign([["new_york", "jerusalem"]], { he: "בלי חתימה פורמלית", en: "No formal signature" }, 0)],
+  // sovereignty
+  SV_AU_CITIES: [item({ kind: "knesset", mode: "election", color: "#2456B5" }, { he: "בחירות מקומיות בערים הפלסטיניות", en: "Local elections in the Palestinian cities" })],
+  SV_AU_MILITARY: [item({ kind: "ground", theater: "west_bank", mode: "sweep" }, { he: "שלטון צבאי ישיר", en: "Direct military rule" })],
+  SV_EC_ZONES: [item({ kind: "economy", mode: "factories" }, { he: "אזורי תעשייה והיתרי עבודה", en: "Industrial zones and work permits" })],
+  SV_EC_LIMITED: [item({ kind: "economy", mode: "boost" }, { he: "הקלות כלכליות מוגבלות", en: "Limited economic relief" })],
+  SV_ST_CITIZENSHIP: [item({ kind: "crowd", place: "jerusalem", size: 60, mode: "right_rally" }, { he: "מסלול אזרחות ושוויון", en: "A citizenship and equality path" }), sign([["brussels", "jerusalem"]], null, 1)],
+  SV_ST_JORDAN: [sign([["jerusalem", "amman"], ["washington", "amman"]], { he: "הצעת קונפדרציה לירדן", en: "A confederation offer to Jordan" }, 0)],
+  SV_ST_RESIDENCY: [sign([["brussels", "jerusalem"], ["new_york", "jerusalem"]], { he: "תושבות בלי הצבעה: גינוי בינלאומי", en: "Residency without the vote: condemnation" }, -1)],
+  SV_FN_VOTE: [item({ kind: "knesset", mode: "election", color: "#2456B5" }, { he: "משאל פלסטיני בפיקוח בינלאומי", en: "A supervised Palestinian vote" })],
+  SV_FN_IMPOSE: [sign([["new_york", "jerusalem"], ["amman", "jerusalem"]], { he: "הסדר כפוי: העולם דוחה", en: "An imposed arrangement: the world rejects it" }, -1)],
+  // spoilers
+  SP_RK_PRECISE: [item({ kind: "airstrike", area: "gaza", sorties: 2, bombs: 4, wide: false }, { he: "תקיפה ממוקדת, השיחות נמשכות", en: "A precise strike; talks continue" })],
+  SP_RK_SUSPEND: [sign([["jerusalem", "washington"]], { he: "המגעים מושעים", en: "Talks suspended" }, -1)],
+  SP_RK_WIDE: [item({ kind: "airstrike", area: "gaza", sorties: 10, bombs: 18, wide: true }, { he: "מבצע רחב ברצועה", en: "A wide operation in the Strip" })],
+  SP_TM_STATUS_QUO: [item({ kind: "crowd", place: "jerusalem", size: 40, mode: "disperse" }, { he: "הסטטוס קוו נאכף", en: "The status quo is enforced" })],
+  SP_TM_FORCE: [item({ kind: "crowd", place: "jerusalem", size: 60, mode: "crackdown" }, { he: "פינוי בכוח בהר הבית", en: "Forced clearing on the Temple Mount" }), item({ kind: "barrage", front: "gaza", count: 10, weapon: "rocket", targets: ["sderot", "ashkelon", "jerusalem"] }, null, 6)],
+  SP_PR_RELEASE: [sign([["jerusalem", "ramallah"]], { he: "שחרור אסירים כמחווה", en: "Prisoners released as a gesture" })],
+  SP_PR_REFUSE: [sign([["ramallah", "jerusalem"]], { he: "סירוב לשחרור", en: "Release refused" }, -1)],
+  SP_OP_EVACUATE: [item({ kind: "settlers", mode: "enforce" }, { he: "המאחז מפונה", en: "The outpost is evacuated" })],
+  SP_OP_LEGALIZE: [item({ kind: "settlers", mode: "build" }, { he: "המאחז מוכשר", en: "The outpost is legalized" })],
+};
+
+const RESOLUTION_DILEMMA_SCENES: Record<string, SceneItem[]> = {
+  SP_ROCKETS: [item({ kind: "barrage", front: "gaza", count: 12, weapon: "rocket", targets: ["sderot", "ashkelon", "netivot"] }, { he: "ירי כדי לטרפד את המגעים", en: "Fire to derail the talks" })],
+  SP_TEMPLE_MOUNT: [item({ kind: "crowd", place: "jerusalem", size: 60, mode: "protest" }, { he: "עימותים בהר הבית", en: "Clashes on the Temple Mount" })],
+};
+
+export const OPTION_SCENES: Record<string, SceneItem[]> = { ...BASE_OPTION_SCENES, ...RESOLUTION_OPTION_SCENES };
+export const DILEMMA_SCENES: Record<string, SceneItem[]> = { ...BASE_DILEMMA_SCENES, ...RESOLUTION_DILEMMA_SCENES };
 
 // ---------------------------------------------------------------------------
 // consequences, keyed by English headline

@@ -52,6 +52,54 @@ function DeltaChips(props: { deltas: Deltas; lang: Lang; small?: boolean }) {
   );
 }
 
+/** Progress toward resolving the conflict carried by a choice or event. */
+function PeaceChip(props: { value: number; lang: Lang; odds?: number; failure?: number }) {
+  const he = props.lang === "he";
+  const { value } = props;
+  if (value === 0 && (props.failure ?? 0) === 0) return null;
+  const tone = value > 0 ? "bg-info-dim text-info-bright" : "bg-bad-dim text-bad-bright";
+  const sign = (n: number) => `${n > 0 ? "+" : ""}${n}`;
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 text-[12px] leading-[20px] font-medium ${tone}`}>
+      <svg width="11" height="11" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12c3-6 9-6 12 0M8 4v4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+      {he ? "הסדר" : "Settlement"} <span className="num">{sign(value)}</span>
+      {props.failure !== undefined && props.failure !== value && <span className="num font-normal opacity-80">/ {sign(props.failure)}</span>}
+    </span>
+  );
+}
+
+function ResolutionMeter(props: { game: Game; lang: Lang }) {
+  const { game, lang } = props;
+  const he = lang === "he";
+  const r = game.resolution;
+  const steps = r.path === null ? [] : S.PATH_MILESTONES[r.path];
+  return (
+    <div className="flex min-w-[210px] flex-col gap-1 border-s border-line0 ps-5" title={he ? "המטרה: הסדר שמסיים את הסכסוך" : "The goal: an arrangement that ends the conflict"}>
+      <span className="flex items-baseline justify-between gap-3">
+        <span className="text-[12px] leading-[14px] font-medium text-fg1">{he ? "הסדר הסכסוך" : "Resolving the conflict"}</span>
+        <span className="num text-[19px] leading-[22px] font-medium text-info-bright">{r.progress}%</span>
+      </span>
+      <bdi dir={he ? "rtl" : "ltr"} className="block h-1.5 w-full overflow-hidden rounded-full bg-bg3">
+        <span className="block h-full rounded-full bg-info transition-[width] duration-700" style={{ width: `${r.progress}%` }} />
+      </bdi>
+      <span className="flex items-center gap-1.5 text-[11.5px] leading-[15px] text-fg2">
+        {r.path === null ? (
+          <span className="text-bad-bright">{he ? "הדוקטרינה אינה מובילה להסדר" : "This doctrine leads to no settlement"}</span>
+        ) : (
+          <>
+            <span className="truncate">{tr(S.PATH_LABELS[r.path], lang)}</span>
+            <span className="ms-auto flex gap-0.5" aria-label={`${r.milestones.length}/${steps.length}`}>
+              {steps.map((m) => (
+                <span key={m} title={tr(S.MILESTONE_LABELS[m], lang)} className={`inline-block h-1.5 w-3 rounded-full ${r.milestones.includes(m) ? "bg-info" : "bg-line1"}`} />
+              ))}
+            </span>
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // HUD
 // ---------------------------------------------------------------------------
@@ -76,6 +124,7 @@ export function Hud(props: { game: Game; lang: Lang }) {
           <span className="block h-full rounded-full bg-fg1/60" style={{ width: `${progress * 100}%` }} />
         </bdi>
       </div>
+      {game.phase !== "policy" && <ResolutionMeter game={game} lang={lang} />}
       {game.party !== null && (
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 border-s border-line0 ps-6">
           <div className="flex items-center gap-2 text-[14px]">
@@ -176,6 +225,8 @@ function OptionCard(props: { game: Game; dilemma: strategic.DilemmaDef; option: 
   }, [open, game, option]);
   const letter = he ? "אבגדהוזחט"[props.index] : "ABCDEFGHI"[props.index];
   const catastrophic = option.ending !== undefined;
+  const peace = S.optionPeace(option);
+  const odds = S.optionOdds(game, option);
 
   const label = (text: string) => <div className="eyebrow mb-1">{text}</div>;
 
@@ -196,6 +247,17 @@ function OptionCard(props: { game: Game; dilemma: strategic.DilemmaDef; option: 
         <span className="flex-1">
           <span className={`block text-[15px] leading-[22px] font-medium ${catastrophic ? "text-bad-bright" : "text-fg0"}`}>{tr(option.label, lang)}</span>
           {!open && <span className="mt-0.5 block text-[13px] leading-[19px] text-fg1">{tr(option.objective, lang)}</span>}
+          <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <PeaceChip value={peace.success} failure={option.gamble !== undefined ? peace.failure : undefined} lang={lang} />
+            {option.gamble !== undefined && (
+              <span className="rounded-full bg-bg3 px-2 text-[12px] leading-[20px] text-fg1">
+                {he ? "סיכוי הצלחה" : "Odds"} <span className="num font-medium text-fg0">{Math.round(odds * 100)}%</span>
+              </span>
+            )}
+            {option.milestone !== undefined && dilemma.milestone !== undefined && (
+              <span className="rounded-full bg-info px-2 text-[11.5px] leading-[20px] text-white">{he ? "אבן דרך" : "Milestone"}</span>
+            )}
+          </span>
         </span>
         <svg width="16" height="16" viewBox="0 0 16 16" className={`mt-1.5 shrink-0 text-fg2 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">
           <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -278,7 +340,7 @@ function OptionCard(props: { game: Game; dilemma: strategic.DilemmaDef; option: 
             const ending = state.ending;
             if (ending === null) return null;
             return (
-              <div key={branch ?? "-"} className={`rounded-[10px] px-3 py-2 text-[13px] leading-[19px] ${ending.kind === "TERM_COMPLETED" ? "bg-good-dim text-good-bright" : "bg-bad-dim text-bad-bright"}`}>
+              <div key={branch ?? "-"} className={`rounded-[10px] px-3 py-2 text-[13px] leading-[19px] ${ending.kind === "CONFLICT_RESOLVED" ? "bg-good-dim text-good-bright" : ending.kind === "TERM_COMPLETED" ? "bg-warn-dim text-warn-bright" : "bg-bad-dim text-bad-bright"}`}>
                 {branch !== undefined && option.gamble !== undefined && <span className="me-1 font-medium">{tr(option.gamble[branch].label, lang)} ·</span>}
                 <span className="font-medium">{tr(ending.headline, lang)}</span>
               </div>
@@ -311,6 +373,8 @@ export function DecisionPanel(props: { game: Game; lang: Lang }) {
           {isCrisis && <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />}
           {dilemma.id === "DOCTRINE"
             ? he ? "שלב 3 מתוך 3 · מדיניות הממשלה" : "Step 3 of 3 · Government policy"
+            : dilemma.milestone !== undefined
+              ? he ? `בדרך להסדר · שלב ${dilemma.milestone.index} מתוך ${dilemma.milestone.of}` : `Toward a settlement · step ${dilemma.milestone.index} of ${dilemma.milestone.of}`
             : isCrisis ? he ? "הקבינט נדרש להכרעה מיידית" : "The cabinet must decide immediately" : he ? "הכרעת ראש הממשלה" : "Prime Minister's decision"}
         </div>
         <h2 className="display mt-2.5 text-[25px] leading-[32px]">{tr(dilemma.title, lang)}</h2>
@@ -384,6 +448,7 @@ export function ConsequenceCard(props: { game: Game; lang: Lang }) {
         <h3 className="display mt-3 text-[25px] leading-[32px]">{tr(e.headline, lang)}</h3>
         <p className="mt-2 text-[14px] leading-[22px] text-fg1">{tr(e.body, lang)}</p>
         <div className="mt-4 flex flex-col gap-2">
+          {e.peace !== undefined && e.peace !== 0 && <div><PeaceChip value={e.peace} lang={lang} /></div>}
           <DeltaChips deltas={e.deltas} lang={lang} />
           {stance.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -470,19 +535,22 @@ export function EndScreen(props: { game: Game; lang: Lang }) {
   const newGame = useCampaign((s) => s.newGame);
   const ending = game.ending;
   if (ending === null) return null;
-  const good = ending.kind === "TERM_COMPLETED";
+  const good = ending.kind === "CONFLICT_RESOLVED";
+  const partial = ending.kind === "TERM_COMPLETED";
+  const r = game.resolution;
   const KIND: Record<strategic.EndingKind, strategic.Bi> = {
+    CONFLICT_RESOLVED: { he: "המטרה הושגה · הסכסוך יושב", en: "Goal achieved · the conflict is resolved" },
     GOVERNMENT_FELL: { he: "הממשלה נפלה", en: "Government fell" },
     STATE_COLLAPSE_EXTERNAL: { he: "קריסת המדינה · גורמים חיצוניים", en: "State collapse · external" },
     STATE_COLLAPSE_INTERNAL: { he: "קריסת המדינה · שסע פנימי", en: "State collapse · internal rift" },
-    TERM_COMPLETED: { he: "הקדנציה הושלמה", en: "Term completed" },
+    TERM_COMPLETED: { he: "הקדנציה הסתיימה בלי הסדר", en: "The term ended without a settlement" },
   };
   return (
     <div className="fade-in pointer-events-auto absolute inset-0 z-30 flex items-center justify-center bg-[#2a2418]/25 p-6 backdrop-blur-[2px]">
       <div className="overlay consequence-in flex max-h-full w-full max-w-[780px] flex-col overflow-hidden rounded-[22px] border border-line0 bg-bg1">
-        <div className={`h-2 ${good ? "bg-good" : "bg-bad"}`} />
+        <div className={`h-2 ${good ? "bg-good" : partial ? "bg-warn" : "bg-bad"}`} />
         <header className="px-8 pt-7 pb-6 text-center">
-          <div className={`inline-block rounded-full px-3 py-1 text-[13px] font-medium ${good ? "bg-good-dim text-good-bright" : "bg-bad-dim text-bad-bright"}`}>{tr(KIND[ending.kind], lang)}</div>
+          <div className={`inline-block rounded-full px-3 py-1 text-[13px] font-medium ${good ? "bg-good-dim text-good-bright" : partial ? "bg-warn-dim text-warn-bright" : "bg-bad-dim text-bad-bright"}`}>{tr(KIND[ending.kind], lang)}</div>
           <h2 className="display mt-4 text-[38px] leading-[46px]">{tr(ending.headline, lang)}</h2>
           <p className="mx-auto mt-3 max-w-[600px] text-[15px] leading-[24px] text-fg1">{tr(ending.reason, lang)}</p>
           <div className="mt-3 text-[13px] text-fg2">
@@ -492,6 +560,26 @@ export function EndScreen(props: { game: Game; lang: Lang }) {
           </div>
         </header>
         <div className="min-h-0 overflow-y-auto border-t border-line0 bg-bg2/60 px-8 py-5">
+          <div className="mb-5 rounded-[14px] border border-line0 bg-bg1 px-5 py-4">
+            <div className="flex items-baseline justify-between">
+              <span className="display text-[18px]">{he ? "ההתקדמות להסדר" : "Progress toward a settlement"}</span>
+              <span className="num text-[26px] font-medium text-info-bright">{r.progress}%</span>
+            </div>
+            <bdi dir={he ? "rtl" : "ltr"} className="mt-2 block h-2 w-full overflow-hidden rounded-full bg-bg3">
+              <span className="block h-full rounded-full bg-info" style={{ width: `${r.progress}%` }} />
+            </bdi>
+            {r.path !== null ? (
+              <ol className="mt-3 flex flex-wrap gap-1.5 text-[12.5px]">
+                {S.PATH_MILESTONES[r.path].map((m, i) => (
+                  <li key={m} className={`rounded-full px-2.5 leading-[22px] ${r.milestones.includes(m) ? "bg-info-dim font-medium text-info-bright" : "bg-bg3 text-fg2"}`}>
+                    <span className="num">{i + 1}</span> · {tr(S.MILESTONE_LABELS[m], lang)}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-2 text-[13px] text-bad-bright">{he ? "הדוקטרינה שנבחרה אינה מובילה להסדר שמסיים את הסכסוך." : "The chosen doctrine does not lead to an arrangement that ends the conflict."}</p>
+            )}
+          </div>
           <div className="grid grid-cols-4 gap-2 md:grid-cols-7">
             {S.METRIC_KEYS.map((k) => (
               <div key={k} className="rounded-[12px] border border-line0 bg-bg1 px-2 py-2.5 text-center">

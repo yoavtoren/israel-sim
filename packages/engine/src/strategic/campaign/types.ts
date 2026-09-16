@@ -28,6 +28,15 @@ export type Visual =
 
 export type Severity = "good" | "info" | "warn" | "bad" | "critical";
 
+/** How the government means to end the conflict (set by the doctrine). */
+export type ResolutionPath = "regional" | "two_state" | "unilateral" | "sovereignty";
+
+export interface Resolution {
+  /** 0–100 toward an arrangement that ends the conflict */ progress: number;
+  /** null: the doctrine offers no way to end the conflict */ path: ResolutionPath | null;
+  /** milestone dilemmas completed, in order */ milestones: string[];
+}
+
 export interface ConsequenceDef {
   /** chance this follows (default 1) */ p?: number;
   headline: Bi;
@@ -40,6 +49,7 @@ export interface ConsequenceDef {
   partners?: Partial<Record<PartyTag, number>>;
   flags?: Partial<CampaignFlags>;
   /** queue this dilemma next */ next?: string;
+  /** progress toward resolving the conflict */ peace?: number;
 }
 
 export interface Ending {
@@ -48,7 +58,7 @@ export interface Ending {
   reason: Bi;
 }
 
-export type EndingKind = "GOVERNMENT_FELL" | "STATE_COLLAPSE_EXTERNAL" | "STATE_COLLAPSE_INTERNAL" | "TERM_COMPLETED";
+export type EndingKind = "CONFLICT_RESOLVED" | "GOVERNMENT_FELL" | "STATE_COLLAPSE_EXTERNAL" | "STATE_COLLAPSE_INTERNAL" | "TERM_COMPLETED";
 
 export interface DilemmaOption {
   id: string;
@@ -67,6 +77,10 @@ export interface DilemmaOption {
   /** record a crisis option in the strategic history (stances read it) */ crisisOption?: CrisisOptionId;
   /** the choice itself ends the game */ ending?: Omit<Ending, "headline"> & { headline?: Bi };
   /** shown while choosing */ visual?: Visual;
+  /** progress toward resolving the conflict */ peace?: number;
+  /** progress by gamble outcome (instead of `peace`) */ peaceGamble?: { success: number; failure: number };
+  /** completes this resolution milestone (only on success when there is a gamble) */ milestone?: string;
+  /** success odds from the current situation (overrides gamble.p) */ odds?: (v: CampaignView) => number;
 }
 
 export interface CampaignView {
@@ -75,6 +89,7 @@ export interface CampaignView {
   flags: CampaignFlags;
   track: PolicyTrack | null;
   coalitionTags: PartyTag[];
+  resolution: Resolution;
 }
 
 export interface DilemmaDef {
@@ -90,6 +105,7 @@ export interface DilemmaDef {
   cooldown?: number;
   once?: boolean;
   crisisId?: CrisisId;
+  /** a step on the path to resolving the conflict */ milestone?: { path: ResolutionPath; index: number; of: number };
 }
 
 export interface CampaignFlags {
@@ -130,6 +146,7 @@ export interface ConsequenceEvent {
   visual: Visual | null;
   /** metric deltas actually applied (for the popup chips) */ deltas: Deltas;
   stance: Partial<Record<ActorId, number>>;
+  /** progress toward resolution this event carried */ peace?: number;
   /** parties that left, or threaten to */ quits: PartyId[];
   threats: PartyId[];
 }
@@ -153,6 +170,7 @@ export interface CampaignState {
   step: number;
   maxSteps: number;
   flags: CampaignFlags;
+  resolution: Resolution;
   /** campaign-only relation shifts on top of the stances model */ stanceShift: Partial<Record<ActorId, number>>;
   current: string | null;
   forced: string[];

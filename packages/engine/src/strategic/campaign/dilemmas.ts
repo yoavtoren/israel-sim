@@ -600,8 +600,9 @@ const TERROR_ATTACK: DilemmaDef = {
   title: { he: "פיגוע ירי בירושלים", en: "Shooting attack in Jerusalem" },
   context: { he: "מחבל פתח באש בתחנת אוטובוס; יש הרוגים. הציבור דורש תגובה.", en: "A gunman opened fire at a bus stop; people were killed. The public demands a response." },
   focus: "israel",
-  weight: (v) => 0.35 + v.metrics.securityThreat / 150,
-  cooldown: 2,
+  // one of several spoilers: rare, and never twice in a short span
+  weight: (v) => 0.1 + Math.max(0, v.metrics.securityThreat - 50) / 400,
+  cooldown: 6,
   options: [
     { id: "TA_TARGETED", label: { he: "מבצע סיכול ממוקד בתשתית המחבל", en: "Targeted counter-terror raid on the attacker's network" }, objective: { he: "פגיעה ברשת בלי ענישה קולקטיבית.", en: "Hit the network without collective punishment." }, pros: [{ he: "יעיל ומדויק", en: "Effective and precise" }], cons: [{ he: "הימין דורש יותר", en: "The right demands more" }], deltas: { securityThreat: -6, internationalLegitimacy: 2 }, partners: { far_right: -5 }, visual: { kind: "ground", target: "west_bank" } },
     { id: "TA_COLLECTIVE", label: { he: "סגר, הריסת בתים ושלילת היתרי עבודה", en: "Closure, home demolitions, work permits revoked" }, objective: { he: "הרתעה רחבה.", en: "Broad deterrence." }, pros: [{ he: "תמיכה ציבורית מיידית", en: "Immediate public support" }], cons: [{ he: "התלקחות וביקורת בינלאומית", en: "Flare-up and international criticism" }], deltas: { securityThreat: 4, internationalLegitimacy: -8, economicStability: -3 }, partners: { far_right: 10, right: 5, center: -10, arab: -25 }, stance: { eu: -5, jordan: -5 } },

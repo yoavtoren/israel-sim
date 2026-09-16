@@ -77,8 +77,8 @@ export function PartyPicker(props: { lang: Lang }) {
           <h1 className="display mt-4 text-[44px] leading-[52px]">{he ? "ברוך הבא, ראש הממשלה" : "Welcome, Prime Minister"}</h1>
           <p className="mx-auto mt-3 max-w-[640px] text-[16px] leading-[26px] text-fg1">
             {he
-              ? "ניצחת בבחירות. עכשיו עליך להקים קואליציה ולהוביל את מדיניות הביטחון של ישראל. כל החלטה תשנה את המפה — ואת עמדת העולם כלפינו. המשחק נגמר כשהממשלה מתפרקת או כשהמדינה קורסת."
-              : "You won the election. Now you must form a coalition and lead Israel's security policy. Every decision changes the map — and how the world sees us. The game ends when the government falls or the state collapses."}
+              ? "ניצחת בבחירות. המטרה שלך אינה לשרוד את הקדנציה אלא ליישב את הסכסוך הישראלי-פלסטיני: הסדר שמסיים את הסכסוך ואת התביעות, מקובל על שני הצדדים ומוכר בעולם. הקם קואליציה שתחזיק מעמד, בחר דרך, התקדם באבני הדרך — והתמודד עם מי שינסו לטרפד. כשלון הוא נפילת הממשלה, קריסת המדינה, או סוף הקדנציה בלי הסדר."
+              : "You won the election. Your goal is not to survive the term but to resolve the Israeli–Palestinian conflict: an arrangement that ends the conflict and its claims, accepted by both sides and recognized worldwide. Build a coalition that lasts, choose a path, advance through its milestones — and face those who try to derail it. You fail if the government falls, the state collapses, or the term ends without a settlement."}
           </p>
           <div className="mt-6">
             <RosterToggle roster={roster} lang={lang} onChange={setRoster} />

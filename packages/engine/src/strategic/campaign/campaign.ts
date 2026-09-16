@@ -14,10 +14,11 @@ import { clamp, createInitialState, seedFromString, updateMetrics } from "../red
 import type { Bi, CrisisId, CrisisOptionId, GambleBranch, MetricKey, SimulationMetrics } from "../types";
 import { METRIC_KEYS } from "../types";
 import { AUTHORED_DILEMMAS, CEASEFIRE_TALKS, DOCTRINE } from "./dilemmas";
+import { CONSEQUENCE_PEACE, FINAL_MILESTONES, MILESTONE_MOMENTUM, OPTION_PEACE, PATH_LABELS, PATH_OF_TRACK, RESOLUTION_DILEMMAS } from "./resolution";
 import { DOCTRINE_REACTIONS, MAJORITY, PARTIES, SEATS, checkCoalition, partnerStrain, partyName, type PartyId, type PartyTag, type SeatRoster } from "./parties";
 import type {
   CampaignFlags, CampaignState, CampaignView, ConsequenceDef, ConsequenceEvent, DilemmaDef, DilemmaOption,
-  Ending, MapFocus, Severity,
+  Ending, MapFocus, Resolution, Severity,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -104,7 +105,7 @@ function crisisDilemma(id: CrisisId): DilemmaDef {
 }
 
 export const DILEMMAS: Record<string, DilemmaDef> = Object.fromEntries(
-  [...AUTHORED_DILEMMAS, CEASEFIRE_TALKS, ...(Object.keys(CRISIS_DEFS) as CrisisId[]).map(crisisDilemma)].map((d) => [d.id, d]),
+  [...AUTHORED_DILEMMAS, CEASEFIRE_TALKS, ...RESOLUTION_DILEMMAS, ...(Object.keys(CRISIS_DEFS) as CrisisId[]).map(crisisDilemma)].map((d) => [d.id, d]),
 );
 
 // ---------------------------------------------------------------------------
@@ -134,6 +135,7 @@ export function createCampaign(seed: string, roster: SeatRoster = "polls"): Camp
     step: 0,
     maxSteps: TERM_STEPS,
     flags: { ...NO_FLAGS },
+    resolution: { progress: 0, path: null, milestones: [] },
     stanceShift: {},
     current: null,
     forced: [],
@@ -202,6 +204,7 @@ export function campaignView(state: CampaignState): CampaignView {
     flags: state.flags,
     track: state.sim.activeTrack,
     coalitionTags: state.coalition.map((p) => PARTIES[p].tag),
+    resolution: state.resolution,
   };
 }
 
@@ -329,10 +332,11 @@ function applyConsequence(w: Work, c: ConsequenceDef): void {
   applyStance(w, c.stance);
   applyPartners(w, c.partners);
   applyFlags(w, c.flags);
+  const peace = applyPeace(w, c.peace ?? CONSEQUENCE_PEACE[c.headline.en] ?? 0);
   if (c.next !== undefined && !w.s.forced.includes(c.next)) w.s = { ...w.s, forced: [...w.s.forced, c.next] };
   pushEvent(w, {
     headline: c.headline, body: c.body, severity: c.severity, focus: c.focus, visual: c.visual ?? null,
-    deltas: diff(before, w.s.sim.metrics), stance: c.stance ?? {}, quits: [], threats: [],
+    deltas: diff(before, w.s.sim.metrics), stance: c.stance ?? {}, quits: [], threats: [], peace: peace === 0 ? undefined : peace,
   });
 }
 
@@ -432,10 +436,19 @@ function endingFor(s: CampaignState): Ending | null {
     };
   }
   if (s.step >= s.maxSteps && !warOngoing(s)) {
+    const p = s.resolution.progress;
+    const headline: Bi = p >= 70
+      ? { he: "הקדנציה הסתיימה — קרוב מאוד להסדר", en: "The term is over — very close to a settlement" }
+      : p >= 40
+        ? { he: "הקדנציה הסתיימה — התקדמות חלקית", en: "The term is over — partial progress" }
+        : { he: "הקדנציה הסתיימה — הסכסוך נמשך", en: "The term is over — the conflict goes on" };
     return {
       kind: "TERM_COMPLETED",
-      headline: { he: "שרדת את הקדנציה", en: "You survived the term" },
-      reason: { he: "ארבע שנים, בלי מלחמה פתוחה בסיומן. ישראל הולכת לבחירות במועדן.", en: "Four years, with no open war at the end. Israel goes to elections on schedule." },
+      headline,
+      reason: {
+        he: `שרדת ארבע שנים, אבל המטרה לא הושגה: ההתקדמות להסדר עומדת על ${p}%. ישראל הולכת לבחירות והממשלה הבאה תירש את הסכסוך.`,
+        en: `You lasted four years, but the goal was not reached: progress toward a settlement stands at ${p}%. Israel heads to elections and the next government inherits the conflict.`,
+      },
     };
   }
   return null;
@@ -458,7 +471,7 @@ function pickNext(w: Work): string {
     const weight = d.weight(v);
     if (weight > 0) candidates.push({ id: d.id, weight });
   }
-  if (candidates.length === 0) return "TERROR_ATTACK";
+  if (candidates.length === 0) return "SP_TEMPLE_MOUNT";
   const total = candidates.reduce((a, c) => a + c.weight, 0);
   let u = draw(w) * total;
   for (const c of candidates) {
@@ -488,7 +501,7 @@ export function choose(state: CampaignState, optionId: string, opts: ChooseOptio
   const wasAtWar = warOngoing(state);
 
   let branch: GambleBranch | null = null;
-  if (opt.gamble !== undefined) branch = opts.branch ?? (w.preview ? "success" : draw(w) < opt.gamble.p ? "success" : "failure");
+  if (opt.gamble !== undefined) branch = opts.branch ?? (w.preview ? "success" : draw(w) < optionOdds(state, opt) ? "success" : "failure");
 
   // 1. the choice itself
   const deltas: Deltas = { ...opt.deltas };
@@ -503,7 +516,15 @@ export function choose(state: CampaignState, optionId: string, opts: ChooseOptio
   } else {
     applyPartners(w, opt.partners);
   }
-  if (opt.setTrack !== undefined) w.s = { ...w.s, sim: { ...w.s.sim, activeTrack: opt.setTrack } };
+  if (opt.setTrack !== undefined) {
+    w.s = { ...w.s, sim: { ...w.s.sim, activeTrack: opt.setTrack }, resolution: { ...w.s.resolution, path: opt.setTrack === null ? null : PATH_OF_TRACK[opt.setTrack] } };
+  }
+  const optionPeace = applyPeace(w, opt.peaceGamble !== undefined && branch !== null ? opt.peaceGamble[branch] : opt.peace ?? OPTION_PEACE[opt.id] ?? 0);
+  const reached = opt.milestone !== undefined && (opt.gamble === undefined || branch === "success") && !w.s.resolution.milestones.includes(opt.milestone) ? opt.milestone : null;
+  if (reached !== null) {
+    w.s = { ...w.s, resolution: { ...w.s.resolution, milestones: [...w.s.resolution.milestones, reached] } };
+    applyPartners(w, MILESTONE_MOMENTUM);
+  }
   if (opt.crisisOption !== undefined) {
     const track = w.s.sim.activeTrack ?? "PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP";
     w.s = {
@@ -520,7 +541,12 @@ export function choose(state: CampaignState, optionId: string, opts: ChooseOptio
   if (opt.gamble !== undefined && branch !== null) {
     pushEvent(w, {
       headline: opt.gamble[branch].label, body: opt.label, severity: branch === "success" ? "good" : "bad",
-      focus: def.focus, visual: null, deltas: {}, stance: {}, quits: [], threats: [],
+      focus: def.focus, visual: null, deltas: {}, stance: {}, quits: [], threats: [], peace: optionPeace,
+    });
+  } else if (reached !== null && def.milestone !== undefined) {
+    pushEvent(w, {
+      headline: { he: `אבן דרך בדרך להסדר: ${def.title.he}`, en: `A milestone toward a settlement: ${def.title.en}` },
+      body: opt.label, severity: "good", focus: def.focus, visual: null, deltas: {}, stance: {}, quits: [], threats: [], peace: optionPeace,
     });
   }
   if (opt.next !== undefined) w.s = { ...w.s, forced: [opt.next, ...w.s.forced] };
@@ -566,11 +592,14 @@ export function choose(state: CampaignState, optionId: string, opts: ChooseOptio
   let ending: Ending | null = null;
   if (opt.ending !== undefined) {
     ending = { kind: opt.ending.kind, reason: opt.ending.reason, headline: opt.ending.headline ?? opt.label };
+  } else if (reached !== null && FINAL_MILESTONES.has(reached)) {
+    w.s = { ...w.s, resolution: { ...w.s.resolution, progress: 100 } };
+    ending = resolvedEnding(w.s.resolution);
   } else {
     ending = endingFor(w.s);
   }
   if (ending !== null) {
-    pushEvent(w, { headline: ending.headline, body: ending.reason, severity: ending.kind === "TERM_COMPLETED" ? "good" : "critical", focus: ending.kind === "STATE_COLLAPSE_INTERNAL" || ending.kind === "GOVERNMENT_FELL" ? "israel" : "world", visual: null, deltas: {}, stance: {}, quits: [], threats: [] });
+    pushEvent(w, { headline: ending.headline, body: ending.reason, severity: ending.kind === "CONFLICT_RESOLVED" ? "good" : ending.kind === "TERM_COMPLETED" ? "warn" : "critical", focus: ending.kind === "STATE_COLLAPSE_INTERNAL" || ending.kind === "GOVERNMENT_FELL" ? "israel" : "world", visual: null, deltas: {}, stance: {}, quits: [], threats: [] });
   }
 
   // 8. what comes next
@@ -604,4 +633,43 @@ export function acknowledge(state: CampaignState): CampaignState {
 /** What an option does before any random consequence (for the decision panel). */
 export function previewOption(state: CampaignState, optionId: string, branch?: GambleBranch): CampaignState {
   return choose(state, optionId, { preview: true, branch });
+}
+
+// ---------------------------------------------------------------------------
+// resolution
+// ---------------------------------------------------------------------------
+
+/** Success odds of a gamble option in the current situation. */
+export function optionOdds(state: CampaignState, opt: DilemmaOption): number {
+  if (opt.gamble === undefined) return 1;
+  return opt.odds !== undefined ? opt.odds(campaignView(state)) : opt.gamble.p;
+}
+
+/** Progress an option would add, by outcome (for the decision panel). */
+export function optionPeace(opt: DilemmaOption): { success: number; failure: number } {
+  if (opt.peaceGamble !== undefined) return opt.peaceGamble;
+  const v = opt.peace ?? OPTION_PEACE[opt.id] ?? 0;
+  return { success: v, failure: v };
+}
+
+function applyPeace(w: Work, delta: number): number {
+  if (delta === 0) return 0;
+  const r = w.s.resolution;
+  // a doctrine with no path can lose ground but not gain it
+  const d = r.path === null && delta > 0 ? 0 : delta;
+  const progress = clamp(r.progress + d);
+  w.s = { ...w.s, resolution: { ...r, progress } };
+  return progress - r.progress;
+}
+
+function resolvedEnding(r: Resolution): Ending {
+  const path = r.path === null ? null : PATH_LABELS[r.path];
+  return {
+    kind: "CONFLICT_RESOLVED",
+    headline: { he: "הסכסוך הישראלי-פלסטיני הסתיים", en: "The Israeli–Palestinian conflict has ended" },
+    reason: {
+      he: `הסדר שמסיים את הסכסוך ואת התביעות אושר ומוכר בעולם${path === null ? "" : ` (${path.he})`}. זו המטרה שלשמה הוקמה הממשלה.`,
+      en: `An arrangement ending the conflict and its claims was ratified and is recognized internationally${path === null ? "" : ` (${path.en})`}. This is what the government set out to do.`,
+    },
+  };
 }
