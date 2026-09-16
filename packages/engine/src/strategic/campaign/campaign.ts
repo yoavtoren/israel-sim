@@ -167,7 +167,7 @@ export function formGovernment(state: CampaignState, members: PartyId[]): Campai
   for (const p of set) {
     if (p === state.party) continue;
     // a partner that just signed the coalition deal starts fairly patient; friction wears it down
-    patience[p] = clamp(Math.round(45 + check.stability * 0.45 - partnerStrain(p, set) * 6));
+    patience[p] = clamp(Math.round(45 + check.stability * 0.45 - partnerStrain(p, set, state.roster) * 6));
   }
   const next: CampaignState = {
     ...state,

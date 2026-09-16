@@ -91,9 +91,40 @@ describe("M13 Prime Minister campaign", () => {
     for (const [p, v] of Object.entries(g.patience)) if (p !== "joint_list") expect(v).toBeGreaterThanOrEqual(joint);
 
     for (const b of S.BENCHMARK_COALITIONS) {
-      const c = S.checkCoalition(b.members);
+      const r = b.roster ?? "polls";
+      const c = S.checkCoalition(b.members, r);
       expect(c.vetoes).toEqual([]);
-      for (const m of b.members) expect(S.SEATS.polls[m]).toBeGreaterThan(0);
+      for (const m of b.members) expect(S.SEATS[r][m]).toBeGreaterThan(0);
+    }
+  });
+
+  it("N12 / Madgam roster: 120 seats, and the veto triangle is the only way to 61", () => {
+    const R: S.SeatRoster = "poll_2026_09_n12";
+    expect(S.CURRENT_POLL_PARTIES.length).toBe(13);
+    expect(S.CURRENT_POLL_PARTIES.reduce((a, p) => a + p.seats, 0)).toBe(120);
+    expect(S.CURRENT_POLL_PARTIES[0].id).toBe("yashar");
+    expect(S.CURRENT_POLL_PARTIES[0].seats).toBe(23);
+    expect(S.SEATS[R].miluimnikim_calcalit).toBe(4);
+    expect(S.partyName("religious_zionism", R).he).toBe("הציונות הדתית וזהות");
+
+    // Haredim + Arab lists together clear a majority and every refusal
+    const triangle = S.checkCoalition(["yashar", "together", "shas", "utj", "joint_list", "raam"], R);
+    expect(triangle.seats).toBe(63);
+    expect(triangle.valid).toBe(true);
+
+    // the same parties under the default roster keep that roster's relations
+    expect(S.refusesEachOther("yashar", "likud", R)).toBe(true);
+    expect(S.refusesEachOther("yashar", "likud")).toBe(false);
+    expect(S.refusesEachOther("yisrael_beiteinu", "shas", R)).toBe(true);
+
+    // so a unity government with Likud is impossible in this reading
+    expect(S.checkCoalition(["yashar", "likud", "together", "yisrael_beiteinu"], R).valid).toBe(false);
+    // and the secular change bloc falls short without the Haredim or the Arab lists
+    expect(S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], R).seats).toBe(58);
+
+    // a refusal is never also carried as friction
+    for (const p of S.CURRENT_POLL_PARTIES) {
+      for (const f of p.frictionWith) expect(S.refusesEachOther(p.id, f, R)).toBe(false);
     }
   });
 

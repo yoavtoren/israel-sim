@@ -181,10 +181,10 @@ export function CoalitionBuilder(props: { lang: Lang }) {
               const p = S.PARTIES[id];
               const inDraft = draft.includes(id);
               const isPm = id === pm;
-              const refusesPm = S.refusesEachOther(id, pm);
-              const clash = draft.filter((m) => m !== id && S.refusesEachOther(id, m));
-              const deep = draft.filter((m) => m !== id && S.frictionBetween(id, m) === "deep");
-              const light = draft.filter((m) => m !== id && S.frictionBetween(id, m) === "friction");
+              const refusesPm = S.refusesEachOther(id, pm, roster);
+              const clash = draft.filter((m) => m !== id && S.refusesEachOther(id, m, roster));
+              const deep = draft.filter((m) => m !== id && S.frictionBetween(id, m, roster) === "deep");
+              const light = draft.filter((m) => m !== id && S.frictionBetween(id, m, roster) === "friction");
               return (
                 <button
                   key={id}

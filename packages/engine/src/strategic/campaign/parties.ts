@@ -9,6 +9,12 @@
  *    polls and is shown at the 4-seat minimum.
  *  - "election_2022": as elected in November 2022 (the Religious Zionism joint
  *    list shown as its three factions).
+ *  - "poll_2026_09_n12": the N12 / Madgam benchmark of September 2026, a second
+ *    reading of the same month. It seats the Reservists & Economic list (below
+ *    the threshold in the 10-poll average) and draws the vetoes harder: there
+ *    Eisenkot REFUSES Likud and Lieberman REFUSES the Haredi parties, where the
+ *    default roster has friction. Relations are therefore ROSTER-SCOPED via
+ *    ROSTER_RELATIONS — one global matrix cannot hold both readings.
  *
  *  Security positions, refusals and friction are ASSUMPTIONS drawn from the
  *  parties' public positions — a game abstraction, not a statement of what any
@@ -19,14 +25,28 @@ import type { Bi, CoalitionType, PolicyTrack } from "../types";
 export type PartyId =
   | "yashar" | "likud" | "together" | "democrats" | "yisrael_beiteinu" | "shas" | "utj" | "otzma_yehudit"
   | "joint_list" | "religious_zionism" | "raam" | "amcha_yisrael"
-  | "national_unity" | "yesh_atid" | "hadash_taal" | "balad" | "noam";
+  | "national_unity" | "yesh_atid" | "hadash_taal" | "balad" | "noam"
+  | "miluimnikim_calcalit";
 
-export type SeatRoster = "polls" | "election_2022";
-export const SEAT_ROSTERS: SeatRoster[] = ["polls", "election_2022"];
+/** Coalition blocs as the September 2026 benchmarks group them. */
+export type Bloc = "LIKUD_BLOC" | "CHANGE_BLOC" | "ARAB_LISTS" | "NON_ALIGNED";
+
+export const PARTY_BLOC: Record<PartyId, Bloc> = {
+  likud: "LIKUD_BLOC", shas: "LIKUD_BLOC", utj: "LIKUD_BLOC", otzma_yehudit: "LIKUD_BLOC",
+  religious_zionism: "LIKUD_BLOC", amcha_yisrael: "LIKUD_BLOC", noam: "LIKUD_BLOC",
+  yashar: "CHANGE_BLOC", together: "CHANGE_BLOC", democrats: "CHANGE_BLOC",
+  yisrael_beiteinu: "CHANGE_BLOC", national_unity: "CHANGE_BLOC", yesh_atid: "CHANGE_BLOC",
+  joint_list: "ARAB_LISTS", raam: "ARAB_LISTS", hadash_taal: "ARAB_LISTS", balad: "ARAB_LISTS",
+  miluimnikim_calcalit: "NON_ALIGNED",
+};
+
+export type SeatRoster = "polls" | "election_2022" | "poll_2026_09_n12";
+export const SEAT_ROSTERS: SeatRoster[] = ["polls", "election_2022", "poll_2026_09_n12"];
 
 export const ROSTER_LABELS: Record<SeatRoster, Bi> = {
   polls: { he: "סקרים עדכניים", en: "Current polls" },
   election_2022: { he: "בחירות 2022", en: "2022 election" },
+  poll_2026_09_n12: { he: "N12 / מדגם, ספטמבר 2026", en: "N12 / Madgam, September 2026" },
 };
 
 export const ROSTER_NOTES: Record<SeatRoster, Bi> = {
@@ -35,18 +55,28 @@ export const ROSTER_NOTES: Record<SeatRoster, Bi> = {
     en: "Average of the 10 latest polls, 9–15 September 2026 · Blue and White and the Reservists below the threshold",
   },
   election_2022: { he: "תוצאות בחירות נובמבר 2022", en: "November 2022 election results" },
+  poll_2026_09_n12: {
+    he: "קריאה שנייה של ספטמבר 2026 · המילואימניקים עוברים את אחוז החסימה · ווטו הדוק יותר",
+    en: "A second reading of September 2026 · the Reservists clear the threshold · tighter vetoes",
+  },
 };
 
 export const SEATS: Record<SeatRoster, Record<PartyId, number>> = {
   polls: {
     yashar: 24, likud: 22, together: 13, democrats: 9, yisrael_beiteinu: 8, shas: 8, utj: 8, otzma_yehudit: 7,
     joint_list: 7, religious_zionism: 5, raam: 5, amcha_yisrael: 4,
-    national_unity: 0, yesh_atid: 0, hadash_taal: 0, balad: 0, noam: 0,
+    national_unity: 0, yesh_atid: 0, hadash_taal: 0, balad: 0, noam: 0, miluimnikim_calcalit: 0,
   },
   election_2022: {
     likud: 32, yesh_atid: 24, national_unity: 12, shas: 11, religious_zionism: 7, utj: 7,
     otzma_yehudit: 6, yisrael_beiteinu: 6, raam: 5, hadash_taal: 5, democrats: 4, noam: 1, balad: 0,
-    yashar: 0, together: 0, joint_list: 0, amcha_yisrael: 0,
+    yashar: 0, together: 0, joint_list: 0, amcha_yisrael: 0, miluimnikim_calcalit: 0,
+  },
+  // N12 / Madgam, September 2026. Bennett and Lapid run as "together" here too.
+  poll_2026_09_n12: {
+    yashar: 23, likud: 20, together: 13, democrats: 10, yisrael_beiteinu: 8, utj: 8, joint_list: 8,
+    shas: 7, otzma_yehudit: 6, religious_zionism: 5, miluimnikim_calcalit: 4, amcha_yisrael: 4, raam: 4,
+    national_unity: 0, yesh_atid: 0, hadash_taal: 0, balad: 0, noam: 0,
   },
 };
 
@@ -57,7 +87,7 @@ export function partySeats(roster: SeatRoster, p: PartyId): number {
 export const PARTY_IDS: PartyId[] = [
   "yashar", "likud", "together", "democrats", "yisrael_beiteinu", "shas", "utj", "otzma_yehudit",
   "joint_list", "religious_zionism", "raam", "amcha_yisrael",
-  "national_unity", "yesh_atid", "hadash_taal", "balad", "noam",
+  "national_unity", "yesh_atid", "hadash_taal", "balad", "noam", "miluimnikim_calcalit",
 ];
 
 /** Parties with seats in a roster, largest first. */
@@ -167,6 +197,13 @@ export const PARTIES: Record<PartyId, PartyDef> = {
     blurb: { he: "ימין דתי-שמרני.", en: "Religious-conservative right." },
     refuses: ["raam", "hadash_taal", "balad", "democrats", "yesh_atid", "national_unity"], friction: [], deepFriction: [],
   },
+  // Seated only in the N12 / Madgam roster; below the threshold in the 10-poll average.
+  miluimnikim_calcalit: {
+    id: "miluimnikim_calcalit", name: { he: "המילואימניקים והכלכלית", en: "Reservists & Economic Party" },
+    tag: "right", hawk: 0.9, color: "#7F8C4A",
+    blurb: { he: "רשימת מילואימניקים וכלכלנים, לא מזוהה עם גוש.", en: "Reservists and economists; aligned with no bloc." },
+    refuses: ["joint_list", "raam", "hadash_taal", "balad"], friction: ["shas", "utj"], deepFriction: [],
+  },
 };
 
 /** Names that differ by roster (the Democrats ran as Labor in 2022). */
@@ -176,6 +213,9 @@ const ROSTER_NAMES: Partial<Record<SeatRoster, Partial<Record<PartyId, Bi>>>> = 
     national_unity: { he: "כחול לבן", en: "Blue and White" },
   },
   election_2022: { democrats: { he: "העבודה", en: "Labor" } },
+  poll_2026_09_n12: {
+    religious_zionism: { he: "הציונות הדתית וזהות", en: "Religious Zionism-Zehut" },
+  },
 };
 
 export function partyName(p: PartyId, roster: SeatRoster): Bi {
@@ -209,10 +249,66 @@ const LEADERS: Record<SeatRoster, Partial<Record<PartyId, Bi>>> = {
     democrats: { he: "מרב מיכאלי", en: "Merav Michaeli" },
     noam: { he: "אבי מעוז", en: "Avi Maoz" },
   },
+  poll_2026_09_n12: {
+    yashar: { he: "גדי איזנקוט", en: "Gadi Eisenkot" },
+    likud: { he: "בנימין נתניהו", en: "Benjamin Netanyahu" },
+    together: { he: "נפתלי בנט ויאיר לפיד", en: "Naftali Bennett & Yair Lapid" },
+    democrats: { he: "יאיר גולן", en: "Yair Golan" },
+    yisrael_beiteinu: { he: "אביגדור ליברמן", en: "Avigdor Lieberman" },
+    utj: { he: "יצחק גולדקנופף ומשה גפני", en: "Yitzhak Goldknopf & Moshe Gafni" },
+    joint_list: { he: "איימן עודה ואחמד טיבי", en: "Ayman Odeh & Ahmad Tibi" },
+    shas: { he: "אריה דרעי", en: "Aryeh Deri" },
+    otzma_yehudit: { he: "איתמר בן גביר", en: "Itamar Ben-Gvir" },
+    religious_zionism: { he: "בצלאל סמוטריץ' ומשה פייגלין", en: "Bezalel Smotrich & Moshe Feiglin" },
+    miluimnikim_calcalit: { he: "יועז הנדל וירון זליכה", en: "Yoaz Hendel & Yaron Zelekha" },
+    amcha_yisrael: { he: "עופר וינטר", en: "Ofer Winter" },
+    raam: { he: "מנסור עבאס", en: "Mansour Abbas" },
+  },
 };
 
 export function partyLeader(p: PartyId, roster: SeatRoster): Bi | null {
   return LEADERS[roster][p] ?? null;
+}
+
+export interface PartyRelations {
+  refuses: PartyId[];
+  friction: PartyId[];
+  deepFriction: PartyId[];
+}
+
+/** Relations a roster overrides. The N12 / Madgam reading draws the vetoes
+ *  harder than the 10-poll average, so the two cannot share one matrix.
+ *  A friction is NOT repeated where a refusal already stands: the pair can
+ *  never sit together, and carrying both would double-count the strain. */
+const ROSTER_RELATIONS: Partial<Record<SeatRoster, Partial<Record<PartyId, Partial<PartyRelations>>>>> = {
+  poll_2026_09_n12: {
+    yashar: { refuses: ["likud", "otzma_yehudit", "religious_zionism"], friction: ["shas", "utj"], deepFriction: [] },
+    likud: { refuses: ["democrats", "joint_list"], friction: ["yisrael_beiteinu"], deepFriction: [] },
+    together: { refuses: ["otzma_yehudit", "religious_zionism"], friction: ["shas", "utj", "joint_list"], deepFriction: [] },
+    // friction with Shas and UTJ dropped: both refuse the Democrats outright
+    democrats: { refuses: ["likud", "otzma_yehudit", "religious_zionism", "amcha_yisrael"], friction: ["yisrael_beiteinu"], deepFriction: [] },
+    yisrael_beiteinu: { refuses: ["shas", "utj", "joint_list", "raam"], friction: ["democrats"], deepFriction: [] },
+    utj: { refuses: ["yisrael_beiteinu", "democrats"], friction: ["together", "yashar"], deepFriction: [] },
+    joint_list: { refuses: ["likud", "otzma_yehudit", "religious_zionism", "yisrael_beiteinu", "amcha_yisrael"], friction: ["together", "yashar"], deepFriction: [] },
+    shas: { refuses: ["yisrael_beiteinu", "democrats"], friction: ["together", "yashar"], deepFriction: [] },
+    otzma_yehudit: { refuses: ["democrats", "joint_list", "raam", "yashar", "together"], friction: [], deepFriction: [] },
+    religious_zionism: { refuses: ["democrats", "joint_list", "raam", "yashar"], friction: [], deepFriction: [] },
+    miluimnikim_calcalit: { refuses: ["joint_list", "raam"], friction: ["shas", "utj"], deepFriction: [] },
+    amcha_yisrael: { refuses: ["democrats", "joint_list", "raam"], friction: [], deepFriction: [] },
+    // friction with Lieberman and the Reservists dropped: both refuse Ra'am outright
+    raam: { refuses: ["otzma_yehudit", "religious_zionism", "amcha_yisrael"], friction: [], deepFriction: [] },
+  },
+};
+
+/** A party's refusals and friction as they stand in a roster. */
+export function relationsOf(p: PartyId, roster: SeatRoster = "polls"): PartyRelations {
+  const base = PARTIES[p];
+  const over = ROSTER_RELATIONS[roster]?.[p];
+  return {
+    refuses: over?.refuses ?? base.refuses,
+    friction: over?.friction ?? base.friction,
+    deepFriction: over?.deepFriction ?? base.deepFriction,
+  };
 }
 
 export const TAG_LABELS: Record<PartyTag, Bi> = {
@@ -241,16 +337,16 @@ export interface CoalitionCheck {
 }
 
 /** The friction level between two parties, whichever side declares it. */
-export function frictionBetween(a: PartyId, b: PartyId): FrictionLevel | null {
-  const A = PARTIES[a];
-  const B = PARTIES[b];
+export function frictionBetween(a: PartyId, b: PartyId, roster: SeatRoster = "polls"): FrictionLevel | null {
+  const A = relationsOf(a, roster);
+  const B = relationsOf(b, roster);
   if (A.deepFriction.includes(b) || B.deepFriction.includes(a)) return "deep";
   if (A.friction.includes(b) || B.friction.includes(a)) return "friction";
   return null;
 }
 
-export function refusesEachOther(a: PartyId, b: PartyId): boolean {
-  return PARTIES[a].refuses.includes(b) || PARTIES[b].refuses.includes(a);
+export function refusesEachOther(a: PartyId, b: PartyId, roster: SeatRoster = "polls"): boolean {
+  return relationsOf(a, roster).refuses.includes(b) || relationsOf(b, roster).refuses.includes(a);
 }
 
 export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls"): CoalitionCheck {
@@ -258,11 +354,11 @@ export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls")
   const set = new Set(list);
   const seats = list.reduce((s, p) => s + SEATS[roster][p], 0);
   const vetoes: Array<[PartyId, PartyId]> = [];
-  for (const p of list) for (const r of PARTIES[p].refuses) if (set.has(r)) vetoes.push([p, r]);
+  for (const p of list) for (const r of relationsOf(p, roster).refuses) if (set.has(r)) vetoes.push([p, r]);
   const frictions: CoalitionCheck["frictions"] = [];
   for (let i = 0; i < list.length; i++) {
     for (let j = i + 1; j < list.length; j++) {
-      const level = frictionBetween(list[i], list[j]);
+      const level = frictionBetween(list[i], list[j], roster);
       if (level !== null) frictions.push({ a: list[i], b: list[j], level });
     }
   }
@@ -276,16 +372,16 @@ export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls")
 }
 
 /** Friction strain a partner carries inside a coalition (for its starting patience). */
-export function partnerStrain(p: PartyId, members: PartyId[]): number {
+export function partnerStrain(p: PartyId, members: PartyId[], roster: SeatRoster = "polls"): number {
   return members.reduce((s, m) => {
     if (m === p) return s;
-    const level = frictionBetween(p, m);
+    const level = frictionBetween(p, m, roster);
     return level === null ? s : s + FRICTION_WEIGHT[level];
   }, 0);
 }
 
 /** Reference coalitions shown in the builder — the September 2026 poll arithmetic. */
-export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: PartyId[] }> = [
+export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: PartyId[]; roster?: SeatRoster }> = [
   {
     id: "netanyahu_bloc", label: { he: "גוש נתניהו", en: "Netanyahu bloc" },
     members: ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "amcha_yisrael"],
@@ -310,6 +406,21 @@ export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: Party
     id: "unity", label: { he: "אחדות: איזנקוט + ליכוד + בנט + ליברמן", en: "Unity: Eisenkot + Likud + Bennett + Lieberman" },
     members: ["yashar", "likud", "together", "yisrael_beiteinu"],
   },
+  // N12 / Madgam: the veto triangle. The only majority that clears every refusal
+  // needs BOTH the Haredi parties and the Arab lists, which is exactly what
+  // Lieberman, Hendel and Golan will not sit with.
+  {
+    id: "veto_triangle_n12", label: { he: "ישר + ביחד + חרדים + ערבים", en: "Yashar + Together + Haredim + Arab lists" },
+    members: ["yashar", "together", "shas", "utj", "joint_list", "raam"], roster: "poll_2026_09_n12",
+  },
+  {
+    id: "netanyahu_bloc_n12", label: { he: "גוש נתניהו (N12)", en: "Netanyahu bloc (N12)" },
+    members: ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "amcha_yisrael"], roster: "poll_2026_09_n12",
+  },
+  {
+    id: "secular_change_n12", label: { he: "גוש השינוי החילוני (N12)", en: "Secular change bloc (N12)" },
+    members: ["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], roster: "poll_2026_09_n12",
+  },
 ];
 
 /** Partner patience change when a doctrine is adopted (assumption). */
@@ -320,3 +431,29 @@ export const DOCTRINE_REACTIONS: Record<PolicyTrack, Record<PartyTag, number>> =
   CENTER_LEFT_PA_RETURN: { far_right: -90, right: -45, haredi: -15, center: 5, left: 15, arab: 15 },
   RADICAL_LEFT_UNILATERAL_WITHDRAWAL: { far_right: -100, right: -80, haredi: -45, center: -40, left: 10, arab: 15 },
 };
+
+/** The N12 / Madgam benchmark as a flat roster, derived from the tables above. */
+export interface Party {
+  id: PartyId;
+  name: string;
+  leader: string;
+  seats: number;
+  bloc: Bloc;
+  refusesToSitWith: PartyId[];
+  frictionWith: PartyId[];
+}
+
+export const CURRENT_POLL_ROSTER: SeatRoster = "poll_2026_09_n12";
+
+export const CURRENT_POLL_PARTIES: Party[] = rosterParties(CURRENT_POLL_ROSTER).map((id) => {
+  const rel = relationsOf(id, CURRENT_POLL_ROSTER);
+  return {
+    id,
+    name: partyName(id, CURRENT_POLL_ROSTER).he,
+    leader: partyLeader(id, CURRENT_POLL_ROSTER)?.he ?? "",
+    seats: SEATS[CURRENT_POLL_ROSTER][id],
+    bloc: PARTY_BLOC[id],
+    refusesToSitWith: rel.refuses,
+    frictionWith: rel.friction,
+  };
+});
