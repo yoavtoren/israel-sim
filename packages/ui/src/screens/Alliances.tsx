@@ -28,7 +28,7 @@ const L = {
   ranking: { he: "דירוג", en: "Ranking" },
   hint: { he: "גלגלת לזום · גרירה להזזה · לחיצה כפולה לאיפוס · לחיצה על מדינה לפירוט", en: "Wheel to zoom · drag to pan · double-click to reset · click a country for details" },
   assumptions: { he: "הציונים הם הנחות מודל, לא מדידה", en: "Scores are model assumptions, not measurements" },
-  crisis: { he: "משבר פתוח — מצרים במלחמה", en: "Crisis open — Egypt at war" },
+  crisis: { he: "משבר פתוח — ממתין להכרעה במפה הטקטית", en: "Crisis open — awaiting a decision on the tactical map" },
 };
 
 const OFF_MAP: strategic.ActorId[] = strategic.ACTOR_IDS.filter((id) => strategic.ACTOR_DEFS[id].mapKey === null);
@@ -170,7 +170,15 @@ export function Alliances() {
 
   return (
     <div className="relative h-full w-full">
-      <AllianceMap stances={stances} lang={lang} selected={selected} onSelect={setSelected} showProxies={showProxies} />
+      <AllianceMap
+        stances={stances}
+        lang={lang}
+        selected={selected}
+        onSelect={setSelected}
+        showProxies={showProxies}
+        // legend + ranking sit on the start side (right in Hebrew); the powers strip at the bottom
+        inset={{ x: lang === "he" ? 272 : -272, bottom: 90 }}
+      />
 
       <div className="pointer-events-none absolute inset-0 flex flex-col gap-3 p-3">
         <div className="flex min-h-0 flex-1 items-start justify-between gap-3">
@@ -197,7 +205,7 @@ export function Alliances() {
                 <span className="inline-block h-0 w-4 border-t border-dashed" style={{ borderColor: "#F85149" }} />
                 {L.proxies[lang]}
               </label>
-              {sim.pendingCrisis?.id === "EGYPTIAN_BALLISTIC_ATTACK" && (
+              {sim.pendingCrisis !== null && (
                 <div className="mt-2 animate-pulse rounded-[2px] border border-bad px-2 py-0.5 text-[12px] text-bad-bright">{L.crisis[lang]}</div>
               )}
               <button

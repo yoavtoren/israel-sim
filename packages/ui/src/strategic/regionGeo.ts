@@ -50,11 +50,11 @@ export const ACTOR_BY_MAPKEY: Map<string, strategic.ActorId> = new Map(
 /** Label anchors. `callout` places the label off the shape (in the sea or a
  *  neighbor) with a leader line back to it — for shapes too small to hold text. */
 export const LABEL_ANCHORS: Record<string, { at: LonLat; callout?: boolean }> = {
-  israel: { at: [34.85, 30.6] },
-  gaza: { at: [33.0, 31.9], callout: true },
-  west_bank: { at: [36.6, 32.35], callout: true },
-  lebanon: { at: [34.2, 34.4], callout: true },
-  cyprus: { at: [33.1, 35.05] },
+  israel: { at: [34.8, 30.4] },
+  gaza: { at: [33.1, 31.95], callout: true },
+  west_bank: { at: [37.6, 32.75], callout: true },
+  lebanon: { at: [33.85, 33.45], callout: true },
+  cyprus: { at: [33.3, 36.05] },
   qatar: { at: [52.3, 26.4], callout: true },
   bahrain: { at: [49.3, 27.9], callout: true },
   kuwait: { at: [48.9, 30.4], callout: true },

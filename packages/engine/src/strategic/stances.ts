@@ -6,7 +6,7 @@
  *  not data. The score is transparent: `drivers` lists each contribution so
  *  the UI can show why a country moved. */
 
-import type { Bi, CrisisOptionId, MetricKey, PolicyTrack, SimulationMetrics, SimulationState } from "./types";
+import type { Bi, CrisisId, CrisisOptionId, MetricKey, PolicyTrack, SimulationMetrics, SimulationState } from "./types";
 
 export type ActorId =
   | "usa" | "eu" | "uk" | "russia" | "china" | "india"
@@ -57,7 +57,7 @@ export interface ActorDef {
   /** shift while the Gulf funds Gaza's reconstruction */ gulfFunds?: number;
   /** shift per verified trusteeship checkpoint */ perCheckpoint?: number;
   /** shift while terror infrastructure is growing */ terrorGrowth?: number;
-  /** shift while the Egyptian crisis is open (before the cabinet decides) */ crisisOpen?: number;
+  /** shift while a crisis is open (before the cabinet decides) */ crisisOpen?: Partial<Record<CrisisId, number>>;
   /** shift after each crisis resolution option */ crisisOutcome?: Partial<Record<CrisisOptionId, number>>;
   /** one line on the 2026 baseline */ note: Bi;
 }
@@ -74,7 +74,8 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     name: { he: "ארצות הברית", en: "United States" }, mapKey: null, base: 78,
     weights: { usMilitaryAid: 0.9, internationalLegitimacy: 0.15 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -35, CONSERVATIVE_RIGHT_ANNEXATION: -10, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 8 },
-    normalization: 8, crisisOutcome: { D_US_MEDIATION: -5, B_AIR_RETALIATION: -30, C_GROUND_INVASION_SINAI: -40 },
+    normalization: 8,
+    crisisOutcome: { D_US_MEDIATION: -5, B_AIR_RETALIATION: -30, C_GROUND_INVASION_SINAI: -40, EGT_PREEMPTIVE_STRIKE: -15, EGT_US_IMF_PRESSURE: 5, IRN_WIDE_RETALIATION: -10, IRN_REGIONAL_ALLIANCE: 8, PA_US_STABILIZATION: 5 },
     note: { he: "בעלת הברית המרכזית: סיוע צבאי, וטו במועצת הביטחון.", en: "Principal ally: military aid, Security Council veto." },
   },
   eu: {
@@ -113,14 +114,16 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     name: { he: "מצרים", en: "Egypt" }, mapKey: "egypt", base: 0,
     weights: { regionalRelations: 0.7 },
     tracks: { CONSERVATIVE_RIGHT_ANNEXATION: -15, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 8, CENTER_LEFT_PA_RETURN: 12 },
-    crisisOpen: -110, crisisOutcome: { A_CANCEL_TRANSFER: -25, B_AIR_RETALIATION: -110, C_GROUND_INVASION_SINAI: -130, D_US_MEDIATION: -30 },
+    crisisOpen: { EGYPTIAN_BALLISTIC_ATTACK: -110, EGYPT_TREATY_BREACH: -40 },
+    crisisOutcome: { A_CANCEL_TRANSFER: -25, B_AIR_RETALIATION: -110, C_GROUND_INVASION_SINAI: -130, D_US_MEDIATION: -30, EGT_STOP_AND_MONITORS: -10, EGT_PREEMPTIVE_STRIKE: -70, EGT_US_IMF_PRESSURE: -25 },
     note: { he: "שלום קר: תיאום ביטחוני בסיני, חשש מדחיקת עזתים לשטחה.", en: "Cold peace: Sinai security coordination, fear of Gazans pushed onto its soil." },
   },
   jordan: {
     name: { he: "ירדן", en: "Jordan" }, mapKey: "jordan", base: -5,
     weights: { regionalRelations: 0.7, internationalLegitimacy: 0.15 },
     tracks: { CONSERVATIVE_RIGHT_ANNEXATION: -35, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 8, CENTER_LEFT_PA_RETURN: 20, RADICAL_LEFT_UNILATERAL_WITHDRAWAL: 15 },
-    crisisOpen: -60, crisisOutcome: { A_CANCEL_TRANSFER: -15, B_AIR_RETALIATION: -80, C_GROUND_INVASION_SINAI: -90, D_US_MEDIATION: -15 },
+    crisisOpen: { EGYPTIAN_BALLISTIC_ATTACK: -60, PA_SECURITY_COLLAPSE: -10 },
+    crisisOutcome: { A_CANCEL_TRANSFER: -15, B_AIR_RETALIATION: -80, C_GROUND_INVASION_SINAI: -90, D_US_MEDIATION: -15, PA_DEFENSIVE_SHIELD_2: -20, PA_US_STABILIZATION: 5, IRN_REGIONAL_ALLIANCE: 15 },
     note: { he: "שלום קר; סיפוח ביהודה ושומרון הוא קו אדום עבור הממלכה.", en: "Cold peace; West Bank annexation is a red line for the kingdom." },
   },
   saudi: {
@@ -128,6 +131,7 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     weights: { regionalRelations: 0.6 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -40, CONSERVATIVE_RIGHT_ANNEXATION: -20, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 5, CENTER_LEFT_PA_RETURN: 5 },
     normalization: 30, gulfFunds: 5, perCheckpoint: 4,
+    crisisOutcome: { IRN_REGIONAL_ALLIANCE: 15, IRN_WIDE_RETALIATION: -5, TUN_SPECIAL_FORCES: -8 },
     note: { he: "אין יחסים רשמיים; נורמליזציה מותנית באופק מדיני.", en: "No formal ties; normalization conditioned on a political horizon." },
   },
   uae: {
@@ -135,6 +139,7 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     weights: { regionalRelations: 0.6 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -50, CONSERVATIVE_RIGHT_ANNEXATION: -25, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 10 },
     normalization: 5, gulfFunds: 10, perCheckpoint: 3,
+    crisisOutcome: { IRN_REGIONAL_ALLIANCE: 12, TUN_SPECIAL_FORCES: -8, TUN_ULTIMATUM_48H: 3 },
     note: { he: "הסכמי אברהם; מתנגדת לסיפוח.", en: "Abraham Accords; opposes annexation." },
   },
   bahrain: {
@@ -202,13 +207,15 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     weights: { securityThreat: -0.1 },
     tracks: {},
     normalization: -5,
+    crisisOpen: { IRAN_COMBINED_BARRAGE: -10 },
     note: { he: "אויבת מוצהרת; מפעילה את 'ציר ההתנגדות'.", en: "Declared enemy; runs the \"Axis of Resistance\"." },
   },
   hezbollah: {
     name: { he: "לבנון", en: "Lebanon" }, entity: { he: "חזבאללה", en: "Hezbollah" }, mapKey: "lebanon", base: -75,
     weights: { securityThreat: -0.35 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -10 },
-    crisisOutcome: { B_AIR_RETALIATION: -20, C_GROUND_INVASION_SINAI: -20 },
+    crisisOpen: { IRAN_COMBINED_BARRAGE: -10 },
+    crisisOutcome: { B_AIR_RETALIATION: -20, C_GROUND_INVASION_SINAI: -20, IRN_WIDE_RETALIATION: -15 },
     note: { he: "חזבאללה מוחלש אך חמוש; מדינת לבנון חלשה.", en: "Hezbollah weakened but armed; a weak Lebanese state." },
   },
   syria: {
@@ -222,7 +229,8 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     name: { he: "עיראק", en: "Iraq" }, entity: { he: "מיליציות פרו-איראניות", en: "Pro-Iran militias" }, mapKey: "iraq", base: -70,
     weights: { securityThreat: -0.2 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -15 },
-    crisisOutcome: { B_AIR_RETALIATION: -15, C_GROUND_INVASION_SINAI: -15 },
+    crisisOpen: { IRAN_COMBINED_BARRAGE: -20 },
+    crisisOutcome: { B_AIR_RETALIATION: -15, C_GROUND_INVASION_SINAI: -15, IRN_WIDE_RETALIATION: -15, IRN_DEFENSIVE_SURGICAL: -10 },
     note: { he: "מיליציות שיעיות משגרות כטב\"מים; ממשלה בהשפעה איראנית.", en: "Shiite militias launch drones; a government under Iranian sway." },
   },
   houthis: {
@@ -236,6 +244,8 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     weights: {},
     tracks: { PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 25, CENTER_LEFT_PA_RETURN: 30, RADICAL_LEFT_UNILATERAL_WITHDRAWAL: 5 },
     perCheckpoint: 12, terrorGrowth: -20,
+    crisisOpen: { TUNNEL_NETWORK_EXPOSED: -30 },
+    crisisOutcome: { TUN_FREEZE_FUNDS: -15, TUN_SPECIAL_FORCES: -20 },
     note: { he: "שרידי חמאס; השליטה האזרחית תלויה במדיניות.", en: "Hamas remnants; civil control depends on policy." },
   },
   palestinian_authority: {
@@ -243,6 +253,8 @@ export const ACTOR_DEFS: Record<ActorId, ActorDef> = {
     weights: { internationalLegitimacy: 0.15 },
     tracks: { RADICAL_RIGHT_DEPORTATION: -40, CONSERVATIVE_RIGHT_ANNEXATION: -45, PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP: 10, CENTER_LEFT_PA_RETURN: 40, RADICAL_LEFT_UNILATERAL_WITHDRAWAL: 30 },
     perCheckpoint: 5, terrorGrowth: -15,
+    crisisOpen: { PA_SECURITY_COLLAPSE: -30 },
+    crisisOutcome: { PA_DEFENSIVE_SHIELD_2: -40, PA_US_STABILIZATION: 15, PA_RETREAT_TO_BARRIER: -20 },
     note: { he: "תיאום ביטחוני חלקי; תשלומים למשפחות מחבלים.", en: "Partial security coordination; payments to attackers' families." },
   },
 };
@@ -277,11 +289,23 @@ const TRACK_SHORT: Record<PolicyTrack, Bi> = {
   RADICAL_LEFT_UNILATERAL_WITHDRAWAL: { he: "נסיגה חד-צדדית", en: "Unilateral withdrawal" },
 };
 
-const CRISIS_SHORT: Partial<Record<CrisisOptionId, Bi>> = {
+const CRISIS_SHORT: Record<CrisisOptionId, Bi> = {
   A_CANCEL_TRANSFER: { he: "ביטול הטרנספר תחת אש", en: "Transfer cancelled under fire" },
   B_AIR_RETALIATION: { he: "תקיפה אווירית במצרים", en: "Air strikes in Egypt" },
   C_GROUND_INVASION_SINAI: { he: "פלישה לסיני", en: "Sinai invasion" },
   D_US_MEDIATION: { he: "הפסקת אש בתיווך ארה\"ב", en: "US-brokered ceasefire" },
+  PA_DEFENSIVE_SHIELD_2: { he: "חומת מגן 2", en: "Defensive Shield 2" },
+  PA_US_STABILIZATION: { he: "ייצוב הרשות בסיוע אמריקאי", en: "US-backed PA stabilization" },
+  PA_RETREAT_TO_BARRIER: { he: "נסיגה לגדר וסגר", en: "Retreat to the barrier, closure" },
+  EGT_STOP_AND_MONITORS: { he: "כוח פיקוח בגבול מצרים", en: "Monitors on the Egyptian border" },
+  EGT_PREEMPTIVE_STRIKE: { he: "תקיפת מנע בסיני", en: "Pre-emptive strike in Sinai" },
+  EGT_US_IMF_PRESSURE: { he: "לחץ אמריקאי וקרן המטבע על קהיר", en: "US / IMF pressure on Cairo" },
+  IRN_WIDE_RETALIATION: { he: "תגמול רחב באיראן", en: "Wide retaliation on Iran" },
+  IRN_DEFENSIVE_SURGICAL: { he: "יירוט ותקיפה כירורגית", en: "Interception and surgical strikes" },
+  IRN_REGIONAL_ALLIANCE: { he: "תקיפה בברית אזורית", en: "Regional-alliance strike" },
+  TUN_FREEZE_FUNDS: { he: "הקפאת כספי השיקום", en: "Reconstruction funds frozen" },
+  TUN_ULTIMATUM_48H: { he: "אולטימטום 48 שעות", en: "48-hour ultimatum" },
+  TUN_SPECIAL_FORCES: { he: "פשיטת כוחות מיוחדים", en: "Special-forces raid" },
 };
 
 const round = (v: number): number => Math.round(v);
@@ -312,12 +336,11 @@ export function actorStance(id: ActorId, state: SimulationState): ActorStance {
     if (passed > 0) add({ he: `${passed} נקודות בדיקה אומתו`, en: `${passed} checkpoints verified` }, def.perCheckpoint * passed);
   }
 
-  if (state.pendingCrisis?.id === "EGYPTIAN_BALLISTIC_ATTACK") {
-    add({ he: "משבר פתוח מול מצרים", en: "Open crisis with Egypt" }, def.crisisOpen);
-  } else if (state.pendingCrisis === null) {
+  if (state.pendingCrisis !== null) {
+    add({ he: "משבר פתוח", en: "Crisis open" }, def.crisisOpen?.[state.pendingCrisis.id]);
+  } else {
     const option = lastCrisisOption(state);
-    const label = option === null ? undefined : CRISIS_SHORT[option];
-    if (option !== null && label !== undefined) add(label, def.crisisOutcome?.[option]);
+    if (option !== null) add(CRISIS_SHORT[option], def.crisisOutcome?.[option]);
   }
 
   const raw = drivers.reduce((s, d) => s + d.delta, 0);

@@ -13,10 +13,15 @@ import {
 
 type Stances = Record<strategic.ActorId, strategic.ActorStance>;
 
-function fitCamera([a, b]: [LonLat, LonLat], w: number, h: number): Camera {
+/** Fit the bounds into the viewport minus the floating panels: `inset.x` px
+ *  (positive = panels on the right, negative = on the left), `inset.bottom` px. */
+function fitCamera([a, b]: [LonLat, LonLat], w: number, h: number, inset: { x: number; bottom: number }): Camera {
   const p0 = project([a[0], b[1]]);
   const p1 = project([b[0], a[1]]);
-  return { cx: (p0.x + p1.x) / 2, cy: (p0.y + p1.y) / 2, scale: Math.min(w / (p1.x - p0.x), h / (p1.y - p0.y)) };
+  const aw = Math.max(200, w - Math.abs(inset.x));
+  const ah = Math.max(200, h - inset.bottom);
+  const scale = Math.min(aw / (p1.x - p0.x), ah / (p1.y - p0.y));
+  return { cx: (p0.x + p1.x) / 2 + inset.x / 2 / scale, cy: (p0.y + p1.y) / 2 + inset.bottom / 2 / scale, scale };
 }
 
 /** Static outlines, memoized so pan/zoom only rewrites the group transform. */
@@ -56,8 +61,11 @@ export function AllianceMap(props: {
   selected: strategic.ActorId | null;
   onSelect: (id: strategic.ActorId | null) => void;
   showProxies: boolean;
+  /** screen space covered by the overlay panels */ inset: { x: number; bottom: number };
 }) {
-  const { stances, lang, selected, onSelect, showProxies } = props;
+  const { stances, lang, selected, onSelect, showProxies, inset } = props;
+  const insetRef = useRef(inset);
+  insetRef.current = inset;
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 900, h: 600 });
   const [cam, setCam] = useState<Camera | null>(null);
@@ -72,13 +80,18 @@ export function AllianceMap(props: {
       const r = el.getBoundingClientRect();
       const s = { w: Math.max(200, r.width), h: Math.max(200, r.height) };
       setSize(s);
-      if (!manual.current) setCam(fitCamera(ALLIANCE_BOUNDS, s.w, s.h));
+      if (!manual.current) setCam(fitCamera(ALLIANCE_BOUNDS, s.w, s.h, insetRef.current));
     });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const camera = cam ?? fitCamera(ALLIANCE_BOUNDS, size.w, size.h);
+  // re-fit when the panels move sides (language switch)
+  useEffect(() => {
+    if (!manual.current) setCam(fitCamera(ALLIANCE_BOUNDS, size.w, size.h, inset));
+  }, [inset.x, inset.bottom]);
+
+  const camera = cam ?? fitCamera(ALLIANCE_BOUNDS, size.w, size.h, inset);
   const S = (p: LonLat) => {
     const q = project(p);
     return { x: size.w / 2 + (q.x - camera.cx) * camera.scale, y: size.h / 2 + (q.y - camera.cy) * camera.scale };
@@ -156,7 +169,7 @@ export function AllianceMap(props: {
       }}
       onDoubleClick={() => {
         manual.current = false;
-        setCam(fitCamera(ALLIANCE_BOUNDS, size.w, size.h));
+        setCam(fitCamera(ALLIANCE_BOUNDS, size.w, size.h, inset));
       }}
     >
       <svg width={size.w} height={size.h} className="absolute inset-0 block">
@@ -232,7 +245,7 @@ export function AllianceMap(props: {
           const target = CALLOUT_TARGETS[key];
           const t = target === undefined ? null : S(target);
           const fs = Math.round(Math.max(10, Math.min(15, 11 * Math.sqrt(labelScale))));
-          const dark = key === "israel";
+          const own = key === "israel";
           return (
             <g key={`lb-${key}`}>
               {anchor.callout === true && t !== null && (
@@ -246,11 +259,11 @@ export function AllianceMap(props: {
                 y={p.y}
                 textAnchor="middle"
                 fontSize={fs}
-                fontWeight={key === "israel" ? 700 : 500}
+                fontWeight={own ? 700 : 500}
                 fontFamily="Heebo, system-ui, sans-serif"
-                fill={dark ? "#0A0F16" : "#F0F4F8"}
-                stroke={dark ? "none" : "#070B11"}
-                strokeWidth={dark ? 0 : 3}
+                fill="#F0F4F8"
+                stroke="#070B11"
+                strokeWidth={own ? 3.5 : 3}
                 strokeOpacity={0.75}
                 paintOrder="stroke"
               >
