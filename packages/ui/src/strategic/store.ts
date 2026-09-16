@@ -17,6 +17,7 @@ function defaultAction(track: strategic.PolicyTrack): strategic.PolicyAction {
 
 interface StrategicStore {
   sim: strategic.SimulationState;
+  /** state before the last decision / crisis resolution (for stance trends) */ prevSim: strategic.SimulationState | null;
   draft: strategic.PolicyAction;
   script: TacticalScript;
   /** simulated seconds into the script */ t: number;
@@ -49,6 +50,7 @@ const initialSim = strategic.createInitialState("BENNETT_LIEBERMAN_GOLAN_ABBAS",
 
 export const useStrategic = create<StrategicStore>((set, get) => ({
   sim: initialSim,
+  prevSim: null,
   draft: defaultAction("PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP"),
   script: buildTurnScript(initialSim),
   t: 0,
@@ -61,7 +63,7 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
 
   newTerm(coalition, seed) {
     const sim = strategic.createInitialState(coalition, seed ?? freshSeed());
-    set({ sim, script: buildTurnScript(sim), t: 0, playing: false, modalOpen: false, trackedId: null, draft: defaultAction(get().draft.track) });
+    set({ sim, prevSim: null, script: buildTurnScript(sim), t: 0, playing: false, modalOpen: false, trackedId: null, draft: defaultAction(get().draft.track) });
   },
 
   pickTrack(track) {
@@ -77,10 +79,10 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
     const next = strategic.executePolicyDecision(sim, draft);
     if (next === sim) return false;
     if (next.pendingCrisis !== null) {
-      set({ sim: next, script: buildCrisisScript(next, null), t: 0, playing: true, modalOpen: false, cameraMode: "auto", trackedId: null });
+      set({ sim: next, prevSim: sim, script: buildCrisisScript(next, null), t: 0, playing: true, modalOpen: false, cameraMode: "auto", trackedId: null });
       return true;
     }
-    set({ sim: next, script: buildTurnScript(next), t: 0, playing: false, modalOpen: false, cameraMode: "auto", trackedId: null });
+    set({ sim: next, prevSim: sim, script: buildTurnScript(next), t: 0, playing: false, modalOpen: false, cameraMode: "auto", trackedId: null });
     return false;
   },
 
@@ -88,7 +90,7 @@ export const useStrategic = create<StrategicStore>((set, get) => ({
     const { sim, t } = get();
     if (sim.pendingCrisis === null) return;
     const script = buildCrisisScript(sim, option); // same key as the halted script + the aftermath
-    set({ sim: strategic.resolveCrisis(sim, option), script, t: Math.max(t, 0), playing: true, modalOpen: false });
+    set({ sim: strategic.resolveCrisis(sim, option), prevSim: sim, script, t: Math.max(t, 0), playing: true, modalOpen: false });
   },
 
   setT(t) {
