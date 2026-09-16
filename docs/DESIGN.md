@@ -77,3 +77,15 @@ RTL is the primary direction, from the first component. `dir="rtl"` at the root;
 - Confidence surfaces in the UI: values driven by `placeholder`-confidence constants render with a dotted underline; hover explains "assumption, not data" (spec §3.4.3).
 - The pipeline ("investments maturing") is a first-class panel: horizon chart of pending effects over 20 years, grouped by ministry, with cancel-risk marked where funding is near `decays_below`.
 - Keyboard: arrows move between budget cells, +/- nudge by 1%, Enter opens preview. Fast-forward controls: 1Q / 1Y / 2Y / 5Y / 10Y.
+
+## 8. The living map
+
+`packages/ui/src/strategic/ambient.ts` draws a persistent, state-driven layer over the campaign and tactical maps (below and above the tactical script). It is a pure function of real time + campaign flags/metrics, pseudo-3D (light from the north-west: height lifts things up the screen and casts a soft south-east shadow), and fades in by zoom level (sea/air from region zoom, ground at country zoom, people at close zoom).
+
+- Separation barrier (3D wall) — torn down with a north→south demolition sweep when annexation / PA dismantling / transfer is in force; the Gaza fence always stands.
+- Skylines (Tel Aviv glass towers, Jerusalem stone + golden dome), Ben Gurion runways, Kinneret and Dead Sea, gas rigs with flares.
+- Sea: container ships and tankers on Haifa/Ashdod/Suez/Red Sea lanes (Red Sea traffic replaced by a burning ship and Houthi skiffs under blockade), navy corvettes (more under siege), fishing boats in calm times, a US carrier group when threat or aid is high.
+- Ground: Merkava tanks patrolling the Gaza and Lebanon borders and the Golan (inside Gaza / southern Lebanon when occupied / at war), UN vehicles after a withdrawal, infiltrating squads from Gaza, the West Bank and Lebanon scaled by the threat metric (stopped at an intact barrier, IDF teams respond), protest crowds with flags.
+- Air: fighter CAPs and strike sorties with smoke columns at the target, long-range sorties toward Iran at extreme threat, rocket fire from Gaza/Lebanon and ballistic missiles from Iran/Yemen on 3D arcs with ground tracks, intercepted by Iron Dome / Arrow, and El Al-style airliners leaving Ben Gurion — their number is emigration pressure (cohesion, economy, threat, protests, sanctions, emergency rule).
+
+Dev QA: `window.__campaign.useCampaign.setState(...)` puts the game in any state.

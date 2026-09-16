@@ -1358,7 +1358,7 @@ function drawStream(f: F, st: Stream, lanes: number): void {
       const launchU = killU - (st.kind === "ballistic" ? 0.3 : 0.28);
       const kill = projectile(f, from, to, killU, H).air;
       const bat = f.L(st.battery);
-      if (u01 >= launchU && u01 <= killU) {
+      if (u01 >= launchU && u01 <= killU && f.on(kill, 40) && Math.hypot(kill.x - bat.x, kill.y - bat.y) < 260 * f.u) {
         const k = (u01 - launchU) / (killU - launchU);
         const ctrl = { x: lerp(bat.x, kill.x, 0.3), y: Math.min(bat.y, kill.y) - 30 * f.u };
         const pt = (t: number) => ({ x: (1 - t) * (1 - t) * bat.x + 2 * (1 - t) * t * ctrl.x + t * t * kill.x, y: (1 - t) * (1 - t) * bat.y + 2 * (1 - t) * t * ctrl.y + t * t * kill.y });
