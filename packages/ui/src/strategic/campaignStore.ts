@@ -127,3 +127,8 @@ export const useCampaign = create<CampaignStore>((set, get) => ({
 }));
 
 sync(first, null);
+
+// Dev-only QA hook: lets a headless browser put the campaign into any state. Stripped from production builds.
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  (window as unknown as Record<string, unknown>).__campaign = { useCampaign };
+}

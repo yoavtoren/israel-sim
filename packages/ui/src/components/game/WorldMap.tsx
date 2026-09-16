@@ -11,6 +11,8 @@ import { toMap, toScreen, type Camera } from "../../strategic/geo";
 import { TIER_COLORS } from "../../strategic/regionGeo";
 import { COUNTRY_HE, WORLD_ACTOR, WORLD_COUNTRIES, WORLD_LABELS, WORLD_NAME, fitWorld, ringsToPath, type WorldFocus } from "../../strategic/worldGeo";
 import { drawFrame, shakeOffset } from "../../strategic/renderer";
+import { ambientFromGame, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { useCampaign } from "../../strategic/campaignStore";
 
 type Stances = Record<strategic.ActorId, strategic.ActorStance>;
 export interface Inset {
@@ -145,6 +147,10 @@ export function WorldMap(props: {
         const L = langRef.current;
 
         // country labels, sized to what fits at this zoom
+        const world = ambientFromGame(useCampaign.getState().game);
+        const amb = { cam, w, h, nowMs: now, lang: L, world };
+        drawAmbientGround(ctx, amb);
+
         ctx.textAlign = "center";
         for (const lab of WORLD_LABELS) {
           const px = Math.sqrt(lab.area) * 100 * cam.scale;
@@ -170,6 +176,7 @@ export function WorldMap(props: {
         }
 
         drawFrame(ctx, { script: st.script, t: st.t, cam, w, h, lang: L, nowMs: now, trackedId: st.trackedId, chrome: cam.scale > 1.4 });
+        drawAmbientAir(ctx, amb);
       }
       raf = requestAnimationFrame(frame);
     };

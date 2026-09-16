@@ -11,6 +11,8 @@ import {
 } from "../../strategic/geo";
 import { COUNTRY_SHAPES, ringsPath } from "../../strategic/regionGeo";
 import { drawFrame, launchPos, shakeOffset } from "../../strategic/renderer";
+import { ambientFromGame, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { useCampaign } from "../../strategic/campaignStore";
 import { crisisFocus } from "../../strategic/crisisScripts";
 import { endTime, focusAt, type Launch } from "../../strategic/scenarios";
 
@@ -149,7 +151,10 @@ export function TacticalMap() {
         }
         ctx.setTransform(dpr, 0, 0, dpr, shake.x * dpr, shake.y * dpr);
         ctx.clearRect(-20, -20, w + 40, h + 40);
+        const amb = { cam, w, h, nowMs: now, lang: langRef.current, world: ambientFromGame(useCampaign.getState().game) };
+        drawAmbientGround(ctx, amb);
         drawFrame(ctx, { script, t, cam, w, h, lang: langRef.current, nowMs: now, trackedId: st.trackedId });
+        drawAmbientAir(ctx, amb);
       }
       raf = requestAnimationFrame(frame);
     };
