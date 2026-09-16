@@ -121,6 +121,13 @@ describe("M13 Prime Minister campaign", () => {
     expect(S.checkCoalition(["yashar", "likud", "together", "yisrael_beiteinu"], R).valid).toBe(false);
     // and the secular change bloc falls short without the Haredim or the Arab lists
     expect(S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], R).seats).toBe(58);
+    // leaning on Ra'am reaches 62: hard (deep friction with Lieberman and Hendel) but possible
+    expect(S.refusesEachOther("yisrael_beiteinu", "raam", R)).toBe(false);
+    expect(S.refusesEachOther("miluimnikim_calcalit", "raam", R)).toBe(false);
+    const withRaam = S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit", "raam"], R);
+    expect(withRaam.seats).toBe(62);
+    expect(withRaam.valid).toBe(true);
+    expect(withRaam.frictions.filter((f) => f.level === "deep").length).toBeGreaterThanOrEqual(2);
 
     // a refusal is never also carried as friction
     for (const p of S.CURRENT_POLL_PARTIES) {

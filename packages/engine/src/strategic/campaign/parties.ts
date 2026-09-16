@@ -202,7 +202,7 @@ export const PARTIES: Record<PartyId, PartyDef> = {
     id: "miluimnikim_calcalit", name: { he: "המילואימניקים והכלכלית", en: "Reservists & Economic Party" },
     tag: "right", hawk: 0.9, color: "#7F8C4A",
     blurb: { he: "רשימת מילואימניקים וכלכלנים, לא מזוהה עם גוש.", en: "Reservists and economists; aligned with no bloc." },
-    refuses: ["joint_list", "raam", "hadash_taal", "balad"], friction: ["shas", "utj"], deepFriction: [],
+    refuses: ["joint_list", "hadash_taal", "balad"], friction: ["shas", "utj"], deepFriction: ["raam"],
   },
 };
 
@@ -287,15 +287,16 @@ const ROSTER_RELATIONS: Partial<Record<SeatRoster, Partial<Record<PartyId, Parti
     together: { refuses: ["otzma_yehudit", "religious_zionism"], friction: ["shas", "utj", "joint_list"], deepFriction: [] },
     // friction with Shas and UTJ dropped: both refuse the Democrats outright
     democrats: { refuses: ["likud", "otzma_yehudit", "religious_zionism", "amcha_yisrael"], friction: ["yisrael_beiteinu"], deepFriction: [] },
-    yisrael_beiteinu: { refuses: ["shas", "utj", "joint_list", "raam"], friction: ["democrats"], deepFriction: [] },
+    // Ra'am: hard but possible — opposition on security grounds, not a refusal (the 2021 precedent)
+    yisrael_beiteinu: { refuses: ["shas", "utj", "joint_list"], friction: ["democrats"], deepFriction: ["raam"] },
     utj: { refuses: ["yisrael_beiteinu", "democrats"], friction: ["together", "yashar"], deepFriction: [] },
     joint_list: { refuses: ["likud", "otzma_yehudit", "religious_zionism", "yisrael_beiteinu", "amcha_yisrael"], friction: ["together", "yashar"], deepFriction: [] },
     shas: { refuses: ["yisrael_beiteinu", "democrats"], friction: ["together", "yashar"], deepFriction: [] },
     otzma_yehudit: { refuses: ["democrats", "joint_list", "raam", "yashar", "together"], friction: [], deepFriction: [] },
     religious_zionism: { refuses: ["democrats", "joint_list", "raam", "yashar"], friction: [], deepFriction: [] },
-    miluimnikim_calcalit: { refuses: ["joint_list", "raam"], friction: ["shas", "utj"], deepFriction: [] },
+    miluimnikim_calcalit: { refuses: ["joint_list"], friction: ["shas", "utj"], deepFriction: ["raam"] },
     amcha_yisrael: { refuses: ["democrats", "joint_list", "raam"], friction: [], deepFriction: [] },
-    // friction with Lieberman and the Reservists dropped: both refuse Ra'am outright
+    // Lieberman and the Reservists carry Ra'am as deep friction on their side
     raam: { refuses: ["otzma_yehudit", "religious_zionism", "amcha_yisrael"], friction: [], deepFriction: [] },
   },
 };
@@ -609,9 +610,8 @@ export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: Party
     id: "unity", label: { he: "אחדות: איזנקוט + ליכוד + בנט + ליברמן", en: "Unity: Eisenkot + Likud + Bennett + Lieberman" },
     members: ["yashar", "likud", "together", "yisrael_beiteinu"],
   },
-  // N12 / Madgam: the veto triangle. The only majority that clears every refusal
-  // needs BOTH the Haredi parties and the Arab lists, which is exactly what
-  // Lieberman, Hendel and Golan will not sit with.
+  // N12 / Madgam: the veto triangle — a majority with BOTH the Haredi parties and
+  // the Arab lists, which Lieberman, Hendel and Golan will not sit with.
   {
     id: "veto_triangle_n12", label: { he: "ישר + ביחד + חרדים + ערבים", en: "Yashar + Together + Haredim + Arab lists" },
     members: ["yashar", "together", "shas", "utj", "joint_list", "raam"], roster: "poll_2026_09_n12",
@@ -623,6 +623,12 @@ export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: Party
   {
     id: "secular_change_n12", label: { he: "גוש השינוי החילוני (N12)", en: "Secular change bloc (N12)" },
     members: ["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit"], roster: "poll_2026_09_n12",
+  },
+  // Leaning on Ra'am takes the secular bloc to 62: Lieberman and Hendel object hard
+  // on security grounds, which strains the government but does not bar it.
+  {
+    id: "secular_change_raam_n12", label: { he: "גוש השינוי + רע\"ם (N12)", en: "Secular change bloc + Ra'am (N12)" },
+    members: ["yashar", "together", "democrats", "yisrael_beiteinu", "miluimnikim_calcalit", "raam"], roster: "poll_2026_09_n12",
   },
 ];
 
