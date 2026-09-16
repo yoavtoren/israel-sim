@@ -6,7 +6,8 @@
 import type { MunitionClass } from "@engine";
 import { useStore } from "../store";
 import { ADVERSARY_NAMES, MUNITION_NAMES, t } from "../lib/strings";
-import { fmtInt, fmtPct, fmtQuarter } from "../lib/format";
+import { fmtInt, fmtPct } from "../lib/format";
+import { EventFeed } from "./Overview";
 import { DOMAIN, SEM, threatColor, bandColor } from "../lib/colors";
 import { Dial, GaugeBar, Num, Panel, TrendArrow } from "../components/ui";
 import { Traceable } from "../components/CausalTrace";
@@ -26,119 +27,117 @@ export function Security() {
   const qos = now.quarters_of_supply;
   const qosColor = qos < 4 ? SEM.badBright : qos < 8 ? SEM.warnBright : SEM.good;
 
+  const fmtQos = Number.isFinite(qos) ? qos.toFixed(1) : "∞";
+  const qosTone = qos < 4 ? "bg-bad-dim text-bad-bright" : qos < 8 ? "bg-warn-dim text-warn-bright" : "bg-good-dim text-good-bright";
+
   return (
-    <div className="grid grid-cols-[320px_1fr_300px] gap-4">
+    <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
       {/* left: stockpile gauges */}
       <Panel title={t("stockpiles", lang)} accent={DOMAIN.security}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {MUNITIONS.map((m) => {
             const cap = Math.max(first.stockpiles[m], 1);
             const v = now.stockpiles[m];
             return (
               <div key={m}>
-                <div className="mb-1 flex items-baseline justify-between">
-                  <span className="text-[12px] text-fg1">{MUNITION_NAMES[m][lang]}</span>
+                <div className="mb-1.5 flex items-baseline justify-between gap-2">
+                  <span className="text-[13px] text-fg1">{MUNITION_NAMES[m][lang]}</span>
                   <Traceable path={`security.stockpiles.${m}`}>
-                    <Num value={fmtInt(v)} raw={v} direction={1} className="text-[13px]" />
+                    <Num value={fmtInt(v)} raw={v} direction={1} className="text-[15px] font-medium" />
                   </Traceable>
                 </div>
-                <GaugeBar value={v / cap} color={bandColor(v / cap, 0.5, 0.25)} height={10} />
+                <GaugeBar value={v / cap} color={bandColor(v / cap, 0.5, 0.25)} height={8} />
+                <div className="mt-1 text-[12px] leading-[16px] text-fg2">
+                  <span className="num">{fmtPct(v / cap, 0)}</span> {lang === "he" ? "מהמלאי ההתחלתי" : "of starting stock"}
+                </div>
               </div>
             );
           })}
-          <div className="border-t border-line0 pt-3">
-            <span className="text-[12px] text-fg1">{t("quartersOfSupply", lang)}: </span>
-            <Num
-              value={Number.isFinite(qos) ? qos.toFixed(1) : "∞"}
-              raw={Number.isFinite(qos) ? qos : 9999}
-              direction={1}
-              className="text-[24px] leading-[32px]"
-            />
-            <span className="ms-2 inline-block h-2 w-2 rounded-full align-middle" style={{ background: qosColor }} />
+          <div className={`rounded-[12px] px-4 py-3 ${qosTone}`}>
+            <div className="text-[12.5px] leading-[18px] opacity-90">{t("quartersOfSupply", lang)}</div>
+            <div className="flex items-baseline gap-2">
+              <Num value={fmtQos} raw={Number.isFinite(qos) ? qos : 9999} direction={1} className="text-[30px] leading-[38px] font-medium" />
+              <span className="text-[12px]">{lang === "he" ? "רבעונים" : "quarters"}</span>
+              <span className="ms-auto inline-block h-2.5 w-2.5 rounded-full" style={{ background: qosColor }} />
+            </div>
           </div>
         </div>
       </Panel>
 
       {/* center: fronts + dials */}
-      <div className="flex flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-5">
         <Panel title={t("fronts", lang)} accent={DOMAIN.security}>
           {now.fronts.length === 0 ? (
-            <div className="py-2 text-center text-[13px] text-fg2">{t("noActiveFronts", lang)}</div>
+            <div className="flex items-center justify-center gap-2 rounded-[10px] bg-good-dim/60 py-4 text-[13px] text-good-bright">
+              <span className="inline-block h-2 w-2 rounded-full bg-good" />
+              {t("noActiveFronts", lang)}
+            </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {now.fronts.map((f) => (
-                <div key={f.id} className="flex items-center gap-3">
-                  <span className="w-40 text-[13px] text-bad-bright">{f.id}</span>
+                <div key={f.id} className="flex items-center gap-4">
+                  <span className="w-40 truncate text-[13px] font-medium text-fg0">{f.id}</span>
                   <div className="flex-1">
-                    <GaugeBar value={f.intensity} color={SEM.badBright} height={8} />
+                    <GaugeBar value={f.intensity} color={SEM.bad} height={8} />
                   </div>
-                  <span className="num text-[12px] text-fg1">{fmtPct(f.intensity, 0)}</span>
+                  <span className="num w-10 text-end text-[13px] text-bad-bright">{fmtPct(f.intensity, 0)}</span>
                 </div>
               ))}
-              <div className="mt-1 text-[12px] text-fg2">
-                {lang === "he" ? "נפגעים מצטברים" : "Cumulative casualties"}:{" "}
-                <span className="num text-bad-bright">{fmtInt(now.war_casualties)}</span>
+              <div className="mt-1 flex items-baseline gap-2 border-t border-line0 pt-3 text-[13px] text-fg1">
+                {lang === "he" ? "נפגעים מצטברים" : "Cumulative casualties"}
+                <span className="num text-[17px] font-medium text-bad-bright">{fmtInt(now.war_casualties)}</span>
               </div>
             </div>
           )}
         </Panel>
 
         <Panel title={`${t("readiness", lang)} · ${t("deterrence", lang)}`} accent={DOMAIN.security}>
-          <div className="flex items-start justify-around">
+          <div className="flex flex-wrap items-start justify-around gap-4 pt-1">
             <Traceable path="security.force_readiness">
-              <Dial value={now.readiness} ghost={ghost.readiness} label={t("readiness", lang)} color={bandColor(now.readiness, 0.6, 0.4)} />
+              <Dial value={now.readiness} ghost={ghost.readiness} label={t("readiness", lang)} color={bandColor(now.readiness, 0.6, 0.4)} size={132} />
             </Traceable>
             <Traceable path="security.deterrence_index">
-              <Dial value={now.deterrence} ghost={ghost.deterrence} label={t("deterrence", lang)} color={bandColor(now.deterrence, 0.5, 0.3)} />
+              <Dial value={now.deterrence} ghost={ghost.deterrence} label={t("deterrence", lang)} color={bandColor(now.deterrence, 0.5, 0.3)} size={132} />
             </Traceable>
             <Traceable path="security.reserve_mobilization">
-              <Dial value={now.mobilization} ghost={ghost.mobilization} label={lang === "he" ? "גיוס מילואים" : "Mobilization"} color={SEM.warnBright} />
+              <Dial value={now.mobilization} ghost={ghost.mobilization} label={lang === "he" ? "גיוס מילואים" : "Mobilization"} color={SEM.warn} size={132} />
             </Traceable>
+          </div>
+          <div className="mt-3 text-center text-[12px] text-fg2">
+            {lang === "he" ? "מחוג מקווקו: הערך לפני שנה" : "Dashed needle: value a year ago"}
           </div>
         </Panel>
 
-        {/* bottom ticker: security events, mono timestamps (DESIGN §6.3) */}
+        {/* security events */}
         <Panel title={t("eventTicker", lang)} accent={DOMAIN.security} className="min-h-0">
-          <div className="max-h-56 overflow-y-auto">
-            {feed.length === 0 ? (
-              <div className="text-[12px] text-fg2">—</div>
-            ) : (
-              [...feed].reverse().map((e, i) => (
-                <div key={i} className="flex gap-3 border-b border-line0/40 py-1 text-[12px] leading-[16px] last:border-0" title={e.note}>
-                  <span className="num shrink-0 text-fg2">{fmtQuarter(e.year, e.quarter)}</span>
-                  <span className="num text-fg1">
-                    {e.id}
-                    {e.count > 1 && <span className="text-fg2"> ×{e.count}</span>}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
+          <EventFeed feed={feed} lang={lang} maxHeight="max-h-64" />
         </Panel>
       </div>
 
       {/* right: threat matrix */}
       <Panel title={t("threatMatrix", lang)} accent={DOMAIN.security}>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {Object.entries(now.threat).map(([adv, level]) => {
             const back = frames[Math.max(0, frames.length - 9)];
             const delta = level - (back.threat[adv] ?? level);
             return (
-              <div key={adv} className="flex items-center gap-2">
-                <span className="w-28 text-[12px] text-fg1">{ADVERSARY_NAMES[adv]?.[lang] ?? adv}</span>
-                <div
-                  className="flex h-8 flex-1 items-center justify-center rounded-[2px] border border-line0"
-                  style={{ background: threatColor(level) }}
-                >
-                  <span className="num text-[13px] text-fg0">{fmtPct(level, 0)}</span>
+              <div key={adv} className="-mx-2 flex items-center gap-3 rounded-[8px] px-2 py-1.5 hover:bg-bg2">
+                <span className="w-24 shrink-0 truncate text-[13px] text-fg0">{ADVERSARY_NAMES[adv]?.[lang] ?? adv}</span>
+                <div className="flex flex-1 items-center gap-2">
+                  <bdi dir="ltr" className="block flex-1">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-bg3">
+                      <div className="h-full rounded-full" style={{ width: `${Math.max(2, level * 100)}%`, background: threatColor(Math.max(0.35, level)) }} />
+                    </div>
+                  </bdi>
+                  <span className="num w-9 text-end text-[13px] font-medium text-fg0">{fmtPct(level, 0)}</span>
                 </div>
-                <span className="num w-6 text-center text-[13px]">
+                <span className="num w-4 text-center text-[13px]">
                   <TrendArrow delta={delta} goodDir={-1} />
                 </span>
               </div>
             );
           })}
-          <div className="mt-2 border-t border-line0 pt-2 text-[11px] leading-[16px] text-fg2">
+          <div className="mt-3 border-t border-line0 pt-3 text-[12px] leading-[18px] text-fg2">
             {lang === "he" ? "חץ: מגמת 8 רבעונים" : "Arrow: 8-quarter trend"}
           </div>
         </div>

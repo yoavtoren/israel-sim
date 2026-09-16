@@ -1,69 +1,55 @@
 # DESIGN — national situation room
 
-Aesthetic: a state's operations floor. Dark, dense, instrument-panel. Bloomberg terminal crossed with a war-room map — not a SaaS dashboard. Numbers are the art. Every component is built from the tokens below and nothing else.
+Aesthetic: a well-edited briefing paper — calm, warm, light. Quality newspaper data journalism crossed with a modern product: paper ground, white cards, ink text, a serif for headlines, generous whitespace, soft layered shadows. Numbers are important but typeset, not terminal. (Replaced the original dark "Bloomberg terminal" direction on 2026-09-16: users found it cold, robotic and repellent.) Every component is built from the tokens in `packages/ui/src/theme.css` and nothing else.
 
-Banned: default Tailwind blue/gray, uncustomized shadcn, emoji as icons, centered hero layouts, purple gradients, big border radii, blur-heavy shadows.
+Banned: dark "war-room" backgrounds, monospace numerals, CRT scanlines/vignettes, 2px boxy cells, all-caps letter-spaced labels, neon-on-black glows, default Tailwind blue/gray, emoji as icons, purple gradients.
 
 ## 1. Color tokens
 
-Surfaces (cool ink ramp, never pure black):
+Surfaces (warm paper ramp):
 
 | token | value | use |
 |---|---|---|
-| `--bg-0` | `#0A0E14` | app background |
-| `--bg-1` | `#111722` | panel |
-| `--bg-2` | `#1A2230` | elevated panel / hover |
-| `--bg-3` | `#232D3F` | active / pressed |
-| `--line-0` | `#2A3444` | hairline borders (1px, the primary elevation cue) |
-| `--line-1` | `#3A4658` | emphasized borders, table header rules |
+| `bg0` | `#F4F1EA` | page / sidebar |
+| `bg1` | `#FFFFFF` | card, modal, floating panel |
+| `bg2` | `#F6F3ED` | inset area, hover |
+| `bg3` | `#EBE6DC` | pressed, bar tracks |
+| `line0` | `#E7E1D6` | hairline borders |
+| `line1` | `#D3CBBD` | emphasized borders |
 
-Text:
+Ink: `fg0 #1C2330` primary · `fg1 #555E6C` secondary · `fg2 #8B919A` muted.
 
-| token | value | use |
-|---|---|---|
-| `--fg-0` | `#E6EDF3` | primary |
-| `--fg-1` | `#93A4B5` | secondary, labels |
-| `--fg-2` | `#5C6B7A` | muted, units, disabled |
+Semantic ramps — `dim` is a light tint for pill/background fills, `base` for marks/borders/bars, `bright` is the DARK variant used as text on paper:
 
-Semantic ramps (each has dim/base/bright for backgrounds, values and emphasis):
+| ramp | dim | base | bright |
+|---|---|---|---|
+| good | `#DCEFE3` | `#3C9A66` | `#1F7A4A` |
+| bad | `#F8E0DC` | `#D9534A` | `#B3302A` |
+| warn | `#F7ECD2` | `#D49A2A` | `#946312` |
+| info | `#E2EBF7` | `#2F63B0` | `#24518F` |
 
-| ramp | dim | base | bright | use |
-|---|---|---|---|---|
-| good | `#1F6E33` | `#2EA043` | `#3FB950` | improving indicator, positive delta |
-| bad | `#8B2E2A` | `#DA3633` | `#F85149` | deteriorating indicator, negative delta |
-| warn | `#7A5B0E` | `#D29922` | `#E3B341` | thresholds approaching, degradation preview |
-| info | `#1F4E8C` | `#3B82D0` | `#58A6FF` | selection, links, neutral highlights |
+"Good/bad" follow the indicator's meaning, not the sign. Every delta is signed AND colored.
 
-"Good/bad" follow the indicator's meaning, not the sign: unemployment ↓ is good-green, debt/GDP ↑ is bad-red. Every delta is signed AND colored.
+Domain accents: fiscal `#C9921F` · macro `#3C9A66` · security `#D05A43` · diplomacy `#2F63B0` · social `#8A63C2` · infrastructure `#3B8FB8`. Sectors: secular `#3F84CF` · national_religious `#2A9A82` · haredi `#7A6BBD` · arab `#D9912A` · other `#BF6A9A`.
 
-Domain accents (charts, board headers): fiscal `#E3B341` · macro `#7EE787` · security `#E8604C` · diplomacy `#58A6FF` · social `#D2A8FF` · infrastructure `#79C0FF`.
-
-Sector palette (fixed everywhere — cards, map, charts, legends):
-
-| sector | color |
-|---|---|
-| secular | `#4C9BE8` |
-| national_religious | `#2EA98F` |
-| haredi | `#8B7EC8` |
-| arab | `#E8A33D` |
-| other | `#C97BA8` |
-
-Map choropleths: sequential ramp `#0E1B2C → #1E4976 → #2E7BB8 → #58A6FF → #A5D6FF` (5 stops); diverging (vs national mean) `bad-base → bg-1 → good-base`. Cluster 1–10 uses warn→info interpolation.
+Maps: sea `#DCE7EC`, context land `#F7F4EE` with white borders, Israel paper-white with a deep-blue outline. Stance tiers: ally `#3569B8` · friendly `#86B2D6` · neutral `#D6D1C6` · cold `#E9C77E` · hostile `#E08A5E` · enemy `#C0453B`. Map labels are dark ink with a white halo. Sequential ramp `#EEF3F8 → #23508F`; diverging `bad → paper → good`.
 
 ## 2. Space, radii, elevation
 
-- Spacing scale (px): 4, 8, 12, 16, 24, 32, 48. Panels pack dense: 12px internal padding, 8px between rows.
-- Radii: 2px (inputs, cells), 4px (panels), 6px (modals). Nothing rounder.
-- Elevation = borders, not shadows: 1px `--line-0` everywhere; a single `0 2px 8px rgb(0 0 0 / 0.45)` only on overlays.
-- Grid: 12-col, 1440px reference; sidebar 280px; the map screen is edge-to-edge.
+- Spacing scale (px): 4, 8, 12, 16, 20, 24, 32. Cards use 16–20px padding; screens 24px gutters.
+- Radii: 6px (inputs), 10px (buttons, small cards), 14px (panels), 18–22px (modals, floating map panels), full (pills, chips, bar tracks).
+- Elevation: `.panel` has a hairline + barely-there shadow; `.overlay` (floating) has a soft three-layer shadow. `.glass` = 95% white with light blur for chrome over maps.
+- Buttons: `.btn-primary` (ink, the main action), `.btn-accent` (blue), `.btn-ghost`, `.btn-danger`. One primary per view.
+- Sidebar 240px; the map screens are edge-to-edge with floating cards.
 
 ## 3. Typography
 
-- UI + Hebrew: **Heebo** (400 / 500 / 700). Fallback: Rubik, system.
-- All numerals: **IBM Plex Mono** with `font-variant-numeric: tabular-nums`. Every number in the app is mono — table cells, tickers, axis labels, deltas.
-- Scale (px/line): 11/16 (units, axis), 12/16 (dense table), 13/20 (base), 15/22 (panel titles), 18/26 (section), 24/32 (screen KPIs), 32/40 (post-mortem verdict only).
-- Units always visible, always `--fg-2`, never dropped: `₪412.5B`, `3.2%`, `12,400 יח׳`.
-- Decimal alignment in tables via tabular mono + fixed fraction digits per column.
+- UI + Hebrew: **Rubik** (400/500/600/700), fallback Heebo.
+- Headlines (`.display`): **Frank Ruhl Libre** 700 — screen titles, dilemma/consequence headlines, panel titles, big dates.
+- Numbers (`.num`): Rubik with tabular figures, LTR-isolated. No monospace.
+- Labels (`.eyebrow`): 11.5px medium `fg2`, sentence case — never tracking-wide caps.
+- Scale (px/line): 12/17 (secondary — the minimum for readable text), 13/19, 14/21 (base), 15–16 (emphasis), 17–21 (panel titles, serif), 25/32 (headlines, serif), 38–44 (hero / verdict, serif).
+- Units always visible in `fg2`: `₪412.5B`, `3.2%`.
 
 ## 4. RTL
 
@@ -71,17 +57,17 @@ RTL is the primary direction, from the first component. `dir="rtl"` at the root;
 
 ## 5. Motion
 
-- 150–250ms, ease-out, Framer Motion. Transitions carry meaning only:
+- 150–320ms, ease-out. Transitions carry meaning, plus gentle entrances for cards and modals (fade / 16px rise):
   - a changing value animates old→new (count-up/down) with a 250ms color pulse in the semantic direction;
   - a panel that gains new causal-trace entries flashes its border `--info-base` once;
   - map choropleth recolors with 200ms crossfade when scrubbing time.
-- No decorative motion, no springs, no parallax.
+- No bouncy springs, no parallax.
 
 ## 6. Reference screens (in words)
 
 **1 — The Budget Chamber.** Full-height dense table, one row per ministry: Hebrew name, current budget (mono, ₪B), proposed (editable cell, mono), % change (signed, colored), rigidity floor shown as a faint red tick inside an inline bar, 12-quarter sparkline of funding ratio. Above the table a fixed strip: revenue, total spend, deficit — live, mono, 24px, deficit colored by band. Right side panel "מה יישבר" (what breaks): the shadow-tick preview — every degradation rule the proposal activates, each with its `surfaces_as` text, delay in quarters (warn-amber chips), and the top-10 state diffs sorted by relative size, each row clickable → causal trace. Confirm button is the only filled-primary element on screen.
 
-**2 — The Map.** Edge-to-edge MapLibre dark canvas, locality polygons choroplethed by any indicator (selector top-right: population, employment, cluster, service access, migration balance). Hover: a locality card — name, population, cluster chip, 4 mono KPIs, migration arrow. Bottom: a time scrubber across the run's quarters; dragging recolors the map and a thin national-aggregate sparkline rides above the scrubber. Periphery programs draw as slow-pulsing outline overlays on targeted localities. Top-left stack: year/quarter in large mono, three national KPIs.
+**2 — The Map.** Edge-to-edge MapLibre light canvas, locality polygons choroplethed by any indicator (selector top-right: population, employment, cluster, service access, migration balance). Hover: a locality card — name, population, cluster chip, 4 mono KPIs, migration arrow. Bottom: a time scrubber across the run's quarters; dragging recolors the map and a thin national-aggregate sparkline rides above the scrubber. Periphery programs draw as slow-pulsing outline overlays on targeted localities. Top-left stack: year/quarter in large mono, three national KPIs.
 
 **3 — The Security Board.** Left column: three stockpile gauges (interceptors / precision / shells) — horizontal bars against capacity with a mono "quarters of supply: 14.2" countdown beneath each, turning warn under 8, bad under 4. Center: fronts strip (empty at peace: a single quiet line "אין חזיתות פעילות"), readiness and deterrence as instrument dials with history ghosts. Right: threat matrix — four adversaries × threat level as heat cells with 8-quarter trend arrows. Bottom ticker: security-domain events from the tick log, mono timestamps, cause → effect phrasing from the causal trace.
 

@@ -8,18 +8,18 @@ import { AFFILIATION, endTime, type MarkerKind } from "../../strategic/scenarios
 import { sound } from "../../strategic/sound";
 
 const MARKER_COLOR: Record<MarkerKind, string> = {
-  info: "#93A4B5",
-  alert: "#E3B341",
-  mobilize: "#F0883E",
-  launch: "#F85149",
-  intercept: "#56D4DD",
-  impact: "#F0883E",
-  halt: "#F85149",
-  strike: "#58A6FF",
-  ceasefire: "#3FB950",
-  crisis: "#F85149",
-  success: "#3FB950",
-  failure: "#F85149",
+  info: "#8B919A",
+  alert: "#D49A2A",
+  mobilize: "#D96A1C",
+  launch: "#C8372D",
+  intercept: "#0E8A94",
+  impact: "#D96A1C",
+  halt: "#B3302A",
+  strike: "#2F63B0",
+  ceasefire: "#3C9A66",
+  crisis: "#B3302A",
+  success: "#3C9A66",
+  failure: "#C8372D",
 };
 
 /** rAF playback clock; mount once while the tactical screen is visible. */
@@ -92,7 +92,7 @@ export function TimelineController() {
   const active = script.launches.filter((l) => AFFILIATION[l.faction] !== "friend" && t >= l.t0 && t < endTime(l)).length;
 
   return (
-    <div className="overlay rounded-[6px] border border-line0 bg-bg1/95 px-3 py-2">
+    <div className="glass overlay rounded-[14px] border border-line0 px-4 pt-3 pb-2.5">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -101,50 +101,50 @@ export function TimelineController() {
             if (halted) setModalOpen(true);
             else setPlaying(!playing);
           }}
-          className={`h-8 min-w-8 rounded-[4px] border px-2 text-[14px] ${halted ? "border-bad text-bad-bright" : "border-line1 bg-bg2 text-fg0 hover:bg-bg3"}`}
+          className={`btn h-10 min-w-10 px-3 text-[14px] ${halted ? "btn-danger" : "btn-primary rounded-full"}`}
           aria-label={playing ? "pause" : "play"}
         >
           {halted ? (lang === "he" ? "הכרעה" : "Decide") : playing ? "❚❚" : "▶"}
         </button>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5 rounded-full bg-bg2 p-0.5">
           {SPEEDS.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => setSpeed(s)}
-              className={`num rounded-[2px] border px-1.5 py-0.5 text-[11px] ${speed === s ? "border-info text-info-bright" : "border-line0 text-fg1 hover:bg-bg3"}`}
+              className={`num rounded-full px-2.5 text-[12px] leading-[24px] transition-colors ${speed === s ? "bg-bg1 font-medium text-info-bright shadow-[0_1px_2px_rgb(0_0_0/0.1)]" : "text-fg1 hover:text-fg0"}`}
             >
               {s}×
             </button>
           ))}
         </div>
-        <div className="flex flex-col leading-[16px]">
-          <span className="num text-[13px] text-fg0">{fmtClock(script.baseTime, t, lang)}</span>
-          <span className="num text-[11px] text-fg2">{fmtT(t)}</span>
+        <div className="flex flex-col leading-[18px]">
+          <span className="num text-[14px] font-medium text-fg0">{fmtClock(script.baseTime, t, lang)}</span>
+          <span className="num text-[12px] text-fg2">{fmtT(t)}</span>
         </div>
-        <div className="ms-auto flex items-center gap-3 text-[12px] text-fg1">
-          <span>{script.title[lang]}</span>
+        <div className="ms-auto flex items-center gap-3 text-[13px] text-fg1">
+          <span className="display text-[15px] text-fg0">{script.title[lang]}</span>
           {active > 0 && (
-            <span className="num rounded-[2px] border border-bad px-1.5 text-bad-bright">
+            <span className="num rounded-full bg-bad-dim px-2.5 text-[12px] leading-[24px] font-medium text-bad-bright">
               {active} {lang === "he" ? "באוויר" : "airborne"}
             </span>
           )}
           {halted && !modalOpen && (
-            <button type="button" className="rounded-[2px] border border-bad px-2 py-0.5 text-bad-bright hover:bg-bad-dim/40" onClick={() => setModalOpen(true)}>
+            <button type="button" className="btn btn-danger px-3 py-1 text-[13px]" onClick={() => setModalOpen(true)}>
               {lang === "he" ? "פתח חדר הכרעה" : "Open decision"}
             </button>
           )}
         </div>
       </div>
 
-      <bdi dir="ltr" className="relative mt-2 block h-7">
+      <bdi dir="ltr" className="relative mt-2.5 block h-7">
         {/* event markers */}
         <div className="pointer-events-none absolute inset-x-[5px] top-0 h-3">
           {script.markers.map((m, i) => (
             <span
               key={i}
               title={`${fmtT(m.t)} · ${m.label[lang]}`}
-              className="pointer-events-auto absolute top-0 h-3 w-[3px] -translate-x-1/2 cursor-pointer rounded-[1px]"
+              className="pointer-events-auto absolute top-0 h-3 w-[3px] -translate-x-1/2 cursor-pointer rounded-full opacity-80 hover:opacity-100"
               style={{ left: `${(m.t / script.duration) * 100}%`, background: MARKER_COLOR[m.kind], width: m.kind === "halt" ? 5 : 3 }}
               onClick={() => setT(m.t)}
             />
@@ -169,7 +169,7 @@ export function TimelineController() {
       </bdi>
 
       {/* latest marker caption */}
-      <div className="mt-0.5 h-4 truncate text-[11px] leading-[16px] text-fg1">
+      <div className="mt-0.5 h-[18px] truncate text-[12px] leading-[18px] text-fg1">
         {(() => {
           const past = script.markers.filter((m) => m.t <= t);
           const m = past[past.length - 1];

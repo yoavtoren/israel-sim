@@ -9,7 +9,7 @@ import type { MinistryId } from "@engine";
 import { useStore } from "../store";
 import { MINISTRY_NAMES, t } from "../lib/strings";
 import { fmtCompact, fmtSigned } from "../lib/format";
-import { DOMAIN, INK, SECTOR_COLORS, SEM } from "../lib/colors";
+import { DOMAIN, INK, SECTOR_COLORS } from "../lib/colors";
 import { Chip, Panel } from "../components/ui";
 
 /** fixed categorical assignment: top ministries by pending magnitude, rest folded into "other" */
@@ -76,31 +76,37 @@ export function Pipeline() {
   const groupName = (g: string): string =>
     g === "other" ? t("otherMinistries", lang) : g === "reform" ? (lang === "he" ? "רפורמות" : "Reforms") : MINISTRY_NAMES[g as MinistryId][lang];
 
+  const totalPending = largest.reduce((a, p) => a + Math.abs(p.pending), 0);
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex max-w-[1320px] flex-col gap-5">
       <Panel title={t("maturing20y", lang)} accent={DOMAIN.fiscal}>
         {state.pipeline.length === 0 ? (
-          <div className="py-4 text-center text-[12px] text-fg2">
-            {lang === "he" ? "אין השקעות תלויות — תקציבים משנים זרמים, זרמים ממלאים מלאים לאט" : "No pending effects yet"}
+          <div className="flex h-40 flex-col items-center justify-center gap-1 rounded-[12px] bg-bg2 text-center">
+            <span className="text-[14px] text-fg1">{lang === "he" ? "אין עדיין השקעות תלויות" : "No pending effects yet"}</span>
+            <span className="text-[12.5px] text-fg2">
+              {lang === "he" ? "תקציבים משנים זרמים, וזרמים ממלאים מלאים לאט" : "Budgets change flows; flows fill stocks slowly"}
+            </span>
           </div>
         ) : (
           <bdi dir="ltr" className="block">
-            <div style={{ height: 240 }}>
+            <div style={{ height: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
-                  <CartesianGrid stroke={INK.line0} vertical={false} />
-                  <XAxis dataKey="x" tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "IBM Plex Mono" }} axisLine={{ stroke: INK.line1 }} tickLine={false} minTickGap={24} />
-                  <YAxis tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "IBM Plex Mono" }} axisLine={false} tickLine={false} width={52} tickFormatter={(v: number) => fmtCompact(v, 0)} />
+                <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -4 }}>
+                  <CartesianGrid stroke={INK.line0} strokeDasharray="2 4" vertical={false} />
+                  <XAxis dataKey="x" tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "Rubik, system-ui, sans-serif" }} axisLine={{ stroke: INK.line1 }} tickLine={false} tickMargin={6} minTickGap={24} />
+                  <YAxis tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "Rubik, system-ui, sans-serif" }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => fmtCompact(v, 0)} />
                   <Tooltip
+                    cursor={{ stroke: INK.line1, strokeDasharray: "3 3" }}
                     content={(p: TooltipProps<number, string>) =>
                       p.active === true && p.payload !== undefined && p.payload.length > 0 ? (
-                        <div className="overlay rounded-[4px] border border-line1 bg-bg2 px-2 py-1 text-[12px]">
-                          <div className="num mb-0.5 text-fg2">{String(p.label)}</div>
+                        <div className="overlay min-w-[160px] rounded-[10px] border border-line0 bg-bg1 px-3 py-2 text-[12px] leading-[18px]" dir={lang === "he" ? "rtl" : "ltr"}>
+                          <div className="num mb-1 text-[11.5px] font-medium text-fg2">{String(p.label)}</div>
                           {p.payload.map((row) => (
-                            <div key={String(row.dataKey)} className="flex items-center gap-2">
-                              <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: String(row.color) }} />
+                            <div key={String(row.dataKey)} className="flex items-center gap-2 py-px">
+                              <span className="inline-block h-2 w-2 rounded-full" style={{ background: String(row.color) }} />
                               <span className="text-fg1">{groupName(String(row.dataKey))}</span>
-                              <span className="num ms-auto">{fmtCompact(Number(row.value), 1)}</span>
+                              <span className="num ms-auto ps-3 font-medium text-fg0">{fmtCompact(Number(row.value), 1)}</span>
                             </div>
                           ))}
                         </div>
@@ -108,18 +114,28 @@ export function Pipeline() {
                     }
                   />
                   {groups.map((g, i) => (
-                    <Area key={g} dataKey={g} stackId="1" stroke={PIPE_COLORS[i % PIPE_COLORS.length]} fill={PIPE_COLORS[i % PIPE_COLORS.length]} fillOpacity={0.35} isAnimationActive={false} />
+                    <Area
+                      key={g}
+                      type="monotone"
+                      dataKey={g}
+                      stackId="1"
+                      stroke={PIPE_COLORS[i % PIPE_COLORS.length]}
+                      strokeWidth={1.5}
+                      fill={PIPE_COLORS[i % PIPE_COLORS.length]}
+                      fillOpacity={0.28}
+                      isAnimationActive={false}
+                    />
                   ))}
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </bdi>
         )}
-        {groups.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-3 px-1">
+        {state.pipeline.length > 0 && groups.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 px-1">
             {groups.map((g, i) => (
-              <span key={g} className="flex items-center gap-1.5 text-[11px] text-fg1">
-                <span className="inline-block h-2 w-3 rounded-[1px]" style={{ background: PIPE_COLORS[i % PIPE_COLORS.length] }} />
+              <span key={g} className="flex items-center gap-1.5 text-[12.5px] text-fg1">
+                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: PIPE_COLORS[i % PIPE_COLORS.length] }} />
                 {groupName(g)}
               </span>
             ))}
@@ -127,48 +143,72 @@ export function Pipeline() {
         )}
       </Panel>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Panel title={t("largestPending", lang)} accent={DOMAIN.fiscal}>
-          <table className="w-full text-[12px] leading-[16px]">
-            <tbody>
-              {largest.map((p, i) => (
-                <tr key={i} className="border-b border-line0/50 last:border-0">
-                  <td className="py-1.5 pe-2 text-fg1">{p.ministry !== null ? MINISTRY_NAMES[p.ministry][lang] : p.decision}</td>
-                  <td className="num max-w-[200px] truncate py-1.5 pe-2 text-fg2" title={p.target}>{p.target}</td>
-                  <td className="num py-1.5 text-end">{fmtSigned(p.pending, 2)}</td>
+          {largest.length === 0 ? (
+            <div className="rounded-[10px] bg-bg2 py-6 text-center text-[13px] text-fg2">—</div>
+          ) : (
+            <table className="w-full text-[13px] leading-[20px]">
+              <thead>
+                <tr className="border-b border-line0">
+                  <th className="eyebrow pb-2 text-start font-medium">{t("ministry", lang)}</th>
+                  <th className="eyebrow pb-2 text-start font-medium">{lang === "he" ? "יעד" : "Target"}</th>
+                  <th className="eyebrow pb-2 text-end font-medium">{lang === "he" ? "יתרה" : "Pending"}</th>
                 </tr>
-              ))}
-              {largest.length === 0 && (
-                <tr><td className="py-2 text-fg2">—</td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {largest.map((p, i) => (
+                  <tr key={i} className="border-b border-line0 last:border-0 hover:bg-bg2">
+                    <td className="py-2 pe-3 text-fg0">{p.ministry !== null ? MINISTRY_NAMES[p.ministry][lang] : p.decision}</td>
+                    <td className="max-w-[220px] truncate py-2 pe-3 text-[12px] text-fg2" title={p.target} dir="ltr">
+                      <span className="block truncate text-end">{p.target}</span>
+                    </td>
+                    <td className="py-2">
+                      <div className="flex items-center justify-end gap-2">
+                        <bdi dir="ltr" className="hidden w-20 sm:block">
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-bg3">
+                            <div className="h-full rounded-full bg-dom-fiscal" style={{ width: `${totalPending > 0 ? Math.min(100, (Math.abs(p.pending) / Math.abs(largest[0].pending)) * 100) : 0}%` }} />
+                          </div>
+                        </bdi>
+                        <span className="num w-14 text-end font-medium text-fg0">{fmtSigned(p.pending, 2)}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </Panel>
 
         <Panel title={t("cancelRisk", lang)} accent={DOMAIN.security}>
           {cancelRisk.length === 0 ? (
-            <div className="text-[12px] text-good-bright">
+            <div className="flex items-center gap-2 rounded-[10px] bg-good-dim/70 px-4 py-3 text-[13px] text-good-bright">
+              <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-good" />
               {lang === "he" ? "אין השקעות בסיכון ביטול במימון הנוכחי" : "Nothing at cancel risk at current funding"}
             </div>
           ) : (
             <ul className="flex flex-col gap-2">
               {cancelRisk.map((p, i) => (
-                <li key={i} className="flex items-center justify-between gap-2 rounded-[2px] border border-warn-dim bg-bg2 p-2 text-[12px]">
-                  <span className="text-fg1">
-                    {p.ministry !== null ? MINISTRY_NAMES[p.ministry][lang] : p.decision} → <span className="num">{p.target}</span>
+                <li key={i} className="flex flex-col gap-1.5 rounded-[10px] bg-warn-dim/60 px-3 py-2.5 text-[13px]">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium text-fg0">{p.ministry !== null ? MINISTRY_NAMES[p.ministry][lang] : p.decision}</span>
+                    <Chip tone="warn">
+                      {lang === "he" ? "מתבטל מתחת" : "decays below"} <span className="num">{(p.decays_if?.ministry_funding_below ?? 0).toFixed(2)}</span>
+                    </Chip>
+                  </div>
+                  <span className="truncate text-[12px] text-fg1" dir="ltr">
+                    → {p.target}
                   </span>
-                  <Chip tone="warn">
-                    {lang === "he" ? "מתבטל מתחת" : "decays below"} <span className="num">{(p.decays_if?.ministry_funding_below ?? 0).toFixed(2)}</span>
-                  </Chip>
                 </li>
               ))}
             </ul>
           )}
-          <div className="mt-2 border-t border-line0 pt-2 text-[11px] leading-[16px] text-fg2" style={{ color: SEM.warn }}>
+          <p className="mt-4 border-t border-line0 pt-3 text-[12.5px] leading-[19px] text-fg1">
             {lang === "he"
-              ? "קיצוץ מאוחר מבטל את היתרה שלא נמסרה — היא אינה מוחזרת (spec §7)"
-              : "A later cut cancels the undelivered remainder — it is not refunded (spec §7)"}
-          </div>
+              ? "קיצוץ מאוחר מבטל את היתרה שלא נמסרה — היא אינה מוחזרת."
+              : "A later cut cancels the undelivered remainder — it is not refunded."}
+            <span className="text-fg2"> (spec §7)</span>
+          </p>
         </Panel>
       </div>
     </div>

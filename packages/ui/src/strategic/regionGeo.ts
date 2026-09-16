@@ -34,7 +34,7 @@ export const TIER_COLORS: TierColors = {
   ENEMY: "#C0453B",
 };
 
-export const ISRAEL_FILL = "#1F3F6E";
+export const ISRAEL_FILL = "#FDFBF6";
 export const CONTEXT_FILL = "#F7F4EE";
 export const CONTEXT_STROKE = "#D9D2C5";
 export const SEA = "#DCE7EC";

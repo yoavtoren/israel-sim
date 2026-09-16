@@ -39,31 +39,31 @@ export function Tactical() {
         <div key={crisisKey} className="crisis-flash pointer-events-none absolute inset-0 z-20" aria-hidden="true" />
       )}
 
-      <div className="pointer-events-none absolute inset-0 flex flex-col p-3">
+      <div className="pointer-events-none absolute inset-0 flex flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="pointer-events-auto">
             <Telemetry />
           </div>
-          <div className="overlay pointer-events-auto flex flex-wrap items-center gap-1.5 rounded-[6px] border border-line0 bg-bg1/95 px-2 py-1.5 text-[12px]">
-            <span className="text-fg2">{lang === "he" ? "מצלמה" : "Camera"}</span>
+          <div className="glass overlay pointer-events-auto flex flex-wrap items-center gap-1 rounded-full border border-line0 py-1 ps-3.5 pe-1 text-[13px]">
+            <span className="eyebrow me-1">{lang === "he" ? "מצלמה" : "Camera"}</span>
             {(Object.keys(CAMERA_LABELS) as CameraMode[]).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setCameraMode(m)}
-                className={`rounded-[2px] border px-1.5 py-0.5 ${cameraMode === m ? "border-info text-info-bright" : "border-line0 text-fg1 hover:bg-bg3"}`}
+                className={`rounded-full px-2.5 leading-[28px] transition-colors ${cameraMode === m ? "bg-info-dim font-medium text-info-bright" : "text-fg1 hover:bg-bg2 hover:text-fg0"}`}
               >
                 {CAMERA_LABELS[m][lang]}
               </button>
             ))}
-            <span className="mx-1 h-4 border-s border-line0" />
+            <span className="mx-1 h-5 border-s border-line0" />
             <button
               type="button"
               onClick={() => {
                 sound.unlock();
                 setSound(!soundOn);
               }}
-              className={`rounded-[2px] border px-1.5 py-0.5 ${soundOn ? "border-warn text-warn-bright" : "border-line0 text-fg1 hover:bg-bg3"}`}
+              className={`rounded-full px-2.5 leading-[28px] transition-colors ${soundOn ? "bg-warn-dim font-medium text-warn-bright" : "text-fg1 hover:bg-bg2 hover:text-fg0"}`}
               aria-pressed={soundOn}
             >
               {soundOn ? (lang === "he" ? "🔊 קול" : "🔊 Sound") : lang === "he" ? "🔇 קול" : "🔇 Sound"}

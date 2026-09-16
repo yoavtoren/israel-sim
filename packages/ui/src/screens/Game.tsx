@@ -41,7 +41,7 @@ export function Game() {
     <div className="relative h-full w-full">
       <WorldMap stances={stances} lang={lang} focus={focus} inset={inset} highlight={highlight} />
 
-      <div className="pointer-events-none absolute inset-0 flex flex-col gap-3 p-3">
+      <div className="pointer-events-none absolute inset-0 flex flex-col gap-3 p-4">
         {inGame && <Hud game={game} lang={lang} />}
         <div className="flex min-h-0 flex-1 gap-3">
           {dilemma !== null && <DecisionPanel game={game} lang={lang} />}
@@ -59,12 +59,12 @@ export function Game() {
                 sound.unlock();
                 setSound(!soundOn);
               }}
-              className="overlay rounded-[8px] border border-line0 bg-bg1/92 px-2 py-1.5 text-[12px]"
+              className="glass overlay flex h-9 w-9 items-center justify-center rounded-full border border-line0 text-[14px] hover:bg-bg1"
               aria-pressed={soundOn}
             >
               {soundOn ? "🔊" : "🔇"}
             </button>
-            <button type="button" onClick={() => setLang(lang === "he" ? "en" : "he")} className="overlay rounded-[8px] border border-line0 bg-bg1/92 px-2 py-1.5 text-[12px]">
+            <button type="button" onClick={() => setLang(lang === "he" ? "en" : "he")} className="glass overlay flex h-9 min-w-9 items-center justify-center rounded-full border border-line0 px-2.5 text-[13px] font-medium text-fg1 hover:bg-bg1 hover:text-fg0">
               {lang === "he" ? "EN" : "עב"}
             </button>
           </div>

@@ -25,7 +25,7 @@ const INDICATORS: Array<{ id: Indicator; label: UIKey }> = [
 const BLANK_STYLE: maplibregl.StyleSpecification = {
   version: 8,
   sources: {},
-  layers: [{ id: "bg", type: "background", paint: { "background-color": "#0A0E14" } }],
+  layers: [{ id: "bg", type: "background", paint: { "background-color": "#E9EEF0" } }],
 };
 
 interface Hover {
@@ -71,10 +71,10 @@ export function MapScreen() {
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 6, ["get", "r"], 10, ["*", ["get", "r"], 3.2]],
           "circle-color": ["get", "color"],
-          "circle-opacity": 0.85,
-          // hairline stroke keeps the darkest ramp stops legible on bg-0
-          "circle-stroke-width": ["case", ["get", "periphery"], 1.5, 0.6],
-          "circle-stroke-color": ["case", ["get", "periphery"], "#58A6FF", "#3A4658"],
+          "circle-opacity": 0.9,
+          // white hairline separates overlapping dots; periphery-program towns get an ink ring
+          "circle-stroke-width": ["case", ["get", "periphery"], 1.8, 0.7],
+          "circle-stroke-color": ["case", ["get", "periphery"], "#1C2330", "#FFFFFF"],
         },
       });
       m.on("mousemove", "loc-circles", (e: MapMouseEvent & { features?: MapGeoJSONFeature[] }) => {
@@ -145,9 +145,10 @@ export function MapScreen() {
       <div ref={mapEl} style={{ position: "absolute", inset: 0 }} />
 
       {/* top-left stack: clock + national KPIs (DESIGN §6.2) */}
-      <div className="panel overlay absolute top-3 start-3 px-3 py-2">
-        <Num value={fmtQuarter(frame.year, frame.quarter)} className="text-[24px] leading-[32px]" />
-        <div className="mt-1 flex flex-col gap-0.5 text-[12px]">
+      <div className="panel overlay glass absolute top-4 start-4 w-[230px] px-4 py-3">
+        <div className="eyebrow">{frameIdx === null ? (lang === "he" ? "עכשיו" : "Now") : lang === "he" ? "מבט לאחור" : "Looking back"}</div>
+        <Num value={fmtQuarter(frame.year, frame.quarter)} className="display block text-[26px] leading-[34px]" />
+        <div className="mt-2 flex flex-col gap-1 border-t border-line0 pt-2 text-[13px]">
           <KV label={t("gdp", lang)} value={fmtBudget(frame.gdp_real, 0)} />
           <KV label={t("unemployment", lang)} value={fmtPct(frame.unemployment, 2)} />
           <KV label={t("debtGdp", lang)} value={fmtPct(frame.debt_gdp, 1)} />
@@ -155,19 +156,21 @@ export function MapScreen() {
       </div>
 
       {/* indicator selector */}
-      <div className="panel overlay absolute top-3 end-3 flex flex-col p-1">
+      <div className="panel overlay glass absolute top-4 end-4 flex w-[200px] flex-col gap-0.5 p-2">
+        <div className="eyebrow px-2 pt-1 pb-1.5">{lang === "he" ? "צביעה לפי" : "Color by"}</div>
         {INDICATORS.map((ind) => (
           <button
             key={ind.id}
             type="button"
             onClick={() => setIndicator(ind.id)}
-            className={`rounded-[2px] px-2 py-1 text-start text-[12px] ${
-              indicator === ind.id ? "bg-bg3 text-fg0" : "text-fg1 hover:bg-bg2"
+            className={`flex items-center gap-2 rounded-[8px] px-2.5 py-1.5 text-start text-[13px] transition-colors ${
+              indicator === ind.id ? "bg-fg0 font-medium text-white" : "text-fg1 hover:bg-bg2 hover:text-fg0"
             }`}
           >
             {t(ind.label, lang)}
           </button>
         ))}
+        <Legend indicator={indicator} lang={lang} />
       </div>
 
       {/* hover locality card */}
@@ -176,11 +179,11 @@ export function MapScreen() {
       )}
 
       {/* bottom: national sparkline riding above the time scrubber */}
-      <div className="panel overlay absolute inset-x-3 bottom-3 px-3 py-2">
-        <div className="mb-1 flex items-center gap-3">
-          <Sparkline values={nationalSeries} width={220} height={22} color={INK.fg1} />
-          <span className="num text-[11px] text-fg2">{fmtCompact(nationalSeries[Math.max(0, Math.min(fi, nationalSeries.length - 1))] ?? 0, 2)}</span>
-          <span className="num ms-auto text-[11px] text-fg2">
+      <div className="panel overlay glass absolute inset-x-4 bottom-4 px-5 py-3">
+        <div className="mb-2 flex items-center gap-3">
+          <Sparkline values={nationalSeries} width={220} height={26} color={INK.fg1} />
+          <span className="num text-[13px] font-medium text-fg0">{fmtCompact(nationalSeries[Math.max(0, Math.min(fi, nationalSeries.length - 1))] ?? 0, 2)}</span>
+          <span className="num ms-auto text-[12px] text-fg2">
             {fmtQuarter(frames[0].year, frames[0].quarter)} → {fmtQuarter(frames[frames.length - 1].year, frames[frames.length - 1].quarter)}
           </span>
         </div>
@@ -195,6 +198,34 @@ export function MapScreen() {
           />
         </bdi>
       </div>
+    </div>
+  );
+}
+
+/** Tiny key for the active color ramp. */
+function Legend(props: { indicator: Indicator; lang: "he" | "en" }) {
+  const stops = Array.from({ length: 9 }, (_, i) => i / 8);
+  const colors =
+    props.indicator === "cluster"
+      ? stops.map((u) => clusterColor(1 + u * 9))
+      : props.indicator === "migration"
+        ? stops.map((u) => divColor(u * 2 - 1))
+        : stops.map((u) => seqColor(u));
+  const [lo, hi] =
+    props.indicator === "cluster"
+      ? ["1", "10"]
+      : props.indicator === "migration"
+        ? [props.lang === "he" ? "עזיבה" : "Leaving", props.lang === "he" ? "הגעה" : "Arriving"]
+        : [props.lang === "he" ? "נמוך" : "Low", props.lang === "he" ? "גבוה" : "High"];
+  return (
+    <div className="mt-2 border-t border-line0 px-2 pt-2.5 pb-1">
+      <bdi dir="ltr" className="block">
+        <div className="h-2 w-full rounded-full" style={{ background: `linear-gradient(90deg, ${colors.join(",")})` }} />
+        <div className="mt-1 flex justify-between text-[11.5px] text-fg2">
+          <span>{lo}</span>
+          <span>{hi}</span>
+        </div>
+      </bdi>
     </div>
   );
 }
@@ -219,19 +250,20 @@ function LocalityCard(props: {
   const mig = props.frame.loc_migration[i];
   return (
     <div
-      className="panel overlay pointer-events-none absolute z-40 w-56 p-2"
+      className="panel overlay pointer-events-none absolute z-40 w-64 px-4 py-3"
       style={{ left: Math.min(props.hover.x + 14, window.innerWidth - 540), top: props.hover.y + 14 }}
     >
-      <div className="mb-1 flex items-center justify-between gap-2">
-        <span className="text-[13px] font-medium">{props.names[i]}</span>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="display text-[16px] leading-[22px]">{props.names[i]}</span>
         <span
-          className="num rounded-[2px] px-1 text-[11px] text-bg0"
+          className="num inline-flex items-center gap-1 rounded-full px-2 text-[11.5px] leading-[20px] font-medium text-white"
           style={{ background: clusterColor(props.clusters[i]) }}
+          title={t("cluster", props.lang)}
         >
           {props.clusters[i] > 0 ? props.clusters[i] : "—"}
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[12px]">
+      <div className="grid grid-cols-1 gap-y-1 border-t border-line0 pt-2 text-[13px]">
         <KV label={t("population", props.lang)} value={fmtInt(props.frame.loc_population[i])} />
         <KV label={t("employment", props.lang)} value={fmtPct(props.frame.loc_employment[i], 1)} />
         <KV label={t("serviceAccess", props.lang)} value={fmtPct(props.frame.loc_service_access[i], 0)} />

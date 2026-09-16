@@ -39,7 +39,7 @@ const Graticule = memo(function Graticule() {
     const b = project([70, lat]);
     lines.push(`M${a.x},${a.y}L${b.x},${b.y}`);
   }
-  return <path d={lines.join("")} stroke="#131B27" strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />;
+  return <path d={lines.join("")} stroke="#FFFFFF" strokeOpacity={0.55} strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />;
 });
 
 function proxyPath(from: LonLat, to: LonLat): string {
@@ -175,7 +175,7 @@ export function AllianceMap(props: {
       <svg width={size.w} height={size.h} className="absolute inset-0 block">
         <defs>
           <pattern id="enemy-hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="6" stroke="#000" strokeWidth="1.6" strokeOpacity="0.28" />
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#FFFFFF" strokeWidth="1.4" strokeOpacity="0.32" />
           </pattern>
         </defs>
         <g transform={`translate(${size.w / 2 - camera.cx * camera.scale} ${size.h / 2 - camera.cy * camera.scale}) scale(${camera.scale})`}>
@@ -191,10 +191,10 @@ export function AllianceMap(props: {
                   data-key={p.key}
                   d={p.d}
                   fill={fill ?? CONTEXT_FILL}
-                  fillOpacity={fill === undefined ? 1 : isHover ? 1 : 0.88}
+                  fillOpacity={fill === undefined ? 1 : isHover ? 1 : 0.92}
                   fillRule="evenodd"
-                  stroke={fill === undefined ? CONTEXT_STROKE : "#0A0F16"}
-                  strokeWidth={fill === undefined ? 0.8 : 1}
+                  stroke={fill === undefined ? CONTEXT_STROKE : "#FFFFFF"}
+                  strokeWidth={fill === undefined ? 0.8 : 1.1}
                   vectorEffect="non-scaling-stroke"
                   strokeLinejoin="round"
                 />
@@ -208,8 +208,8 @@ export function AllianceMap(props: {
               key={`hl-${p.key}`}
               d={p.d}
               fill="none"
-              stroke={p.key === selectedKey ? "#FFFFFF" : "#C9D6E3"}
-              strokeWidth={p.key === selectedKey ? 2.2 : 1.4}
+              stroke={p.key === selectedKey ? "#1C2330" : "#555E6C"}
+              strokeWidth={p.key === selectedKey ? 2.4 : 1.4}
               vectorEffect="non-scaling-stroke"
               strokeLinejoin="round"
               pointerEvents="none"
@@ -221,9 +221,9 @@ export function AllianceMap(props: {
                 key={`px-${l.actor}`}
                 d={proxyPath(l.from, l.to)}
                 fill="none"
-                stroke="#F85149"
-                strokeOpacity={0.55}
-                strokeWidth={1.3}
+                stroke="#B3302A"
+                strokeOpacity={0.6}
+                strokeWidth={1.4}
                 strokeDasharray="5 5"
                 vectorEffect="non-scaling-stroke"
                 pointerEvents="none"
@@ -250,8 +250,8 @@ export function AllianceMap(props: {
             <g key={`lb-${key}`}>
               {anchor.callout === true && t !== null && (
                 <>
-                  <line x1={p.x} y1={p.y + 3} x2={t.x} y2={t.y} stroke="#93A4B5" strokeOpacity={0.6} strokeWidth={0.8} />
-                  <circle cx={t.x} cy={t.y} r={1.8} fill="#E6EDF3" />
+                  <line x1={p.x} y1={p.y + 3} x2={t.x} y2={t.y} stroke="#555E6C" strokeOpacity={0.5} strokeWidth={0.9} />
+                  <circle cx={t.x} cy={t.y} r={2.2} fill="#1C2330" stroke="#FFFFFF" strokeWidth={1} />
                 </>
               )}
               <text
@@ -260,11 +260,12 @@ export function AllianceMap(props: {
                 textAnchor="middle"
                 fontSize={fs}
                 fontWeight={own ? 700 : 500}
-                fontFamily="Heebo, system-ui, sans-serif"
-                fill="#F0F4F8"
-                stroke="#070B11"
-                strokeWidth={own ? 3.5 : 3}
-                strokeOpacity={0.75}
+                fontFamily="Rubik, Heebo, system-ui, sans-serif"
+                fill="#1C2330"
+                stroke="#FFFFFF"
+                strokeWidth={own ? 4 : 3.5}
+                strokeOpacity={0.85}
+                strokeLinejoin="round"
                 paintOrder="stroke"
               >
                 {name}
@@ -275,11 +276,14 @@ export function AllianceMap(props: {
                   y={p.y + fs + 1}
                   textAnchor="middle"
                   fontSize={fs - 2}
-                  fontFamily="IBM Plex Mono, ui-monospace, monospace"
-                  fill="#C9D6E3"
-                  stroke="#070B11"
+                  fontFamily="Rubik, system-ui, sans-serif"
+                  fontWeight={500}
+                  style={{ fontVariantNumeric: "tabular-nums" }}
+                  fill="#555E6C"
+                  stroke="#FFFFFF"
                   strokeWidth={3}
-                  strokeOpacity={0.75}
+                  strokeOpacity={0.85}
+                  strokeLinejoin="round"
                   paintOrder="stroke"
                 >
                   {stances[actor].score > 0 ? `+${stances[actor].score}` : stances[actor].score}
@@ -292,7 +296,7 @@ export function AllianceMap(props: {
 
       {hover !== null && (hoverActor !== undefined || hover.key === "israel") && (
         <div
-          className="overlay pointer-events-none absolute z-10 rounded-[4px] border border-line1 bg-bg1 px-2 py-1 text-[12px] leading-[18px]"
+          className="overlay pointer-events-none absolute z-10 rounded-[10px] border border-line0 bg-bg1 px-3 py-2 text-[13px] leading-[20px]"
           style={{ left: Math.min(hover.x + 14, size.w - 220), top: hover.y + 12 }}
           dir={lang === "he" ? "rtl" : "ltr"}
         >
@@ -300,14 +304,14 @@ export function AllianceMap(props: {
             <div className="text-fg0">{lang === "he" ? "ישראל" : "Israel"}</div>
           ) : (
             <>
-              <div className="text-fg0">
+              <div className="font-medium text-fg0">
                 {strategic.ACTOR_DEFS[hoverActor].name[lang]}
                 {strategic.ACTOR_DEFS[hoverActor].entity !== undefined && (
-                  <span className="text-fg2"> · {strategic.ACTOR_DEFS[hoverActor].entity?.[lang]}</span>
+                  <span className="font-normal text-fg2"> · {strategic.ACTOR_DEFS[hoverActor].entity?.[lang]}</span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 text-fg1">
-                <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: TIER_COLORS[stances[hoverActor].tier] }} />
+              <div className="flex items-center gap-1.5 text-[12.5px] text-fg1">
+                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: TIER_COLORS[stances[hoverActor].tier] }} />
                 {strategic.TIER_LABELS[stances[hoverActor].tier][lang]}
                 <bdi className="num text-fg0">{stances[hoverActor].score > 0 ? `+${stances[hoverActor].score}` : stances[hoverActor].score}</bdi>
               </div>

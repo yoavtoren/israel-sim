@@ -20,9 +20,9 @@ export interface Inset {
   bottom: number;
 }
 
-const ISRAEL = "#5B7FA6";
-const CONTEXT = "#131B26";
-const STROKE = "#26303D";
+const ISRAEL = "#FDFBF6";
+const CONTEXT = "#F7F4EE";
+const STROKE = "#FFFFFF";
 
 function lerpCam(a: Camera, b: Camera, k: number): Camera {
   return {
@@ -43,8 +43,8 @@ const Outlines = memo(function Outlines(props: { fills: Map<string, string>; hig
             data-key={c.key}
             d={PATHS.get(c.key)}
             fill={props.fills.get(c.key) ?? CONTEXT}
-            stroke={hot ? "#F0F6FC" : c.key === "israel" ? "#E6EDF3" : STROKE}
-            strokeWidth={hot ? 1.8 : c.key === "israel" ? 1.4 : 0.7}
+            stroke={hot ? "#1C2330" : c.key === "israel" ? "#24518F" : props.fills.has(c.key) ? STROKE : "#DCD5C8"}
+            strokeWidth={hot ? 2 : c.key === "israel" ? 1.8 : 0.8}
             vectorEffect="non-scaling-stroke"
             strokeLinejoin="round"
             fillRule="evenodd"
@@ -152,9 +152,20 @@ export function WorldMap(props: {
           const p = toScreen({ x: lab.x, y: lab.y }, cam, w, h);
           if (p.x < -60 || p.x > w + 60 || p.y < -20 || p.y > h + 20) continue;
           const actor = WORLD_ACTOR.get(lab.key);
-          ctx.font = `${actor !== undefined || lab.key === "israel" ? 600 : 400} ${Math.min(14, 9 + px / 90)}px Heebo, system-ui, sans-serif`;
-          ctx.fillStyle = lab.key === "israel" ? "rgba(255,255,255,0.95)" : actor !== undefined ? "rgba(240,246,252,0.85)" : "rgba(147,164,181,0.5)";
+          ctx.font = `${actor !== undefined || lab.key === "israel" ? 600 : 400} ${Math.min(14, 9 + px / 90)}px Rubik, Heebo, system-ui, sans-serif`;
           const name = (L === "he" ? COUNTRY_HE[lab.key] : undefined) ?? WORLD_NAME.get(lab.key) ?? lab.key;
+          ctx.lineJoin = "round";
+          if (lab.key === "israel") {
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "rgba(255,255,255,0.9)";
+            ctx.strokeText(name, p.x, p.y);
+            ctx.fillStyle = "#24518F";
+          } else {
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = actor !== undefined ? "rgba(255,255,255,0.8)" : "rgba(247,244,238,0.9)";
+            ctx.strokeText(name, p.x, p.y);
+            ctx.fillStyle = actor !== undefined ? "rgba(28,35,48,0.92)" : "rgba(110,104,94,0.75)";
+          }
           ctx.fillText(name, p.x, p.y);
         }
 
@@ -192,7 +203,7 @@ export function WorldMap(props: {
       ref={wrapRef}
       dir="ltr"
       className="absolute inset-0 overflow-hidden select-none"
-      style={{ background: "radial-gradient(ellipse at 55% 40%, #0B1320 0%, #05080D 80%)", cursor: drag.current !== null ? "grabbing" : "grab" }}
+      style={{ background: "radial-gradient(ellipse at 55% 40%, #E3ECF0 0%, #CFDCE3 85%)", cursor: drag.current !== null ? "grabbing" : "grab" }}
       onWheel={onWheel}
       onMouseDown={(e) => {
         const cam = camRef.current;
@@ -224,18 +235,18 @@ export function WorldMap(props: {
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0" style={{ width: size.w, height: size.h }} />
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.5) 100%)" }}
+        style={{ background: "radial-gradient(ellipse at center, rgba(244,241,234,0) 65%, rgba(244,241,234,0.45) 100%)" }}
       />
       {hover !== null && hoverName !== "" && (
         <div
-          className="overlay pointer-events-none absolute z-10 rounded-[4px] border border-line1 bg-bg1 px-2 py-1 text-[12px] leading-[18px]"
+          className="overlay pointer-events-none absolute z-10 rounded-[10px] border border-line0 bg-bg1 px-3 py-2 text-[13px] leading-[19px]"
           style={{ left: hover.x + 14, top: hover.y + 12 }}
           dir={lang === "he" ? "rtl" : "ltr"}
         >
           <div className="font-medium text-fg0">{hoverName}</div>
           {hoverActor !== undefined && (
             <div className="flex items-center gap-1.5 text-fg1">
-              <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: TIER_COLORS[stances[hoverActor].tier] }} />
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: TIER_COLORS[stances[hoverActor].tier] }} />
               {strategic.TIER_LABELS[stances[hoverActor].tier][lang]}
               <span className="num">({stances[hoverActor].score > 0 ? "+" : ""}{stances[hoverActor].score})</span>
             </div>

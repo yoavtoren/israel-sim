@@ -18,9 +18,9 @@ function fmtCountdown(sec: number): string {
 
 function Row(props: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 text-[12px] leading-[18px]">
+    <div className="flex items-baseline justify-between gap-3 text-[13px] leading-[22px]">
       <span className="text-fg1">{props.label}</span>
-      <span className="text-fg0">{props.children}</span>
+      <span className="font-medium text-fg0">{props.children}</span>
     </div>
   );
 }
@@ -49,18 +49,18 @@ export function Telemetry() {
   const he = lang === "he";
 
   return (
-    <div className="flex w-[270px] flex-col gap-2">
-      <div className="overlay rounded-[6px] border border-line0 bg-bg1/95 p-3">
-        <div className="mb-1 flex items-center justify-between text-[11px] text-fg2">
-          <span>{he ? "טלמטריה" : "Telemetry"}</span>
+    <div className="flex w-[292px] flex-col gap-2.5">
+      <div className="glass overlay rounded-[14px] border border-line0 px-4 py-3.5">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="eyebrow">{he ? "מעקב אחר איום" : "Tracked threat"}</span>
           {trackedId !== null && (
-            <button type="button" className="text-info-bright hover:underline" onClick={() => setTracked(null)}>
+            <button type="button" className="rounded-full bg-info-dim px-2.5 text-[12px] leading-[22px] text-info-bright hover:bg-info-dim/70" onClick={() => setTracked(null)}>
               {he ? "מעקב אוטומטי" : "auto-track"}
             </button>
           )}
         </div>
         {tracked === undefined ? (
-          <div className="text-[12px] text-fg2">{he ? "אין איומים באוויר · לחצו על מסלול למעקב" : "Nothing airborne · click a track to follow"}</div>
+          <div className="text-[13px] leading-[20px] text-fg2">{he ? "אין איומים באוויר · לחצו על מסלול למעקב" : "Nothing airborne · click a track to follow"}</div>
         ) : (
           (() => {
             const l = tracked;
@@ -73,14 +73,14 @@ export function Telemetry() {
               : ic?.success === true && t >= ic.tHit ? (he ? "יורט" : "intercepted")
               : t >= tImpact ? (AFFILIATION[l.faction] === "friend" ? (he ? "פגיעה במטרה" : "on target") : he ? "פגיעה" : "impact")
               : he ? "בטיסה" : "in flight";
-            const statusColor = status === (he ? "יורט" : "intercepted") ? "text-good-bright" : status === (he ? "פגיעה" : "impact") ? "text-bad-bright" : "text-warn-bright";
+            const statusColor = status === (he ? "יורט" : "intercepted") ? "bg-good-dim text-good-bright" : status === (he ? "פגיעה" : "impact") ? "bg-bad-dim text-bad-bright" : "bg-warn-dim text-warn-bright";
             return (
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2 text-[13px] font-medium">
-                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: FACTION_COLORS[l.faction] }} />
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 text-[15px] leading-[22px] font-medium text-fg0">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full ring-2 ring-white" style={{ background: FACTION_COLORS[l.faction] }} />
                   {KIND_NAMES[l.kind][lang]} · {FACTION_NAMES[l.faction][lang]}
                 </div>
-                <div className="mb-1 text-[12px] text-fg1">
+                <div className="mb-2 border-b border-line0 pb-2 text-[13px] leading-[20px] text-fg1">
                   {l.originName[lang]} → {l.targetName[lang]}
                 </div>
                 <Row label={he ? "מהירות" : "Velocity"}>
@@ -102,7 +102,7 @@ export function Telemetry() {
                   <span className="num">{t < tImpact ? `T−${fmtCountdown((tImpact - Math.max(t, l.t0)) * l.compression)}` : "—"}</span>
                 </Row>
                 <Row label={he ? "סטטוס" : "Status"}>
-                  <span className={statusColor}>{status}</span>
+                  <span className={`rounded-full px-2.5 text-[12px] leading-[22px] ${statusColor}`}>{status}</span>
                 </Row>
               </div>
             );
@@ -110,33 +110,37 @@ export function Telemetry() {
         )}
       </div>
 
-      <div className="overlay grid grid-cols-2 gap-x-3 gap-y-1 rounded-[6px] border border-line0 bg-bg1/95 p-3 text-[12px]">
-        <Row label={he ? "שוגרו" : "Launched"}><span className="num">{launched}</span></Row>
-        <Row label={he ? "באוויר" : "Airborne"}><span className="num text-warn-bright">{active.length}</span></Row>
-        <Row label={he ? "יורטו" : "Intercepted"}><span className="num text-good-bright">{intercepted}</span></Row>
-        <Row label={he ? "פגיעות" : "Impacts"}><span className="num text-bad-bright">{impacts}</span></Row>
-        <Row label={he ? "תקיפות שלנו" : "Our strikes"}><span className="num text-info-bright">{strikes}</span></Row>
-        <Row label={he ? "כוחות עוינים" : "Hostile units"}><span className="num text-bad-bright">{hostileUnits}</span></Row>
-        <Row label={he ? "כוחות בתנועה" : "Units moving"}><span className="num">{moving}</span></Row>
+      <div className="glass overlay rounded-[14px] border border-line0 px-4 py-3">
+        <div className="eyebrow mb-1.5">{he ? "תמונת מצב" : "Engagement"}</div>
+        <div className="grid grid-cols-2 gap-x-4">
+          <Row label={he ? "שוגרו" : "Launched"}><span className="num">{launched}</span></Row>
+          <Row label={he ? "באוויר" : "Airborne"}><span className="num text-warn-bright">{active.length}</span></Row>
+          <Row label={he ? "יורטו" : "Intercepted"}><span className="num text-good-bright">{intercepted}</span></Row>
+          <Row label={he ? "פגיעות" : "Impacts"}><span className="num text-bad-bright">{impacts}</span></Row>
+          <Row label={he ? "תקיפות שלנו" : "Our strikes"}><span className="num text-info-bright">{strikes}</span></Row>
+          <Row label={he ? "כוחות עוינים" : "Hostile units"}><span className="num text-bad-bright">{hostileUnits}</span></Row>
+          <Row label={he ? "כוחות בתנועה" : "Units moving"}><span className="num">{moving}</span></Row>
+        </div>
       </div>
 
-      <div className="overlay rounded-[6px] border border-line0 bg-bg1/95 p-3 text-[11px] leading-[18px] text-fg1">
+      <div className="glass overlay flex flex-col gap-0.5 rounded-[14px] border border-line0 px-4 py-3 text-[12px] leading-[20px] text-fg1">
+        <div className="eyebrow mb-1">{he ? "מקרא" : "Legend"}</div>
         {(["egypt", "gaza", "iran", "hezbollah", "militants", "idf"] as Faction[]).map((f) => (
           <div key={f} className="flex items-center gap-2">
-            <span className="inline-block h-[3px] w-4 rounded" style={{ background: FACTION_COLORS[f] }} />
+            <span className="inline-block h-[3px] w-5 rounded-full" style={{ background: FACTION_COLORS[f] }} />
             {f === "iran" ? (he ? "איראן / עיראק" : "Iran / Iraq") : FACTION_NAMES[f][lang]}
           </div>
         ))}
         <div className="flex items-center gap-2">
-          <span className="inline-block h-[3px] w-4 rounded" style={{ background: INTERCEPTOR_COLOR }} />
+          <span className="inline-block h-[3px] w-5 rounded-full" style={{ background: INTERCEPTOR_COLOR }} />
           {he ? "מיירטים · מעטפות הגנה" : "Interceptors · defense envelopes"}
         </div>
-        <div className="mt-1 flex items-center gap-3">
-          <span className="inline-block h-3 w-4 border-[1.5px] border-[#80E0FF]" /> {he ? "ידידותי" : "Friendly"}
-          <span className="inline-block h-3 w-3 rotate-45 border-[1.5px] border-[#FF8080]" /> {he ? "עוין" : "Hostile"}
-          <span className="inline-block h-3 w-3 border-[1.5px] border-[#AAFFAA]" /> {he ? "ניטרלי" : "Neutral"}
+        <div className="mt-1.5 flex items-center gap-2.5">
+          <span className="inline-block h-3 w-4 rounded-[2px] border-[1.5px] border-[#2F63B0] bg-[#DEEAF9]" /> {he ? "ידידותי" : "Friendly"}
+          <span className="ms-1 inline-block h-2.5 w-2.5 rotate-45 border-[1.5px] border-[#B3302A] bg-[#FAE0DB]" /> {he ? "עוין" : "Hostile"}
+          <span className="ms-1 inline-block h-3 w-3 rounded-[2px] border-[1.5px] border-[#2F7D52] bg-[#DCEFE3]" /> {he ? "ניטרלי" : "Neutral"}
         </div>
-        <div className="mt-1 text-fg2">{he ? "גבולות Natural Earth · מסלולים מסוגננים · כטב\"מים ושיוט בדחיסת זמן" : "Natural Earth borders · stylized trajectories · drones & cruise time-compressed"}</div>
+        <div className="mt-1.5 border-t border-line0 pt-1.5 text-[11.5px] leading-[17px] text-fg2">{he ? "גבולות Natural Earth · מסלולים מסוגננים · כטב\"מים ושיוט בדחיסת זמן" : "Natural Earth borders · stylized trajectories · drones & cruise time-compressed"}</div>
       </div>
     </div>
   );

@@ -30,36 +30,40 @@ export function PostMortem() {
   const ended = state.outcome.ended;
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-4">
-      <div className="panel border-bad p-4">
+    <div className="mx-auto flex max-w-4xl flex-col gap-5">
+      <div className="panel overflow-hidden">
+        <div className="h-1.5 w-full" style={{ background: ended ? SEM.bad : SEM.warn }} />
+        <div className="px-7 pt-6 pb-6">
+        <div className="eyebrow mb-1 !text-[12.5px]">{lang === "he" ? "סיכום הריצה" : "Run summary"}</div>
         {/* 32/40 verdict type — the only place it's allowed (DESIGN §3) */}
-        <div className="text-[32px] leading-[40px] font-bold" style={{ color: ended ? SEM.badBright : SEM.warnBright }}>
+        <div className="display text-[34px] leading-[42px]" style={{ color: ended ? SEM.badBright : SEM.warnBright }}>
           {ended ? (state.outcome.kind ?? "") : lang === "he" ? "הריצה נמשכת" : "Run in progress"}
         </div>
         {state.outcome.note !== null && (
-          <p className="mt-2 max-w-3xl text-[13px] leading-[20px] text-fg1">{state.outcome.note}</p>
+          <p className="mt-3 max-w-3xl text-[15px] leading-[24px] text-fg1">{state.outcome.note}</p>
         )}
-        <div className="mt-3 flex gap-8 border-t border-line0 pt-3">
+        <div className="mt-5 flex flex-wrap gap-x-10 gap-y-3 border-t border-line0 pt-4">
           <Verdict label={t("casualties", lang)} value={fmtInt(now.war_casualties)} bad={now.war_casualties > 0} />
           <Verdict label={t("gdp", lang)} value={fmtBudget(now.gdp_real, 0)} />
           <Verdict label={t("debtGdp", lang)} value={fmtPct(now.debt_gdp, 0)} />
           <Verdict label={t("poverty", lang)} value={fmtPct(now.poverty_rate, 1)} />
           <Verdict label={t("cwp", lang)} value={fmtPct(now.civil_war_pressure, 0)} />
-          <span className="ms-auto self-end text-[11px] text-fg2">
-            {fmtQuarter(frames[0].year, frames[0].quarter)} → {fmtQuarter(now.year, now.quarter)} · {t("seed", lang)}{" "}
+          <span className="ms-auto self-end text-[12px] text-fg2">
+            <span className="num">{fmtQuarter(frames[0].year, frames[0].quarter)} → {fmtQuarter(now.year, now.quarter)}</span> · {t("seed", lang)}{" "}
             <span className="num">{seed}</span>
           </span>
+        </div>
         </div>
       </div>
 
       {cf !== null && (
         <Panel title={t("vsNoChange", lang)} accent={DOMAIN.macro}>
-          <table className="w-full text-[12px]">
+          <table className="w-full text-[14px] leading-[22px]">
             <thead>
-              <tr className="border-b border-line1 text-fg1">
-                <th className="py-1.5 text-start font-medium"></th>
-                <th className="py-1.5 text-end font-medium">{lang === "he" ? "בפועל" : "Actual"}</th>
-                <th className="py-1.5 text-end font-medium">{lang === "he" ? "ללא שינוי" : "No-change"}</th>
+              <tr className="border-b border-line0">
+                <th className="eyebrow pb-2 text-start font-medium"></th>
+                <th className="eyebrow pb-2 text-end font-medium">{lang === "he" ? "בפועל" : "Actual"}</th>
+                <th className="eyebrow pb-2 text-end font-medium">{lang === "he" ? "ללא שינוי" : "No-change"}</th>
               </tr>
             </thead>
             <tbody>
@@ -74,7 +78,7 @@ export function PostMortem() {
         </Panel>
       )}
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-5">
         <Panel title={`${t("gdp", lang)} (₪B) — ${t("vsNoChange", lang)}`} accent={DOMAIN.macro}>
           <SeriesChart
             data={gdpRows}
@@ -85,7 +89,7 @@ export function PostMortem() {
             format={(v) => v.toFixed(0)}
           />
         </Panel>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <Panel title={`${t("debtGdp", lang)} (%)`} accent={DOMAIN.fiscal}>
             <SeriesChart
               data={debtRows}
@@ -114,7 +118,7 @@ export function PostMortem() {
           type="button"
           disabled={busy}
           onClick={() => void boot(`${seed}-${frames.length}`)}
-          className="rounded-[2px] bg-info px-4 py-2 text-[13px] font-medium text-fg0 hover:bg-info-bright disabled:opacity-40"
+          className="btn btn-primary px-6 py-2.5 text-[14px]"
         >
           {t("newRun", lang)}
         </button>
@@ -126,18 +130,18 @@ export function PostMortem() {
 function Verdict(props: { label: string; value: string; bad?: boolean }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[11px] leading-[16px] text-fg2">{props.label}</span>
-      <span className={`num text-[18px] leading-[26px] ${props.bad === true ? "text-bad-bright" : ""}`}>{props.value}</span>
+      <span className="text-[12.5px] leading-[18px] text-fg2">{props.label}</span>
+      <span className={`num text-[22px] leading-[30px] font-medium ${props.bad === true ? "text-bad-bright" : "text-fg0"}`}>{props.value}</span>
     </div>
   );
 }
 
 function CompareRow(props: { label: string; a: string; b: string }) {
   return (
-    <tr className="border-b border-line0/50 last:border-0">
-      <td className="py-1.5 text-fg1">{props.label}</td>
-      <td className="num py-1.5 text-end">{props.a}</td>
-      <td className="num py-1.5 text-end text-fg1">{props.b}</td>
+    <tr className="border-b border-line0 last:border-0 hover:bg-bg2">
+      <td className="py-2 text-fg1">{props.label}</td>
+      <td className="num py-2 text-end font-medium text-fg0">{props.a}</td>
+      <td className="num py-2 text-end text-fg2">{props.b}</td>
     </tr>
   );
 }

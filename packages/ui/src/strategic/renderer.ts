@@ -25,8 +25,11 @@ export interface FrameEnv {
   /** radar, defense envelopes, city and region labels (off when zoomed out to the world) */ chrome?: boolean;
 }
 
-const SANS = "Heebo, system-ui, sans-serif";
-const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SANS = "Rubik, Heebo, system-ui, sans-serif";
+const INK = "#1C2330";
+const BAD_INK = "#B3302A";
+const BLAST_COLOR = "#D9531E";
+const FRIENDLY_BLAST_COLOR = "#2F63B0";
 const RADAR_CENTER: LonLat = [34.95, 31.75];
 
 export function rgba(hex: string, a: number): string {
@@ -35,6 +38,29 @@ export function rgba(hex: string, a: number): string {
 }
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+/** Map label on paper: dark fill over a soft white halo so it reads on any ground. */
+function haloText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, haloAlpha = 0.92): void {
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.miterLimit = 2;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = `rgba(255,255,255,${clamp01(haloAlpha).toFixed(3)})`;
+  ctx.strokeText(text, x, y);
+  ctx.restore();
+  ctx.fillText(text, x, y);
+}
+
+/** Solid projectile head: colored dot with a white rim. */
+function headDot(ctx: CanvasRenderingContext2D, p: Pt, r: number, color: string): void {
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+}
 
 // ---------------------------------------------------------------------------
 // per-script geometry cache
@@ -130,11 +156,11 @@ export function drawFrame(ctx: CanvasRenderingContext2D, env: FrameEnv): void {
   drawZones(ctx, env, SL);
   drawUnits(ctx, env, SL);
 
-  ctx.globalCompositeOperation = "lighter";
+  ctx.globalCompositeOperation = "multiply";
   for (const l of script.launches) drawSmoke(ctx, env, l, S, pxPerUnit);
   ctx.globalCompositeOperation = "source-over";
   for (const l of script.launches) drawLaunch(ctx, env, l, S);
-  for (const b of script.blasts) drawBlast(ctx, env, SL(b.pos), t - b.t, b.heavy, hashString(b.id), "#F0883E");
+  for (const b of script.blasts) drawBlast(ctx, env, SL(b.pos), t - b.t, b.heavy, hashString(b.id), BLAST_COLOR);
 
   drawReticles(ctx, env, SL, active);
   drawOrigins(ctx, env, SL);
@@ -152,7 +178,7 @@ function drawRadar(ctx: CanvasRenderingContext2D, env: FrameEnv, c: Pt, pxPerKm:
 
   // range rings every 100 km
   ctx.save();
-  ctx.strokeStyle = "rgba(88,166,255,0.07)";
+  ctx.strokeStyle = "rgba(36,81,143,0.13)";
   ctx.lineWidth = 1;
   ctx.setLineDash([2, 6]);
   const step = 100 * pxPerKm;
@@ -169,10 +195,10 @@ function drawRadar(ctx: CanvasRenderingContext2D, env: FrameEnv, c: Pt, pxPerKm:
   const wedge = 0.55;
   if (typeof ctx.createConicGradient === "function") {
     const g = ctx.createConicGradient(angle - wedge, c.x, c.y);
-    g.addColorStop(0, "rgba(86,212,221,0)");
-    g.addColorStop(wedge / (Math.PI * 2), "rgba(86,212,221,0.10)");
-    g.addColorStop(wedge / (Math.PI * 2) + 0.0005, "rgba(86,212,221,0)");
-    g.addColorStop(1, "rgba(86,212,221,0)");
+    g.addColorStop(0, "rgba(47,99,176,0)");
+    g.addColorStop(wedge / (Math.PI * 2), "rgba(47,99,176,0.05)");
+    g.addColorStop(wedge / (Math.PI * 2) + 0.0005, "rgba(47,99,176,0)");
+    g.addColorStop(1, "rgba(47,99,176,0)");
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.moveTo(c.x, c.y);
@@ -180,7 +206,7 @@ function drawRadar(ctx: CanvasRenderingContext2D, env: FrameEnv, c: Pt, pxPerKm:
     ctx.closePath();
     ctx.fill();
   }
-  ctx.strokeStyle = "rgba(86,212,221,0.35)";
+  ctx.strokeStyle = "rgba(47,99,176,0.22)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(c.x, c.y);
@@ -195,7 +221,7 @@ function drawRadar(ctx: CanvasRenderingContext2D, env: FrameEnv, c: Pt, pxPerKm:
     behind = ((behind % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
     const alpha = 1 - behind / (Math.PI * 1.6);
     if (alpha <= 0) continue;
-    ctx.strokeStyle = `rgba(126,231,135,${(0.55 * alpha).toFixed(3)})`;
+    ctx.strokeStyle = `rgba(31,122,74,${(0.6 * alpha).toFixed(3)})`;
     ctx.beginPath();
     ctx.arc(p.x, p.y, 7 + 5 * (1 - alpha), 0, Math.PI * 2);
     ctx.stroke();
@@ -218,7 +244,7 @@ function drawEnvelopes(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lo
     if (b.outer || b.airborne === true) {
       ctx.setLineDash(b.airborne === true ? [2, 5] : [8, 6]);
       ctx.lineDashOffset = -env.nowMs / 60;
-      ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, hot ? 0.35 + 0.3 * pulse : 0.18);
+      ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, hot ? 0.45 + 0.35 * pulse : 0.24);
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
@@ -228,24 +254,28 @@ function drawEnvelopes(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lo
     } else {
       const g = ctx.createRadialGradient(c.x, c.y, r * 0.2, c.x, c.y, r);
       g.addColorStop(0, rgba(INTERCEPTOR_COLOR, 0));
-      g.addColorStop(0.85, rgba(INTERCEPTOR_COLOR, hot ? 0.1 : 0.04));
-      g.addColorStop(1, rgba(INTERCEPTOR_COLOR, hot ? 0.2 : 0.07));
+      g.addColorStop(0.85, rgba(INTERCEPTOR_COLOR, hot ? 0.07 : 0.018));
+      g.addColorStop(1, rgba(INTERCEPTOR_COLOR, hot ? 0.13 : 0.035));
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, hot ? 0.5 + 0.4 * pulse : 0.22);
+      ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, hot ? 0.55 + 0.4 * pulse : 0.26);
       ctx.lineWidth = hot ? 1.5 : 1;
       ctx.stroke();
     }
     if (b.airborne !== true) {
       // launcher glyph
-      ctx.fillStyle = rgba(INTERCEPTOR_COLOR, 0.9);
+      ctx.fillStyle = rgba(INTERCEPTOR_COLOR, 0.95);
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 1.2;
+      ctx.lineJoin = "round";
       ctx.beginPath();
       ctx.moveTo(c.x, c.y - 5);
       ctx.lineTo(c.x + 4, c.y + 3);
       ctx.lineTo(c.x - 4, c.y + 3);
       ctx.closePath();
+      ctx.stroke();
       ctx.fill();
     }
   }
@@ -270,21 +300,21 @@ function drawZones(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
     pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
 
     if (z.kind === "border_alert" || z.kind === "barrier") {
-      ctx.strokeStyle = rgba(z.color, (0.25 + 0.55 * pulse) * a);
+      ctx.strokeStyle = rgba(z.color, (0.4 + 0.5 * pulse) * a);
       ctx.lineWidth = z.kind === "barrier" ? 2 + 1.5 * pulse : 3 + 3 * pulse;
-      ctx.shadowColor = z.color;
-      ctx.shadowBlur = 14;
+      ctx.shadowColor = rgba(z.color, 0.45 * a);
+      ctx.shadowBlur = 10;
       if (z.kind === "barrier") ctx.setLineDash([10, 5]);
       ctx.stroke();
     } else if (z.kind === "contested") {
       ctx.closePath();
-      ctx.fillStyle = rgba(z.color, (0.1 + 0.14 * pulse) * a);
+      ctx.fillStyle = rgba(z.color, (0.1 + 0.1 * pulse) * a);
       ctx.fill();
       ctx.strokeStyle = rgba(z.color, 0.7 * a);
       ctx.lineWidth = 1.2;
       ctx.stroke();
       ctx.clip();
-      ctx.strokeStyle = rgba(z.color, 0.3 * a);
+      ctx.strokeStyle = rgba(z.color, 0.28 * a);
       ctx.lineWidth = 1;
       const xs = pts.map((p) => p.x);
       const ys = pts.map((p) => p.y);
@@ -301,8 +331,8 @@ function drawZones(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
       ctx.lineWidth = 2.5;
       ctx.setLineDash([5, 4]);
       ctx.lineDashOffset = -nowMs / 40;
-      ctx.shadowColor = z.color;
-      ctx.shadowBlur = 8;
+      ctx.shadowColor = rgba(z.color, 0.35 * a);
+      ctx.shadowBlur = 6;
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.shadowBlur = 0;
@@ -312,8 +342,8 @@ function drawZones(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
         ctx.strokeRect(p.x - 3.5, p.y - 3.5, 7, 7);
       }
     } else if (z.kind === "treaty_line") {
-      ctx.strokeStyle = rgba(z.color, 0.45 * a);
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = rgba(z.color, 0.7 * a);
+      ctx.lineWidth = 1.3;
       ctx.setLineDash([6, 4]);
       ctx.stroke();
     }
@@ -321,10 +351,10 @@ function drawZones(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
 
     if (z.label !== null) {
       const top = pts.reduce((m, p) => (p.y < m.y ? p : m), pts[0]);
-      ctx.font = `600 10px ${SANS}`;
+      ctx.font = `600 11px ${SANS}`;
       ctx.textAlign = "center";
-      ctx.fillStyle = rgba(z.color, 0.9 * a);
-      ctx.fillText(z.label[lang], top.x, top.y - 6);
+      ctx.fillStyle = rgba(z.color, a);
+      haloText(ctx, z.label[lang], top.x, top.y - 6, 0.92 * a);
     }
   }
 }
@@ -334,9 +364,9 @@ function drawZones(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
 // ---------------------------------------------------------------------------
 
 const AFF_STYLE: Record<Affiliation, { stroke: string; fill: string }> = {
-  friend: { stroke: "#80E0FF", fill: "rgba(128,224,255,0.16)" },
-  hostile: { stroke: "#FF8080", fill: "rgba(255,128,128,0.16)" },
-  neutral: { stroke: "#AAFFAA", fill: "rgba(170,255,170,0.14)" },
+  friend: { stroke: "#2F63B0", fill: "rgba(222,234,249,0.94)" },
+  hostile: { stroke: "#B3302A", fill: "rgba(250,224,219,0.94)" },
+  neutral: { stroke: "#2F7D52", fill: "rgba(220,239,227,0.94)" },
 };
 
 function unitPos(u: UnitMove, t: number): LonLat {
@@ -348,12 +378,12 @@ function unitPos(u: UnitMove, t: number): LonLat {
 /** Screen boxes of labels already drawn this frame — later labels that would overlap are skipped. */
 type LabelBoxes = Array<{ x0: number; y0: number; x1: number; y1: number }>;
 
-function placeLabel(ctx: CanvasRenderingContext2D, boxes: LabelBoxes, text: string, x: number, y: number): boolean {
+function placeLabel(ctx: CanvasRenderingContext2D, boxes: LabelBoxes, text: string, x: number, y: number, haloAlpha = 0.92): boolean {
   const w = ctx.measureText(text).width;
   const box = { x0: x - w / 2 - 2, y0: y - 10, x1: x + w / 2 + 2, y1: y + 3 };
   if (boxes.some((b) => box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0)) return false;
   boxes.push(box);
-  ctx.fillText(text, x, y);
+  haloText(ctx, text, x, y, haloAlpha);
   return true;
 }
 
@@ -380,7 +410,7 @@ function drawUnits(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
     if (moving) {
       const from = SL(u.from);
       const to = SL(u.to);
-      ctx.strokeStyle = rgba(FACTION_COLORS[u.faction], 0.35);
+      ctx.strokeStyle = rgba(FACTION_COLORS[u.faction], 0.5);
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 4]);
       ctx.beginPath();
@@ -388,14 +418,14 @@ function drawUnits(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
       ctx.lineTo(c.x, c.y);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.strokeStyle = rgba(FACTION_COLORS[u.faction], 0.7);
+      ctx.strokeStyle = rgba(FACTION_COLORS[u.faction], 0.8);
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(c.x, c.y);
       ctx.lineTo(to.x, to.y);
       ctx.stroke();
       const ang = Math.atan2(to.y - c.y, to.x - c.x);
-      ctx.fillStyle = rgba(FACTION_COLORS[u.faction], 0.8);
+      ctx.fillStyle = rgba(FACTION_COLORS[u.faction], 0.9);
       ctx.beginPath();
       ctx.moveTo(to.x, to.y);
       ctx.lineTo(to.x - 8 * Math.cos(ang - 0.4), to.y - 8 * Math.sin(ang - 0.4));
@@ -410,10 +440,10 @@ function drawUnits(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat
     ctx.restore();
 
     if (cam.scale > 1.0 || u.type === "carrier") {
-      ctx.font = `10px ${SANS}`;
+      ctx.font = `500 11px ${SANS}`;
       ctx.textAlign = "center";
-      ctx.fillStyle = rgba(style.stroke, 0.85 * appear);
-      placeLabel(ctx, boxes, u.label[lang], c.x, c.y + 22);
+      ctx.fillStyle = rgba(style.stroke, 0.95 * appear);
+      placeLabel(ctx, boxes, u.label[lang], c.x, c.y + 23, 0.92 * appear);
     }
   }
 }
@@ -422,6 +452,7 @@ function drawSymbol(ctx: CanvasRenderingContext2D, c: Pt, u: UnitMove, aff: Affi
   const W = 26;
   const H = 17;
   ctx.lineWidth = 1.6;
+  ctx.lineJoin = "round";
   ctx.strokeStyle = style.stroke;
   ctx.fillStyle = style.fill;
   ctx.beginPath();
@@ -517,16 +548,16 @@ function drawSymbol(ctx: CanvasRenderingContext2D, c: Pt, u: UnitMove, aff: Affi
   ctx.stroke();
   const text = u.type === "sof" ? "SF" : u.type === "police" ? "MP" : u.type === "monitor" ? "MFO" : null;
   if (text !== null) {
-    ctx.font = `700 8px ${MONO}`;
+    ctx.font = `700 8px ${SANS}`;
     ctx.textAlign = "center";
     ctx.fillStyle = style.stroke;
     ctx.fillText(text, c.x, c.y + 3);
   }
   if (u.echelon !== "") {
-    ctx.font = `700 8px ${MONO}`;
+    ctx.font = `700 8px ${SANS}`;
     ctx.textAlign = "center";
     ctx.fillStyle = style.stroke;
-    ctx.fillText(u.echelon, c.x, c.y - (aff === "hostile" ? 16 : 12));
+    haloText(ctx, u.echelon, c.x, c.y - (aff === "hostile" ? 16 : 12));
   }
 }
 
@@ -563,7 +594,7 @@ function drawSmoke(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: (
     const dx = (hash01(seed, k) - 0.5) * age * 0.45 * puffScale;
     const dy = (hash01(seed, k + 7919) - 0.5) * age * 0.45 * puffScale - age * 0.08 * puffScale;
     const r = (spec.size + age * 0.12) * puffScale;
-    ctx.fillStyle = `rgba(190,200,215,${(spec.alpha * (1 - f) ** 1.6).toFixed(3)})`;
+    ctx.fillStyle = `rgba(178,184,194,${(spec.alpha * 0.9 * (1 - f) ** 1.6).toFixed(3)})`;
     ctx.beginPath();
     ctx.arc(p.x + dx, p.y + dy, r, 0, Math.PI * 2);
     ctx.fill();
@@ -580,7 +611,7 @@ function drawSmoke(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: (
     const age = env.t - te;
     if (age > 30) continue;
     const p = S(bez(ictrl, k / n));
-    ctx.fillStyle = `rgba(210,240,245,${(0.14 * (1 - age / 30) ** 1.5).toFixed(3)})`;
+    ctx.fillStyle = `rgba(120,185,190,${(0.2 * (1 - age / 30) ** 1.5).toFixed(3)})`;
     ctx.beginPath();
     ctx.arc(p.x + (hash01(seed, k + 31) - 0.5) * age * 0.3, p.y - age * 0.05, (1 + age * 0.1) * puffScale, 0, Math.PI * 2);
     ctx.fill();
@@ -591,7 +622,7 @@ function glow(ctx: CanvasRenderingContext2D, p: Pt, r: number, inner: string, ou
   const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
   g.addColorStop(0, inner);
   g.addColorStop(0.35, outer);
-  g.addColorStop(1, "rgba(0,0,0,0)");
+  g.addColorStop(1, outer.replace(/[\d.]+\)$/, "0)"));
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
@@ -618,8 +649,8 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
     let prev = S(pathPoint(l, c, u0));
     for (let i = 1; i <= n; i++) {
       const p = S(pathPoint(l, c, u0 + ((u - u0) * i) / n));
-      ctx.strokeStyle = rgba(col, (i / n) ** 1.5 * 0.9);
-      ctx.lineWidth = l.kind === "ballistic" ? 2.4 : l.kind === "drone" ? 1 : 1.6;
+      ctx.strokeStyle = rgba(col, (i / n) ** 1.3 * 0.95);
+      ctx.lineWidth = l.kind === "ballistic" ? 2.6 : l.kind === "drone" ? 1.2 : 2;
       ctx.beginPath();
       ctx.moveTo(prev.x, prev.y);
       ctx.lineTo(p.x, p.y);
@@ -627,19 +658,20 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
       prev = p;
     }
 
-    ctx.globalCompositeOperation = "lighter";
     if (l.kind === "ballistic") {
-      if (u < 0.38) glow(ctx, head, 16 * flicker, "rgba(255,250,230,1)", "rgba(255,160,60,0.55)"); // boost plume
-      else if (u > 0.78) glow(ctx, head, 11 * flicker, "rgba(255,240,220,0.95)", rgba(col, 0.6)); // re-entry heating
-      else glow(ctx, head, 6, "rgba(255,255,255,0.8)", rgba(col, 0.35));
+      if (u < 0.38) glow(ctx, head, 16 * flicker, "rgba(255,196,84,0.95)", "rgba(232,120,40,0.4)"); // boost plume
+      else if (u > 0.78) glow(ctx, head, 12 * flicker, "rgba(255,170,70,0.9)", rgba(col, 0.38)); // re-entry heating
+      else glow(ctx, head, 7, rgba(col, 0.5), rgba(col, 0.2));
+      headDot(ctx, head, 2.8, col);
     } else if (l.kind === "rocket") {
-      glow(ctx, head, (u < 0.6 ? 10 : 6) * flicker, "rgba(255,245,220,0.95)", rgba(col, 0.5));
+      glow(ctx, head, (u < 0.6 ? 10 : 7) * flicker, "rgba(255,196,96,0.8)", rgba(col, 0.26));
+      headDot(ctx, head, 2.2, col);
     } else if (l.kind === "cruise") {
-      glow(ctx, head, 6 * flicker, "rgba(255,230,200,0.9)", rgba(col, 0.45));
+      glow(ctx, head, 7 * flicker, rgba(col, 0.55), rgba(col, 0.22));
+      headDot(ctx, head, 2, col);
     } else if (l.kind === "airstrike") {
-      glow(ctx, head, 7, "rgba(220,240,255,0.9)", rgba(col, 0.45));
+      glow(ctx, head, 8, rgba(col, 0.45), rgba(col, 0.18));
     }
-    ctx.globalCompositeOperation = "source-over";
 
     if (l.kind === "drone" || l.kind === "airstrike") {
       const ahead = S(pathPoint(l, c, Math.min(1, u + 0.01)));
@@ -647,7 +679,10 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
       ctx.save();
       ctx.translate(head.x, head.y);
       ctx.rotate(ang);
-      ctx.fillStyle = l.kind === "drone" ? rgba(col, 0.95) : "#DDEFFF";
+      ctx.fillStyle = l.kind === "drone" ? rgba(col, 0.95) : col;
+      ctx.strokeStyle = "rgba(255,255,255,0.95)";
+      ctx.lineWidth = 1.2;
+      ctx.lineJoin = "round";
       ctx.beginPath();
       if (l.kind === "drone") {
         ctx.moveTo(5, 0);
@@ -661,18 +696,19 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
         ctx.lineTo(-3, 6);
       }
       ctx.closePath();
+      ctx.stroke();
       ctx.fill();
       ctx.restore();
       if (l.kind === "drone" && Math.floor(nowMs / 400 + seed) % 2 === 0) {
-        ctx.fillStyle = "rgba(255,90,90,0.95)";
-        ctx.fillRect(head.x - 1, head.y - 1, 2, 2);
+        ctx.fillStyle = "rgba(200,40,40,0.95)";
+        ctx.fillRect(head.x - 1.5, head.y - 1.5, 3, 3);
       }
     }
 
     if (env.trackedId === l.id) {
-      ctx.strokeStyle = "#E6EDF3";
-      ctx.lineWidth = 1;
-      const s = 10;
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 1.5;
+      const s = 11;
       for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
         ctx.beginPath();
         ctx.moveTo(head.x + sx * s, head.y + sy * (s - 4));
@@ -681,7 +717,8 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
         ctx.stroke();
       }
       ctx.setLineDash([2, 4]);
-      ctx.strokeStyle = rgba(col, 0.4);
+      ctx.strokeStyle = rgba(col, 0.6);
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
       for (let i = 0; i <= 30; i++) {
         const p = S(pathPoint(l, c, u + ((1 - u) * i) / 30));
@@ -703,22 +740,19 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
     for (let i = 1; i <= 12; i++) {
       const p = S(bez(ictrl, v0 + ((v - v0) * i) / 12));
       ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, (i / 12) * 0.95);
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.moveTo(prev.x, prev.y);
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
       prev = p;
     }
-    ctx.globalCompositeOperation = "lighter";
-    glow(ctx, prev, 8 * flicker, "rgba(235,255,255,1)", rgba(INTERCEPTOR_COLOR, 0.55));
-    ctx.globalCompositeOperation = "source-over";
+    glow(ctx, prev, 9 * flicker, rgba(INTERCEPTOR_COLOR, 0.55), rgba(INTERCEPTOR_COLOR, 0.22));
+    headDot(ctx, prev, 2.2, INTERCEPTOR_COLOR);
     // launch flash at the battery
     const since = t - ic.tLaunch;
     if (since < 4) {
-      ctx.globalCompositeOperation = "lighter";
-      glow(ctx, S(ictrl[0]), 14 * (1 - since / 4), "rgba(235,255,255,0.9)", rgba(INTERCEPTOR_COLOR, 0.4));
-      ctx.globalCompositeOperation = "source-over";
+      glow(ctx, S(ictrl[0]), 16 * (1 - since / 4), rgba(INTERCEPTOR_COLOR, 0.6), rgba(INTERCEPTOR_COLOR, 0.25));
     }
   }
 
@@ -730,9 +764,7 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
       if (dt < 40) drawKill(ctx, p, dt, seed);
     } else if (dt < 8) {
       // near miss: interceptor self-destructs beside the threat
-      ctx.globalCompositeOperation = "lighter";
-      glow(ctx, { x: p.x + 9, y: p.y - 6 }, 12 * (1 - dt / 8), "rgba(235,255,255,0.8)", rgba(INTERCEPTOR_COLOR, 0.35));
-      ctx.globalCompositeOperation = "source-over";
+      glow(ctx, { x: p.x + 9, y: p.y - 6 }, 12 * (1 - dt / 8), rgba(INTERCEPTOR_COLOR, 0.5), rgba(INTERCEPTOR_COLOR, 0.2));
     }
   }
 
@@ -740,18 +772,23 @@ function drawLaunch(ctx: CanvasRenderingContext2D, env: FrameEnv, l: Launch, S: 
   const tImpact = l.t0 + l.flight;
   if (!intercepted && t >= tImpact) {
     const friendly = AFFILIATION[l.faction] === "friend";
-    drawBlast(ctx, env, S(pathPoint(l, c, 1)), t - tImpact, l.kind === "ballistic" || l.kind === "airstrike", seed, friendly ? "#A5D6FF" : "#F0883E");
+    drawBlast(ctx, env, S(pathPoint(l, c, 1)), t - tImpact, l.kind === "ballistic" || l.kind === "airstrike", seed, friendly ? FRIENDLY_BLAST_COLOR : BLAST_COLOR);
   }
 }
 
 function drawKill(ctx: CanvasRenderingContext2D, p: Pt, dt: number, seed: number): void {
-  ctx.globalCompositeOperation = "lighter";
-  if (dt < 4) glow(ctx, p, 30 * (1 - dt / 4) + 6, "rgba(255,255,255,1)", "rgba(180,245,255,0.55)");
-  ctx.globalCompositeOperation = "source-over";
+  if (dt < 4) {
+    glow(ctx, p, 30 * (1 - dt / 4) + 6, "rgba(255,214,120,0.95)", rgba(INTERCEPTOR_COLOR, 0.35));
+    ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, 0.9 * (1 - dt / 4));
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3 + 3 * (1 - dt / 4), 0, Math.PI * 2);
+    ctx.stroke();
+  }
   if (dt < 14) {
     const k = dt / 14;
-    ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, 0.85 * (1 - k));
-    ctx.lineWidth = 2 * (1 - k) + 0.5;
+    ctx.strokeStyle = rgba(INTERCEPTOR_COLOR, 0.9 * (1 - k));
+    ctx.lineWidth = 2.2 * (1 - k) + 0.6;
     ctx.beginPath();
     ctx.arc(p.x, p.y, 4 + 34 * Math.sqrt(k), 0, Math.PI * 2);
     ctx.stroke();
@@ -765,7 +802,7 @@ function drawKill(ctx: CanvasRenderingContext2D, p: Pt, dt: number, seed: number
     const y = p.y + Math.sin(a) * sp * dt * 0.6 + 0.025 * dt * dt;
     const life = 1 - dt / 40;
     const hot = clamp01(1 - dt / 12);
-    ctx.fillStyle = `rgba(255,${Math.round(120 + 120 * hot)},${Math.round(60 * hot)},${(0.9 * life).toFixed(3)})`;
+    ctx.fillStyle = `rgba(${Math.round(85 + 140 * hot)},${Math.round(92 + 18 * hot)},${Math.round(104 - 74 * hot)},${(0.85 * life).toFixed(3)})`;
     ctx.fillRect(x - 1, y - 1, 2, 2);
   }
 }
@@ -774,15 +811,13 @@ function drawBlast(ctx: CanvasRenderingContext2D, env: FrameEnv, p: Pt, dt: numb
   if (dt < 0) return;
   const scale = heavy ? 1 : 0.6;
   if (dt < 3) {
-    ctx.globalCompositeOperation = "lighter";
-    glow(ctx, p, (40 * (1 - dt / 3) + 8) * scale, "rgba(255,250,230,1)", "rgba(255,170,80,0.6)");
-    ctx.globalCompositeOperation = "source-over";
+    glow(ctx, p, (40 * (1 - dt / 3) + 8) * scale, "rgba(255,206,90,1)", "rgba(226,96,36,0.5)");
   }
   if (dt < 30) {
     const k = dt / 30;
     for (let i = 0; i < 3; i++) {
       const kk = Math.max(0, k - i * 0.1);
-      ctx.strokeStyle = rgba(color, 0.85 * (1 - kk));
+      ctx.strokeStyle = rgba(color, 0.9 * (1 - kk));
       ctx.lineWidth = (2.2 - i * 0.6) * scale + 0.3;
       ctx.beginPath();
       ctx.arc(p.x, p.y, (4 + 55 * Math.sqrt(kk)) * scale, 0, Math.PI * 2);
@@ -794,21 +829,22 @@ function drawBlast(ctx: CanvasRenderingContext2D, env: FrameEnv, p: Pt, dt: numb
       const sp = (1.2 + hash01(seed, i * 31) * 2.5) * scale;
       const x = p.x + Math.cos(a) * sp * dt;
       const y = p.y + Math.sin(a) * sp * dt * 0.7 + 0.03 * dt * dt;
-      ctx.fillStyle = `rgba(255,${Math.round(200 - dt * 4)},90,${(0.9 * (1 - k)).toFixed(3)})`;
-      ctx.fillRect(x - 1, y - 1, 2, 2);
+      ctx.fillStyle = `rgba(${Math.round(200 - dt * 3)},${Math.round(110 - dt * 2)},40,${(0.9 * (1 - k)).toFixed(3)})`;
+      ctx.fillRect(x - 1.2, y - 1.2, 2.4, 2.4);
     }
   }
   // lingering fire, then scorch
   if (dt < 90) {
     const flick = 0.6 + 0.4 * hash01(Math.floor(env.nowMs / 80), seed);
-    ctx.globalCompositeOperation = "lighter";
-    glow(ctx, p, 9 * scale * flick * (1 - dt / 90) + 2, "rgba(255,200,120,0.7)", "rgba(240,100,40,0.35)");
-    ctx.globalCompositeOperation = "source-over";
+    glow(ctx, p, 9 * scale * flick * (1 - dt / 90) + 2, "rgba(255,170,60,0.8)", "rgba(210,70,30,0.3)");
   }
-  ctx.fillStyle = rgba(color === "#A5D6FF" ? "#58A6FF" : "#DA3633", 0.55);
+  ctx.fillStyle = rgba(color === FRIENDLY_BLAST_COLOR ? "#24518F" : "#7A2A1A", 0.75);
+  ctx.strokeStyle = "rgba(255,255,255,0.85)";
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2);
+  ctx.arc(p.x, p.y, 2.6, 0, Math.PI * 2);
   ctx.fill();
+  ctx.stroke();
 }
 
 // ---------------------------------------------------------------------------
@@ -829,7 +865,7 @@ function drawReticles(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lon
     ctx.save();
     ctx.translate(c.x, c.y);
     ctx.rotate(rot * (closing > 0.8 ? 3 : 1));
-    ctx.strokeStyle = `rgba(248,81,73,${(0.55 + 0.45 * pulse).toFixed(3)})`;
+    ctx.strokeStyle = `rgba(200,55,45,${(0.6 + 0.4 * pulse).toFixed(3)})`;
     ctx.lineWidth = 1.6;
     const L = size * 0.38;
     for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
@@ -841,7 +877,7 @@ function drawReticles(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lon
     }
     ctx.restore();
 
-    ctx.strokeStyle = "rgba(248,81,73,0.55)";
+    ctx.strokeStyle = "rgba(200,55,45,0.55)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(c.x - size * 0.55, c.y);
@@ -859,10 +895,10 @@ function drawReticles(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lon
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.font = `600 9px ${MONO}`;
+    ctx.font = `600 10px ${SANS}`;
     ctx.textAlign = "left";
-    ctx.fillStyle = `rgba(248,81,73,${(0.7 + 0.3 * pulse).toFixed(3)})`;
-    ctx.fillText(`LOCK ×${incoming.length}`, c.x + size + 4, c.y - size + 8);
+    ctx.fillStyle = `rgba(179,48,42,${(0.8 + 0.2 * pulse).toFixed(3)})`;
+    haloText(ctx, `LOCK ×${incoming.length}`, c.x + size + 4, c.y - size + 8);
   }
 }
 
@@ -872,39 +908,45 @@ function drawReticles(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: Lon
 
 function drawOrigins(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat) => Pt): void {
   const { script, t, lang, nowMs } = env;
-  ctx.font = `11px ${SANS}`;
+  ctx.font = `500 11px ${SANS}`;
   ctx.textAlign = "center";
   for (const o of Object.values(ORIGINS)) {
     const firing = script.launches.some((l) => AFFILIATION[l.faction] === "hostile" && l.originName.en === o.name.en && t >= l.t0 - 20);
     if (!firing) continue;
     const c = SL(o.pos);
     const hot = script.launches.some((l) => l.originName.en === o.name.en && t >= l.t0 && t - l.t0 < 15);
-    ctx.strokeStyle = hot ? `rgba(248,81,73,${(0.6 + 0.4 * Math.sin(nowMs / 90)).toFixed(3)})` : "#F85149";
-    ctx.lineWidth = 1.3;
+    ctx.strokeStyle = hot ? `rgba(200,55,45,${(0.6 + 0.4 * Math.sin(nowMs / 90)).toFixed(3)})` : BAD_INK;
+    ctx.fillStyle = "rgba(250,224,219,0.9)";
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
     ctx.beginPath();
     ctx.moveTo(c.x, c.y - 7);
     ctx.lineTo(c.x + 6, c.y + 4);
     ctx.lineTo(c.x - 6, c.y + 4);
     ctx.closePath();
+    ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = "#F85149";
-    ctx.fillText(o.name[lang], c.x, c.y + 18);
+    ctx.fillStyle = BAD_INK;
+    haloText(ctx, o.name[lang], c.x, c.y + 18);
   }
 }
 
 function drawLabels(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLat) => Pt): void {
   const { cam, lang, w, h } = env;
-  ctx.font = `11px ${SANS}`;
+  ctx.font = `500 11.5px ${SANS}`;
   for (const city of Object.values(CITIES)) {
     const c = SL(city.pos);
-    ctx.fillStyle = "#E6EDF3";
+    ctx.fillStyle = INK;
+    ctx.strokeStyle = "rgba(255,255,255,0.95)";
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(c.x, c.y, 2.5, 0, Math.PI * 2);
+    ctx.arc(c.x, c.y, 2.6, 0, Math.PI * 2);
     ctx.fill();
+    ctx.stroke();
     if (cam.scale > 0.9 || city.id === "tel_aviv") {
       ctx.textAlign = "start";
-      ctx.fillStyle = "rgba(230,237,243,0.9)";
-      ctx.fillText(city.name[lang], c.x + 6, c.y - 4);
+      ctx.fillStyle = "rgba(28,35,48,0.92)";
+      haloText(ctx, city.name[lang], c.x + 6, c.y - 4);
     }
   }
   ctx.textAlign = "center";
@@ -912,8 +954,8 @@ function drawLabels(ctx: CanvasRenderingContext2D, env: FrameEnv, SL: (ll: LonLa
     if (r.kind === "territory" && cam.scale < 1.1) continue;
     const c = SL(r.label);
     if (c.x < -40 || c.x > w + 40 || c.y < -20 || c.y > h + 20) continue;
-    ctx.font = r.kind === "territory" ? `10px ${SANS}` : `600 12px ${SANS}`;
-    ctx.fillStyle = r.kind === "own" ? "rgba(121,192,255,0.85)" : "rgba(147,164,181,0.55)";
-    ctx.fillText(r.name[lang].toUpperCase(), c.x, c.y);
+    ctx.font = r.kind === "territory" ? `500 10.5px ${SANS}` : `600 12px ${SANS}`;
+    ctx.fillStyle = r.kind === "own" ? "rgba(36,81,143,0.85)" : "rgba(85,94,108,0.62)";
+    haloText(ctx, r.name[lang].toUpperCase(), c.x, c.y, 0.7);
   }
 }

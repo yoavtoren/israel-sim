@@ -18,8 +18,8 @@ const ROLE: Record<string, "own" | "territory" | "neighbor"> = {
   israel: "own", gaza: "territory", west_bank: "territory",
   egypt: "neighbor", jordan: "neighbor", lebanon: "neighbor", syria: "neighbor",
 };
-const FILL = { own: "#1B2D46", territory: "#232E3D", neighbor: "#161F2B", context: "#10161F" };
-const STROKE = { own: "#3B82D0", territory: "#93A4B5", neighbor: "#34404F", context: "#222C39" };
+const FILL = { own: "#F3F6FB", territory: "#ECE7DD", neighbor: "#F2EEE6", context: "#EFEBE3" };
+const STROKE = { own: "#3569B8", territory: "#A69C8B", neighbor: "#BDB3A2", context: "#D3CBBD" };
 
 function linePath(line: LonLat[]): string {
   return line.map((p, i) => {
@@ -44,14 +44,14 @@ const BaseLayer = memo(function BaseLayer() {
     <>
       <defs>
         <pattern id="tac-hatch" patternUnits="userSpaceOnUse" width="3" height="3" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="3" stroke="#93A4B5" strokeWidth="0.5" strokeOpacity="0.35" />
+          <line x1="0" y1="0" x2="0" y2="3" stroke="#8B7F6C" strokeWidth="0.5" strokeOpacity="0.3" />
         </pattern>
       </defs>
       {Array.from({ length: 47 }, (_, i) => 14 + i).map((lon) => (
-        <path key={`lon${lon}`} d={linePath([[lon, 4], [lon, 47]])} stroke={lon % 5 === 0 ? "#18212D" : "#121922"} strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />
+        <path key={`lon${lon}`} d={linePath([[lon, 4], [lon, 47]])} stroke={lon % 5 === 0 ? "rgba(36,81,143,0.12)" : "rgba(36,81,143,0.045)"} strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />
       ))}
       {Array.from({ length: 44 }, (_, i) => 4 + i).map((lat) => (
-        <path key={`lat${lat}`} d={linePath([[14, lat], [66, lat]])} stroke={lat % 5 === 0 ? "#18212D" : "#121922"} strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />
+        <path key={`lat${lat}`} d={linePath([[14, lat], [66, lat]])} stroke={lat % 5 === 0 ? "rgba(36,81,143,0.12)" : "rgba(36,81,143,0.045)"} strokeWidth={1} vectorEffect="non-scaling-stroke" fill="none" />
       ))}
       {shapes.map((s) => (
         <g key={s.key}>
@@ -68,7 +68,7 @@ const BaseLayer = memo(function BaseLayer() {
           {s.role === "territory" && <path d={s.d} fill="url(#tac-hatch)" stroke="none" />}
         </g>
       ))}
-      <path d={linePath(SUEZ_CANAL)} stroke="#58A6FF" strokeOpacity={0.7} strokeWidth={1.5} vectorEffect="non-scaling-stroke" fill="none" />
+      <path d={linePath(SUEZ_CANAL)} stroke="#4F86C0" strokeOpacity={0.9} strokeWidth={1.5} vectorEffect="non-scaling-stroke" fill="none" />
     </>
   );
 });
@@ -238,7 +238,7 @@ export function TacticalMap() {
       ref={wrapRef}
       dir="ltr"
       className="absolute inset-0 overflow-hidden select-none"
-      style={{ background: "radial-gradient(ellipse at 55% 45%, #0B121C 0%, #06090E 75%)", cursor: hover !== null ? "pointer" : "grab" }}
+      style={{ background: "radial-gradient(ellipse at 55% 45%, #DCE8EE 0%, #D3E2E9 60%, #C9DAE3 100%)", cursor: hover !== null ? "pointer" : "grab" }}
       onWheel={onWheel}
       onMouseMove={onMouseMove}
       onMouseDown={onMouseDown}
@@ -255,22 +255,19 @@ export function TacticalMap() {
         </g>
       </svg>
       <canvas ref={canvasRef} className="absolute inset-0" style={{ width: size.w, height: size.h }} />
-      {/* HUD vignette + scanlines */}
+      {/* soft paper vignette */}
       <div
         className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%), repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px)",
-        }}
+        style={{ background: "radial-gradient(ellipse at center, rgba(244,241,234,0) 70%, rgba(244,241,234,0.18) 100%)" }}
       />
       {hover !== null && (
         <div
-          className="overlay pointer-events-none absolute z-10 rounded-[4px] border border-line1 bg-bg1 px-2 py-1 text-[12px] leading-[18px]"
+          className="overlay glass pointer-events-none absolute z-10 rounded-[10px] border border-line0 px-2.5 py-1.5 text-[13px] leading-[19px]"
           style={{ left: hover.x + 14, top: hover.y + 10 }}
           dir={lang === "he" ? "rtl" : "ltr"}
         >
           {hover.text.map((line, i) => (
-            <div key={i} className={i === 0 ? "text-fg0" : "text-fg1"}>
+            <div key={i} className={i === 0 ? "font-medium text-fg0" : "text-[12px] text-fg1"}>
               {line}
             </div>
           ))}

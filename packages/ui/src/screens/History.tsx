@@ -141,35 +141,52 @@ export function History() {
   const int0 = (v: number) => v.toFixed(0);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="panel px-3 py-2 text-[12px] leading-[16px] text-fg1">
+    <div className="mx-auto flex max-w-[1320px] flex-col gap-5">
+      <div className="flex flex-col gap-1.5 px-1 pt-1">
+        <h1 className="display text-[26px] leading-[34px] text-fg0">{lang === "he" ? "איך הריצה שלכם נראית מול העבר" : "How your run compares with the past"}</h1>
+        <p className="max-w-[860px] text-[14px] leading-[22px] text-fg1">
         {lang === "he"
           ? "סדרות אמת 2000–2025 (בנק ישראל, החשב הכללי, ביטוח לאומי, שב\"כ — מקורות בקבצי sidecar); הסימולציה נמשכת מ-2026 באותם צירים. תוצר מושווה כצמיחה שנתית — לא כרמה."
           : "Real 2000–2025 series (BoI, Accountant General, NII, Shabak — sources in the sidecars); the simulation continues from 2026 on the same axes. GDP compared as annual growth, not level."}
+        </p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px] text-fg1">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-0 w-5 border-t-[2.5px] border-fg1" />
+            {actualName}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-0 w-5 border-t-[2.5px] border-dotted border-info" />
+            {simName}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-3 w-5 rounded-[3px] bg-[#EFE9DE]" />
+            {lang === "he" ? "אירועים היסטוריים" : "Historical episodes"}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <Panel title={`${lang === "he" ? "צמיחת תוצר שנתית" : "Annual GDP growth"} (%)`} accent={DOMAIN.macro}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("growth", lang === "he" ? "צמיחה" : "Growth", DOMAIN.macro)} format={pct1} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("growth", lang === "he" ? "צמיחה" : "Growth", DOMAIN.macro)} format={pct1} height={200} />
         </Panel>
         <Panel title={`${t("unemployment", lang)} (%)`} accent={DOMAIN.macro}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("unemp", t("unemployment", lang), SEM.badBright)} format={pct1} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("unemp", t("unemployment", lang), SEM.badBright)} format={pct1} height={200} />
         </Panel>
         <Panel title={`${t("debtGdp", lang)} (%)`} accent={DOMAIN.fiscal}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("debt", t("debtGdp", lang), DOMAIN.fiscal)} format={int0} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("debt", t("debtGdp", lang), DOMAIN.fiscal)} format={int0} height={200} />
         </Panel>
         <Panel title={`${t("poverty", lang)} (%)`} accent={DOMAIN.social}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("poverty", t("poverty", lang), DOMAIN.social)} format={pct1} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("poverty", t("poverty", lang), DOMAIN.social)} format={pct1} height={200} />
         </Panel>
         <Panel title={lang === "he" ? "פיגועים קטלניים בשנה" : "Fatal terror attacks / year"} accent={DOMAIN.security}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("terror", lang === "he" ? "פיגועים" : "Attacks", DOMAIN.security)} format={int0} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("terror", lang === "he" ? "פיגועים" : "Attacks", DOMAIN.security)} format={int0} height={200} />
         </Panel>
         <Panel title={lang === "he" ? "גלי מחאה גדולים בשנה" : "Major protest waves / year"} accent={DOMAIN.social}>
-          <SeriesChart data={rows} episodes={episodes} series={pair("protest", lang === "he" ? "גלי מחאה" : "Protest waves", DOMAIN.diplomacy)} format={int0} height={190} />
+          <SeriesChart data={rows} episodes={episodes} series={pair("protest", lang === "he" ? "גלי מחאה" : "Protest waves", DOMAIN.diplomacy)} format={int0} height={200} />
         </Panel>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         {(["men", "women"] as const).map((g) => (
           <Panel key={g} title={`${t("participation", lang)} — ${g === "men" ? (lang === "he" ? "גברים" : "Men") : lang === "he" ? "נשים" : "Women"} (%)`} accent={DOMAIN.social}>
             <SeriesChart
@@ -188,17 +205,17 @@ export function History() {
 
       {/* the detailed year-by-year table */}
       <Panel title={lang === "he" ? "טבלה מפורטת, שנה אחר שנה" : "Detailed year-by-year table"} accent={DOMAIN.macro}>
-        <div className="max-h-[420px] overflow-y-auto">
-          <table className="w-full text-[12px] leading-[16px]">
-            <thead className="sticky top-0 bg-bg1">
-              <tr className="border-b border-line1 text-fg1">
-                <th className="px-2 py-1.5 text-start font-medium">{lang === "he" ? "שנה" : "Year"}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{lang === "he" ? "צמיחה" : "Growth"}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{t("unemployment", lang)}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{t("debtGdp", lang)}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{t("poverty", lang)}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{lang === "he" ? "פיגועים" : "Terror"}</th>
-                <th className="px-2 py-1.5 text-end font-medium">{lang === "he" ? "מחאות" : "Protests"}</th>
+        <div className="-mx-5 max-h-[440px] overflow-y-auto">
+          <table className="w-full text-[13px] leading-[20px]">
+            <thead className="sticky top-0 z-10 bg-bg1/95 backdrop-blur">
+              <tr className="border-b border-line0">
+                <th className="eyebrow py-2 ps-5 pe-3 text-start font-medium">{lang === "he" ? "שנה" : "Year"}</th>
+                <th className="eyebrow px-3 py-2 text-end font-medium">{lang === "he" ? "צמיחה" : "Growth"}</th>
+                <th className="eyebrow px-3 py-2 text-end font-medium">{t("unemployment", lang)}</th>
+                <th className="eyebrow px-3 py-2 text-end font-medium">{t("debtGdp", lang)}</th>
+                <th className="eyebrow px-3 py-2 text-end font-medium">{t("poverty", lang)}</th>
+                <th className="eyebrow px-3 py-2 text-end font-medium">{lang === "he" ? "פיגועים" : "Terror"}</th>
+                <th className="eyebrow py-2 ps-3 pe-5 text-end font-medium">{lang === "he" ? "מחאות" : "Protests"}</th>
               </tr>
             </thead>
             <tbody>
@@ -241,14 +258,14 @@ export function History() {
 
 function HRow(props: { year: string; growth: string; unemp: string; debt: string; poverty: string; terror: string; protests: string; sim?: boolean }) {
   return (
-    <tr className={`border-b border-line0/50 last:border-0 ${props.sim === true ? "bg-info-dim/15 text-info-bright" : ""}`}>
-      <td className="num px-2 py-1">{props.year}</td>
-      <td className="num px-2 py-1 text-end">{props.growth}</td>
-      <td className="num px-2 py-1 text-end">{props.unemp}</td>
-      <td className="num px-2 py-1 text-end">{props.debt}</td>
-      <td className="num px-2 py-1 text-end">{props.poverty}</td>
-      <td className="num px-2 py-1 text-end">{props.terror}</td>
-      <td className="num px-2 py-1 text-end">{props.protests}</td>
+    <tr className={`border-b border-line0 last:border-0 ${props.sim === true ? "bg-info-dim/50 text-info-bright hover:bg-info-dim" : "text-fg0 hover:bg-bg2"}`}>
+      <td className={`num py-1.5 ps-5 pe-3 ${props.sim === true ? "font-medium" : "text-fg1"}`}>{props.year}</td>
+      <td className="num px-3 py-1.5 text-end">{props.growth}</td>
+      <td className="num px-3 py-1.5 text-end">{props.unemp}</td>
+      <td className="num px-3 py-1.5 text-end">{props.debt}</td>
+      <td className="num px-3 py-1.5 text-end">{props.poverty}</td>
+      <td className="num px-3 py-1.5 text-end">{props.terror}</td>
+      <td className="num py-1.5 ps-3 pe-5 text-end">{props.protests}</td>
     </tr>
   );
 }

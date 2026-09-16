@@ -125,9 +125,9 @@ body {
 
 /* frosted card used over maps */
 .glass {
-  background: rgb(255 255 255 / 0.9);
-  backdrop-filter: saturate(1.4) blur(10px);
-  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  background: rgb(255 255 255 / 0.95);
+  backdrop-filter: saturate(0.6) blur(12px);
+  -webkit-backdrop-filter: saturate(0.6) blur(12px);
 }
 
 /* primary / secondary buttons */

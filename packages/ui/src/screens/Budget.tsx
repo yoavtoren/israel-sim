@@ -46,12 +46,12 @@ export function Budget() {
   };
 
   return (
-    <div className="flex h-full gap-4">
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
-        {/* fixed fiscal strip — live, mono, 24px, deficit colored by band (DESIGN §6.1).
+    <div className="mx-auto flex h-full max-w-[1400px] gap-5">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* fixed fiscal strip — live, deficit colored by band (DESIGN §6.1).
             Values come from the latest frame: at boot the raw state has empty fiscal
             flows and the frame is seeded from a zero-change shadow tick. */}
-        <div className="panel flex items-center gap-8 px-4 py-3">
+        <div className="panel flex flex-wrap items-center gap-x-10 gap-y-3 px-6 py-4">
           <Strip label={t("revenue", lang)} value={fmtBudget(latest(frames).revenue_total, 1)} raw={latest(frames).revenue_total} dir={1} path="fiscal.revenue" />
           <Strip label={t("spend", lang)} value={fmtBudget(latest(frames).spend_total, 1)} raw={latest(frames).spend_total} dir={0} path="fiscal.ministries" />
           <Strip
@@ -63,21 +63,16 @@ export function Budget() {
             color={deficitColor(latest(frames).deficit, state.macro.gdp_real)}
           />
           {previewedDeficit !== undefined && (
-            <span className="flex items-baseline gap-2 text-[12px] text-fg2">
-              ⇐
-              <span className="num text-[15px]" style={{ color: deficitColor(previewedDeficit.proposed, state.macro.gdp_real) }}>
-                {fmtBudget(previewedDeficit.proposed, 1)}
+            <span className="flex flex-col">
+              <span className="eyebrow !text-[12px]">{t("proposed", lang)}</span>
+              <span className="num text-[20px] leading-[34px] font-medium" style={{ color: deficitColor(previewedDeficit.proposed, state.macro.gdp_real) }}>
+                ← {fmtBudget(previewedDeficit.proposed, 1)}
               </span>
-              ({t("proposed", lang)})
             </span>
           )}
           <span className="ms-auto flex gap-2">
             {dirty && (
-              <button
-                type="button"
-                onClick={clearDraft}
-                className="rounded-[2px] border border-line0 px-3 py-1.5 text-[12px] text-fg1 hover:bg-bg2"
-              >
+              <button type="button" onClick={clearDraft} className="btn btn-ghost px-4 py-2 text-[13px]">
                 {lang === "he" ? "נקה" : "Reset"}
               </button>
             )}
@@ -86,7 +81,7 @@ export function Budget() {
               type="button"
               disabled={busy || state.outcome.ended}
               onClick={() => void advance(1)}
-              className="rounded-[2px] bg-info px-3 py-1.5 text-[13px] font-medium text-fg0 hover:bg-info-bright disabled:opacity-40"
+              className="btn btn-accent px-5 py-2 text-[13.5px]"
             >
               {t("confirmBudget", lang)}
             </button>
@@ -98,15 +93,21 @@ export function Budget() {
 
         {/* ministry table */}
         <div className="panel min-h-0 flex-1 overflow-y-auto">
-          <table className="w-full text-[12px] leading-[16px]">
-            <thead className="sticky top-0 bg-bg1">
-              <tr className="border-b border-line1 text-start text-fg1">
-                <th className="px-3 py-2 text-start font-medium">{t("ministry", lang)}</th>
-                <th className="px-2 py-2 text-end font-medium">{t("current", lang)}</th>
-                <th className="px-2 py-2 text-end font-medium">{t("proposed", lang)}</th>
-                <th className="px-2 py-2 text-end font-medium">{t("change", lang)}</th>
-                <th className="px-2 py-2 font-medium">{lang === "he" ? "גרירה (רצפת קשיחות באדום)" : "Drag (rigidity floor in red)"}</th>
-                <th className="px-3 py-2 text-end font-medium">{t("fundingRatio12q", lang)}</th>
+          <table className="w-full text-[13px] leading-[20px]">
+            <thead className="sticky top-0 z-10 bg-bg1/95 backdrop-blur">
+              <tr className="border-b border-line0">
+                <th className="eyebrow px-5 pt-4 pb-2.5 text-start font-medium">{t("ministry", lang)}</th>
+                <th className="eyebrow px-3 pt-4 pb-2.5 text-end font-medium">{t("current", lang)}</th>
+                <th className="eyebrow px-3 pt-4 pb-2.5 text-end font-medium">{t("proposed", lang)} (₪M)</th>
+                <th className="eyebrow px-3 pt-4 pb-2.5 text-end font-medium">{t("change", lang)}</th>
+                <th className="eyebrow px-3 pt-4 pb-2.5 text-start font-medium">
+                  {lang === "he" ? "גרירה" : "Drag"}
+                  <span className="ms-1.5 inline-flex items-center gap-1 text-fg2">
+                    <span className="inline-block h-2.5 w-[2px] rounded-full bg-bad" />
+                    {lang === "he" ? "רצפת קשיחות" : "rigidity floor"}
+                  </span>
+                </th>
+                <th className="eyebrow px-5 pt-4 pb-2.5 text-end font-medium">{t("fundingRatio12q", lang)}</th>
               </tr>
             </thead>
             <tbody>
@@ -116,14 +117,14 @@ export function Budget() {
                 const changed = draft.budgets[m.id] !== undefined && Math.abs(proposed - st.budget) > 0.5;
                 const rel = proposed / st.budget - 1;
                 return (
-                  <tr key={m.id} className="border-b border-line0/60 hover:bg-bg2/50">
-                    <td className="px-3 py-1.5">
+                  <tr key={m.id} className={`border-b border-line0 transition-colors last:border-0 ${changed ? "bg-warn-dim/25" : "hover:bg-bg2"}`}>
+                    <td className="px-5 py-2">
                       <Traceable path={`fiscal.ministries.${m.id}`} className="text-fg0">
                         {MINISTRY_NAMES[m.id][lang]}
                       </Traceable>
                     </td>
-                    <td className="num px-2 py-1.5 text-end text-fg1">{fmtBudget(st.budget, 1)}</td>
-                    <td className="w-28 px-2 py-1.5">
+                    <td className="num px-3 py-2 text-end text-fg1">{fmtBudget(st.budget, 1)}</td>
+                    <td className="w-32 px-3 py-2">
                       <input
                         ref={(el) => {
                           if (el) rowRefs.current.set(m.id, el);
@@ -151,10 +152,16 @@ export function Budget() {
                         }}
                       />
                     </td>
-                    <td className={`num px-2 py-1.5 text-end ${changed ? (rel > 0 ? "text-good-bright" : "text-bad-bright") : "text-fg2"}`}>
-                      {fmtSignedPct(rel, 1)}
+                    <td className="px-3 py-2 text-end">
+                      {changed ? (
+                        <span className={`num inline-block rounded-full px-2 text-[12px] leading-[20px] font-medium ${rel > 0 ? "bg-info-dim text-info-bright" : "bg-warn-dim text-warn-bright"}`}>
+                          {fmtSignedPct(rel, 1)}
+                        </span>
+                      ) : (
+                        <span className="num text-fg2">—</span>
+                      )}
                     </td>
-                    <td className="w-44 px-2 py-1.5">
+                    <td className="w-48 px-3 py-2">
                       <BudgetSlider
                         current={st.budget}
                         baseline={m.baseline_budget}
@@ -163,8 +170,10 @@ export function Budget() {
                         onChange={(v) => setBudgetDraft(m.id, v)}
                       />
                     </td>
-                    <td className="px-3 py-1.5 text-end">
-                      <Sparkline values={fundingHistory.get(m.id) ?? []} color={SEM.info} refLine={1} width={110} height={18} />
+                    <td className="px-5 py-2">
+                      <div className="flex justify-end">
+                        <Sparkline values={fundingHistory.get(m.id) ?? []} color={SEM.info} refLine={1} width={110} height={22} />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -175,61 +184,73 @@ export function Budget() {
       </div>
 
       {/* מה יישבר — the shadow-tick preview panel */}
-      <aside className="flex w-[340px] shrink-0 flex-col gap-3 overflow-y-auto">
-        <div className="panel">
-          <header className="flex items-center justify-between border-b border-line0 px-3 py-2">
-            <span className="text-[15px] font-medium">{t("whatBreaks", lang)}</span>
-            {previewBusy && <span className="animate-pulse text-[11px] text-fg2">…</span>}
+      <aside className="flex w-[340px] shrink-0 flex-col gap-4 overflow-y-auto pb-1">
+        <section className="panel">
+          <header className="flex items-center justify-between px-5 pt-4 pb-1">
+            <span className="display text-[18px] leading-[26px]">{t("whatBreaks", lang)}</span>
+            {previewBusy && <span className="animate-pulse text-[12px] text-fg2">{lang === "he" ? "מחשב…" : "Computing…"}</span>}
           </header>
-          <div className="p-3">
+          <div className="px-5 pt-2 pb-5">
             {preview === null ? (
-              <div className="text-[12px] text-fg2">{lang === "he" ? "ערכו את התקציב כדי לראות תחזית" : "Edit the budget to see the preview"}</div>
+              <div className="rounded-[10px] bg-bg2 px-4 py-5 text-center text-[13px] leading-[20px] text-fg2">
+                {lang === "he" ? "שנו סכום באחד המשרדים — כאן תופיע תחזית למה שעלול להישבר" : "Change a ministry's budget to see what might break"}
+              </div>
             ) : preview.breaks.length === 0 ? (
-              <div className="text-[12px] text-good-bright">{t("noBreaks", lang)}</div>
+              <div className="flex items-center gap-2 rounded-[10px] bg-good-dim/70 px-4 py-3 text-[13px] text-good-bright">
+                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-good" />
+                {t("noBreaks", lang)}
+              </div>
             ) : (
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-2.5">
                 {preview.breaks.map((b, i) => (
-                  <li key={i} className="rounded-[2px] border border-warn-dim bg-bg2 p-2">
+                  <li key={i} className="rounded-[12px] border border-warn/30 bg-warn-dim/40 px-3.5 py-3">
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <span className="text-[12px] font-medium text-warn-bright">{MINISTRY_NAMES[b.ministry][lang]}</span>
+                      <span className="text-[13.5px] font-medium text-fg0">{MINISTRY_NAMES[b.ministry][lang]}</span>
                       <Chip tone="warn">
                         <span className="num">{b.fires_after_quarters}</span> {t("firesAfter", lang)}
                       </Chip>
                     </div>
-                    <div className="text-[12px] leading-[16px] text-fg1">{b.surfaces_as}</div>
+                    <div className="text-[12.5px] leading-[19px] text-fg1">{b.surfaces_as}</div>
                     {b.triggers_event !== null && (
-                      <div className="num mt-1 text-[11px] text-bad-bright">→ {b.triggers_event}</div>
+                      <div className="mt-1.5 text-[12px] text-bad-bright" dir="ltr">
+                        <span className="text-end">→ {b.triggers_event.replace(/_/g, " ")}</span>
+                      </div>
                     )}
                   </li>
                 ))}
               </ul>
             )}
             {preview !== null && preview.events.length > 0 && (
-              <div className="mt-2 border-t border-line0 pt-2">
+              <div className="mt-3 flex flex-col gap-1.5 border-t border-line0 pt-3">
                 {preview.events.map((e, i) => (
-                  <div key={i} className="text-[12px] text-bad-bright">⚠ {e.note}</div>
+                  <div key={i} className="flex gap-2 text-[12.5px] leading-[19px] text-bad-bright">
+                    <span aria-hidden>⚠</span>
+                    {e.note}
+                  </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
+        </section>
 
         {preview !== null && preview.diffs.length > 0 && (
-          <div className="panel">
-            <header className="border-b border-line0 px-3 py-2 text-[15px] font-medium">{t("topDiffs", lang)}</header>
-            <table className="w-full text-[12px] leading-[16px]">
+          <section className="panel">
+            <header className="px-5 pt-4 pb-1">
+              <span className="display text-[18px] leading-[26px]">{t("topDiffs", lang)}</span>
+            </header>
+            <table className="mb-3 w-full text-[12.5px] leading-[18px]">
               <tbody>
                 {preview.diffs.slice(0, 10).map((d) => (
-                  <tr key={d.path} className="border-b border-line0/50 last:border-0">
-                    <td className="max-w-[180px] truncate px-3 py-1.5 text-fg1" title={d.path}>
+                  <tr key={d.path} className="border-b border-line0 last:border-0 hover:bg-bg2">
+                    <td className="max-w-[200px] truncate px-5 py-2 text-fg1" title={d.path} dir="ltr">
                       <Traceable path={d.path}>{d.path}</Traceable>
                     </td>
-                    <td className={`num px-3 py-1.5 text-end ${deltaClass(d.path, d.delta)}`}>{fmtSigned(d.delta, 2)}</td>
+                    <td className={`num px-5 py-2 text-end font-medium ${deltaClass(d.path, d.delta)}`}>{fmtSigned(d.delta, 2)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </section>
         )}
       </aside>
     </div>
@@ -239,11 +260,11 @@ export function Budget() {
 function Strip(props: { label: string; value: string; raw: number; dir: number; path: string; color?: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[11px] leading-[16px] text-fg2">{props.label}</span>
-      <Traceable path={props.path}>
-        <Num value={props.value} raw={props.raw} direction={props.dir} className="text-[24px] leading-[32px]" title={props.path} />
+      <span className="eyebrow !text-[12px]">{props.label}</span>
+      <Traceable path={props.path} className="self-start">
+        <Num value={props.value} raw={props.raw} direction={props.dir} className="text-[26px] leading-[34px] font-medium tracking-tight" title={props.path} />
       </Traceable>
-      {props.color !== undefined && <span className="-mt-1 block h-[2px] w-full rounded" style={{ background: props.color }} />}
+      {props.color !== undefined && <span className="mt-0.5 block h-[3px] w-full rounded-full" style={{ background: props.color, opacity: 0.85 }} />}
     </div>
   );
 }
@@ -265,20 +286,20 @@ function BudgetSlider(props: {
   const cut = pct < 100;
   return (
     <bdi dir="ltr" className="block w-full">
-      <div className="relative h-4 w-full" title={`${Math.round(pct)}%`}>
-        <div className="absolute inset-0 rounded-[2px] bg-bg2" />
-        <div className="absolute inset-y-0 w-px bg-line1" style={{ left: "50%" }} />
+      <div className="relative h-5 w-full" title={`${Math.round(pct)}%`}>
+        <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-bg3" />
+        <div className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-line1" style={{ left: "50%" }} />
         <div
-          className="absolute inset-y-[3px] rounded-[1px]"
+          className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full"
           style={{
             left: `${Math.min(50, x(pct))}%`,
             width: `${Math.abs(x(pct) - 50)}%`,
-            background: cut ? SEM.warnBright : SEM.info,
+            background: cut ? SEM.warn : SEM.info,
           }}
         />
         <div
-          className="absolute inset-y-0 w-[2px]"
-          style={{ left: `${x(floorPct)}%`, background: SEM.badBright, opacity: 0.8 }}
+          className="absolute top-1/2 h-3.5 w-[2px] -translate-y-1/2 rounded-full"
+          style={{ left: `${x(floorPct)}%`, background: SEM.bad, opacity: 0.75 }}
         />
         <input
           type="range"
@@ -322,23 +343,27 @@ function AllocationBar(props: { ministries: MinistryMeta[]; state: WorldState; d
   });
   const total = segs.reduce((a, s) => a + s.value, 0);
   return (
-    <div className="panel px-3 py-2">
+    <div className="panel px-6 py-4">
+      <div className="mb-2.5 flex items-baseline justify-between">
+        <span className="display text-[16px] leading-[22px]">{props.lang === "he" ? "חלוקת התקציב" : "Budget allocation"}</span>
+        <span className="num text-[12.5px] text-fg2">{fmtBudget(total, 1)}</span>
+      </div>
       <bdi dir="ltr" className="block">
-        <div className="flex h-5 w-full overflow-hidden rounded-[2px]">
+        <div className="flex h-3 w-full overflow-hidden rounded-full">
           {segs.map((s) => (
             <div
               key={s.id}
               className="h-full"
-              style={{ width: `calc(${(s.value / total) * 100}% - 2px)`, marginInlineEnd: 2, background: s.color, borderRadius: 1 }}
+              style={{ width: `calc(${(s.value / total) * 100}% - 3px)`, marginInlineEnd: 3, background: s.color }}
               title={`${s.name} · ${fmtBudget(s.value, 1)} · ${((s.value / total) * 100).toFixed(1)}%`}
             />
           ))}
         </div>
       </bdi>
-      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
         {segs.map((s) => (
-          <span key={s.id} className="flex items-center gap-1.5 text-[11px] leading-[16px] text-fg1">
-            <span className="inline-block h-2 w-3 rounded-[1px]" style={{ background: s.color }} />
+          <span key={s.id} className="flex items-center gap-1.5 text-[12.5px] leading-[18px] text-fg1">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
             {s.name}
             <span className="num text-fg2">{fmtBudget(s.value, 1)}</span>
           </span>
