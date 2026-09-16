@@ -15,9 +15,17 @@ function withTrack(track: S.PolicyTrack, patch: Partial<Action> = {}): Action {
   return { track, ...S.TRACK_DEFS[track].defaults, ...patch };
 }
 
+/** one half-year: decide, and if a crisis opens, take its last option */
+function step(state: S.SimulationState, action: Action): S.SimulationState {
+  const s = S.executePolicyDecision(state, action);
+  if (s.pendingCrisis === null) return s;
+  const opts = S.CRISIS_DEFS[s.pendingCrisis.id].options;
+  return S.resolveCrisis(s, opts[opts.length - 1].id);
+}
+
 function playOut(state: S.SimulationState, action: Action): S.SimulationState {
   let s = state;
-  while (!s.gameOver) s = S.executePolicyDecision(s, action);
+  while (!s.gameOver) s = step(s, action);
   return s;
 }
 
@@ -139,7 +147,7 @@ describe("M11 strategic layer", () => {
       let s = S.createInitialState("BENNETT_LIEBERMAN_GOLAN_ABBAS", seed);
       while (!s.gameOver) {
         const before = s;
-        s = S.executePolicyDecision(s, trusteeship);
+        s = step(s, trusteeship);
         const passed = S.CHECKPOINT_ORDER.filter((k) => s.checkpoints[k] && !before.checkpoints[k]);
         expect(passed.length).toBeLessThanOrEqual(1);
         // stages are a prefix: never a later stage without the earlier one
@@ -173,7 +181,7 @@ describe("M11 strategic layer", () => {
       const p = S.previewPolicyDecision(s, trusteeship);
       expect(p.rngState).toBe(s.rngState);
       expect(p.turns[p.turns.length - 1].events).not.toContain("PROCESS_FROZEN");
-      s = S.executePolicyDecision(s, trusteeship);
+      s = step(s, trusteeship);
     }
   });
 });

@@ -2,13 +2,14 @@
  *  comes from `state.rngState` so a run replays exactly. */
 
 import {
-  CHECKPOINT_DEFS, COALITION_REACTION, COALITION_SUSTAIN, CRISIS_DEFS,
+  CHECKPOINT_DEFS, COALITION_REACTION, COALITION_SUSTAIN,
   INITIAL_COALITION_STABILITY, OUTCOME_REASONS, RULES, SETTLEMENT_EFFECTS, THRESHOLDS, TRACK_DEFS,
   type Deltas,
 } from "./defs";
+import { CRISIS_DEFS, crisisOption, crisisRisks, optionDeltas, type CrisisRisk } from "./crisisEngine";
 import {
   CHECKPOINT_ORDER, METRIC_KEYS,
-  type Bi, type CheckpointKey, type CheckpointStatus, type CoalitionType, type CrisisOptionId, type LogEntry,
+  type Bi, type CheckpointKey, type CheckpointStatus, type CoalitionType, type CrisisId, type CrisisOptionId, type GambleBranch, type LogEntry,
   type LogTone, type OutcomeKind, type PolicyAction, type SimulationMetrics, type SimulationState,
   type StepOptions, type StrategicFlags, type TriggeredEvent,
 } from "./types";
@@ -79,6 +80,7 @@ export function createInitialState(
     ],
     turns: [],
     metricsHistory: [{ ...metrics }],
+    crisisLastTurn: {},
     rngState: seedFromString(String(seed)),
   };
 }
@@ -152,7 +154,9 @@ export function checkpointReady(key: CheckpointKey, c: CheckpointStatus, m: Simu
 class Ledger {
   logs: LogEntry[] = [];
   events: TriggeredEvent[] = [];
-  constructor(private turn: number) {}
+  constructor(private turn: number, events: TriggeredEvent[] = []) {
+    this.events = [...events];
+  }
   log(tone: LogTone, text: Bi): void {
     this.logs.push({ turn: this.turn, tone, text });
   }
@@ -178,8 +182,9 @@ function finish(
     flags: StrategicFlags;
     activeTrack: SimulationState["activeTrack"];
     action: PolicyAction;
-    crisisOption: CrisisOptionId | null;
+    crisis: { id: CrisisId; option: CrisisOptionId; branch: GambleBranch | null } | null;
     ledger: Ledger;
+    rngState: number;
     forcedOutcome?: { kind: OutcomeKind; reason: Bi };
   },
 ): SimulationState {
@@ -198,6 +203,7 @@ function finish(
     activeTrack: patch.activeTrack,
     lastAction: patch.action,
     pendingCrisis: null,
+    rngState: patch.rngState,
     turn: outcome === null ? state.turn + 1 : state.turn,
     gameOver: outcome !== null,
     gameOverReason: reason,
@@ -205,7 +211,15 @@ function finish(
     historyLogs: [...state.historyLogs, ...patch.ledger.logs],
     turns: [
       ...state.turns,
-      { turn: state.turn, action: patch.action, crisisOption: patch.crisisOption, events: patch.ledger.events, metricsAfter: { ...patch.metrics } },
+      {
+        turn: state.turn,
+        action: patch.action,
+        crisisId: patch.crisis?.id ?? null,
+        crisisOption: patch.crisis?.option ?? null,
+        crisisBranch: patch.crisis?.branch ?? null,
+        events: patch.ledger.events,
+        metricsAfter: { ...patch.metrics },
+      },
     ],
     metricsHistory: [...state.metricsHistory, { ...patch.metrics }],
   };
@@ -233,12 +247,14 @@ export function executePolicyDecision(state: SimulationState, action: PolicyActi
     L.log("bad", { he: "הקבינט הורה על טרנספר כפוי של אוכלוסיית עזה.", en: "The cabinet ordered the forced transfer of Gaza's population." });
     L.log("bad", { he: "התראות גבול בחזית מצרים — פריצת מלחמה אזורית.", en: "Border alerts on the Egyptian front — regional war breaks out." });
     L.event("REGIONAL_WAR_BREAKOUT");
+    L.event("CRISIS_TRIGGERED");
     return {
       ...state,
       metrics: updateMetrics(state.metrics, def.transition.deltas),
       activeTrack: action.track,
       lastAction: action,
-      pendingCrisis: { id: "EGYPTIAN_BALLISTIC_ATTACK", action, metricsBefore: { ...state.metrics } },
+      pendingCrisis: { id: "EGYPTIAN_BALLISTIC_ATTACK", action, phase: "pre", metricsBefore: { ...state.metrics }, events: L.events },
+      crisisLastTurn: { ...state.crisisLastTurn, EGYPTIAN_BALLISTIC_ATTACK: state.turn },
       historyLogs: [...state.historyLogs, ...L.logs],
     };
   }
@@ -255,7 +271,7 @@ export function executePolicyDecision(state: SimulationState, action: PolicyActi
     if (coalition !== "CENTER_LEFT_BLOC") {
       L.event("COALITION_CRISIS");
       return finish(state, {
-        metrics: m, checkpoints: cps, flags, activeTrack: action.track, action, crisisOption: null, ledger: L,
+        metrics: m, checkpoints: cps, flags, activeTrack: action.track, action, crisis: null, ledger: L, rngState: rng,
         forcedOutcome: {
           kind: "COALITION_COLLAPSE",
           reason: {
@@ -328,9 +344,11 @@ export function executePolicyDecision(state: SimulationState, action: PolicyActi
   }
 
   // -- brief rule 2: PA security alone
+  let paSecurityRuleFired = false;
   if (reliesOnPalestinianSecurityAlone(action)) {
     if (!flags.terrorInfrastructureGrowth) {
       flags.terrorInfrastructureGrowth = true;
+      paSecurityRuleFired = true;
       L.event("TERROR_INFRASTRUCTURE_GROWTH");
       L.log("bad", { he: "אזהרה ביטחונית: ללא חופש פעולה לצה\"ל ארגוני הטרור מתחמשים מחדש (לקח אוסלו וההתנתקות).", en: "Security warning: without IDF freedom of action, terror groups rearm (the Oslo and disengagement lesson)." });
       m = updateMetrics(m, { securityThreat: RULES.paSecurityAloneThreat.value });
@@ -396,24 +414,111 @@ export function executePolicyDecision(state: SimulationState, action: PolicyActi
     L.log("warn", { he: "המתווה האזורי ננטש: כל שלבי האימות אופסו.", en: "Regional framework abandoned: all verification stages reset." });
   }
 
-  return finish(state, { metrics: m, checkpoints: cps, flags, activeTrack: action.track, action, crisisOption: null, ledger: L });
+  // -- crisis engine: at most one crisis per turn, highest-priority first
+  const passed = CHECKPOINT_ORDER.filter((k) => cps[k] && !state.checkpoints[k]);
+  const risks = m.coalitionStability > 0
+    ? crisisRisks({ prev: state, action, metrics: m, flags, passed, adopting, paSecurityRuleFired })
+    : [];
+  let opened: CrisisRisk | null = null;
+  for (const r of risks) {
+    if (r.p >= 1) {
+      opened = r;
+      break;
+    }
+    if (opts.preview === true) continue;
+    const [u, s] = nextRandom(rng);
+    rng = s;
+    if (u < r.p) {
+      opened = r;
+      break;
+    }
+  }
+  if (opened !== null) {
+    const def = CRISIS_DEFS[opened.id];
+    L.event("CRISIS_TRIGGERED");
+    L.log("bad", { he: `הקבינט נדרש להכרעה מיידית: ${def.title.he}.`, en: `The cabinet must decide immediately: ${def.title.en}.` });
+    return {
+      ...state,
+      metrics: m,
+      checkpoints: cps,
+      flags,
+      activeTrack: action.track,
+      lastAction: action,
+      rngState: rng,
+      pendingCrisis: { id: opened.id, action, phase: "post", metricsBefore: { ...m }, events: L.events },
+      crisisLastTurn: { ...state.crisisLastTurn, [opened.id]: state.turn },
+      historyLogs: [...state.historyLogs, ...L.logs],
+    };
+  }
+
+  return finish(state, { metrics: m, checkpoints: cps, flags, activeTrack: action.track, action, crisis: null, ledger: L, rngState: rng });
+}
+
+/** Crises that could open if this decision were taken (probabilities, no draws). */
+export function previewCrisisRisks(state: SimulationState, action: PolicyAction): CrisisRisk[] {
+  if (state.gameOver || state.pendingCrisis !== null) return [];
+  if (action.track === "RADICAL_RIGHT_DEPORTATION") {
+    return [{ id: "EGYPTIAN_BALLISTIC_ATTACK", p: 1, why: CRISIS_DEFS.EGYPTIAN_BALLISTIC_ATTACK.trigger }];
+  }
+  const after = executePolicyDecision(state, action, { preview: true });
+  if (after.pendingCrisis !== null) {
+    // deterministic crisis — show it, then everything that would have been drawn alongside
+    return [{ id: after.pendingCrisis.id, p: 1, why: CRISIS_DEFS[after.pendingCrisis.id].trigger }];
+  }
+  const last = after.turns[after.turns.length - 1];
+  if (last === undefined || after.turns.length === state.turns.length) return [];
+  const prevAction = state.lastAction;
+  const adopting = prevAction === null || state.activeTrack === null || prevAction.track !== action.track ||
+    (action.track === "PRAGMATIC_CENTER_REGIONAL_TRUSTEESHIP" && prevAction.concedeConstructiveAmbiguity !== action.concedeConstructiveAmbiguity);
+  return crisisRisks({
+    prev: state,
+    action,
+    metrics: after.metrics,
+    flags: after.flags,
+    passed: CHECKPOINT_ORDER.filter((k) => after.checkpoints[k] && !state.checkpoints[k]),
+    adopting,
+    paSecurityRuleFired: last.events.includes("TERROR_INFRASTRUCTURE_GROWTH"),
+  }).filter(() => after.metrics.coalitionStability > 0);
 }
 
 // ---------------------------------------------------------------------------
 // crisis resolution
 // ---------------------------------------------------------------------------
 
-export function resolveCrisis(state: SimulationState, optionId: CrisisOptionId): SimulationState {
+export interface ResolveOptions {
+  /** force a gamble outcome (preview) instead of drawing it */ branch?: GambleBranch;
+}
+
+export function resolveCrisis(state: SimulationState, optionId: CrisisOptionId, opts: ResolveOptions = {}): SimulationState {
   const pending = state.pendingCrisis;
   if (state.gameOver || pending === null) return state;
-  const opt = CRISIS_DEFS[pending.id].options[optionId];
-  const L = new Ledger(state.turn);
+  const def = CRISIS_DEFS[pending.id];
+  const opt = crisisOption(pending.id, optionId);
+  const L = new Ledger(state.turn, pending.events);
   const flags = { ...state.flags };
-  let m = updateMetrics(pending.metricsBefore, opt.deltas);
+  let checkpoints = { ...state.checkpoints };
+  let activeTrack = state.activeTrack;
+  let rng = state.rngState;
+  const fx = opt.effects ?? {};
 
-  L.log(opt.executesTransfer ? "bad" : "warn", { he: `הכרעת הקבינט: ${opt.label.he}.`, en: `Cabinet decision: ${opt.label.en}.` });
+  let branch: GambleBranch | null = null;
+  if (opt.gamble !== undefined) {
+    if (opts.branch !== undefined) {
+      branch = opts.branch;
+    } else {
+      const [u, s] = nextRandom(rng);
+      rng = s;
+      branch = u < opt.gamble.p ? "success" : "failure";
+    }
+  }
 
-  if (opt.executesTransfer) {
+  const base = pending.phase === "pre" ? pending.metricsBefore : state.metrics;
+  let m = updateMetrics(base, optionDeltas(opt, branch));
+  const crisis = { id: pending.id, option: optionId, branch };
+
+  L.log(fx.executesTransfer === true ? "bad" : "warn", { he: `הכרעת הקבינט (${def.title.he}): ${opt.label.he}.`, en: `Cabinet decision (${def.title.en}): ${opt.label.en}.` });
+
+  if (fx.executesTransfer === true) {
     // brief §3 hard rule: MASS_DEPORTATION carried out
     m.usMilitaryAid = 0;
     m.regionalRelations = 0;
@@ -424,18 +529,27 @@ export function resolveCrisis(state: SimulationState, optionId: CrisisOptionId):
     L.event("REGIONAL_WAR_BREAKOUT");
     return finish(state, {
       metrics: m, checkpoints: { ...initialCheckpoints }, flags, activeTrack: pending.action.track, action: pending.action,
-      crisisOption: optionId, ledger: L, forcedOutcome: { kind: "STRATEGIC_COLLAPSE", reason: opt.outcomeReason },
+      crisis, ledger: L, rngState: rng, forcedOutcome: { kind: "STRATEGIC_COLLAPSE", reason: opt.result },
     });
   }
 
-  L.log("info", opt.outcomeReason);
-  if (optionId === "D_US_MEDIATION") {
-    flags.usConditionsTurns = RULES.usConditionsTurns;
-    L.log("warn", { he: "ארה\"ב מתנה את הסיוע בחזרה לסטטוס קוו ובהימנעות מסיפוח והרחבת התנחלויות.", en: "The US conditions aid on a return to the status quo and no annexation or settlement expansion." });
+  L.log("info", opt.result);
+  if (opt.gamble !== undefined && branch !== null) {
+    L.log(branch === "success" ? "good" : "bad", opt.gamble[branch].label);
   }
-  return finish(state, {
-    metrics: m, checkpoints: { ...initialCheckpoints }, flags, activeTrack: null, action: pending.action, crisisOption: optionId, ledger: L,
-  });
+  if (pending.phase === "pre") checkpoints = { ...initialCheckpoints };
+  if (fx.abandonsTrack === true) activeTrack = null;
+  if (fx.usConditionsTurns !== undefined) flags.usConditionsTurns = Math.max(flags.usConditionsTurns, fx.usConditionsTurns);
+  if (fx.restoresIdfControl === true && flags.terrorInfrastructureGrowth) {
+    flags.terrorInfrastructureGrowth = false;
+    L.log("good", { he: "צה\"ל השיב לעצמו חופש פעולה: צמיחת תשתיות הטרור נבלמה.", en: "The IDF regained freedom of action: terror infrastructure growth halted." });
+  }
+  if (fx.freezesProcess === true) {
+    flags.processFrozenTurns = Math.max(flags.processFrozenTurns, RULES.processFreezeTurns);
+    flags.gulfFundsReconstruction = false;
+    L.event("PROCESS_FROZEN");
+  }
+  return finish(state, { metrics: m, checkpoints, flags, activeTrack, action: pending.action, crisis, ledger: L, rngState: rng });
 }
 
 /** Decision preview: the same step without random draws. */

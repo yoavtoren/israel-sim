@@ -107,7 +107,8 @@ export const SUEZ_CANAL: LonLat[] = [[32.35, 31.25], [32.32, 30.85], [32.27, 30.
 /** Egypt–Israel border + Philadelphi corridor (Kerem Shalom → Taba) */
 export const EGYPT_BORDER: LonLat[] = [[34.22, 31.32], [34.27, 31.22], [34.4, 30.85], [34.55, 30.4], [34.73, 29.9], [34.9, 29.49]];
 
-export type CityId = "tel_aviv" | "haifa" | "dimona" | "ashdod" | "eilat" | "jerusalem" | "beersheba";
+export type CityId =
+  | "tel_aviv" | "haifa" | "dimona" | "ashdod" | "ashkelon" | "eilat" | "jerusalem" | "beersheba" | "netanya" | "afula";
 export interface City {
   id: CityId;
   name: { he: string; en: string };
@@ -118,12 +119,17 @@ export const CITIES: Record<CityId, City> = {
   haifa: { id: "haifa", name: { he: "חיפה", en: "Haifa" }, pos: [34.99, 32.79] },
   dimona: { id: "dimona", name: { he: "דימונה", en: "Dimona" }, pos: [35.03, 31.07] },
   ashdod: { id: "ashdod", name: { he: "אשדוד", en: "Ashdod" }, pos: [34.65, 31.8] },
+  ashkelon: { id: "ashkelon", name: { he: "אשקלון", en: "Ashkelon" }, pos: [34.57, 31.67] },
   eilat: { id: "eilat", name: { he: "אילת", en: "Eilat" }, pos: [34.95, 29.56] },
   jerusalem: { id: "jerusalem", name: { he: "ירושלים", en: "Jerusalem" }, pos: [35.21, 31.77] },
   beersheba: { id: "beersheba", name: { he: "באר שבע", en: "Be'er Sheva" }, pos: [34.79, 31.25] },
+  netanya: { id: "netanya", name: { he: "נתניה", en: "Netanya" }, pos: [34.86, 32.33] },
+  afula: { id: "afula", name: { he: "עפולה", en: "Afula" }, pos: [35.29, 32.61] },
 };
 
-export type OriginId = "sinai" | "sinai_south" | "tehran" | "western_iraq" | "south_lebanon" | "gaza";
+export type OriginId =
+  | "sinai" | "sinai_south" | "tehran" | "western_iraq" | "south_lebanon" | "gaza"
+  | "jenin" | "nablus" | "tulkarm" | "kermanshah" | "isfahan" | "tabriz";
 export const ORIGINS: Record<OriginId, { name: { he: string; en: string }; pos: LonLat }> = {
   sinai: { name: { he: "צפון סיני", en: "Northern Sinai" }, pos: [33.75, 30.95] },
   sinai_south: { name: { he: "מרכז סיני", en: "Central Sinai" }, pos: [33.55, 30.2] },
@@ -131,9 +137,16 @@ export const ORIGINS: Record<OriginId, { name: { he: string; en: string }; pos: 
   western_iraq: { name: { he: "מערב עיראק", en: "Western Iraq" }, pos: [40.2, 33.4] },
   south_lebanon: { name: { he: "דרום לבנון", en: "Southern Lebanon" }, pos: [35.45, 33.3] },
   gaza: { name: { he: "רצועת עזה", en: "Gaza Strip" }, pos: [34.42, 31.45] },
+  jenin: { name: { he: "ג'נין", en: "Jenin" }, pos: [35.3, 32.46] },
+  nablus: { name: { he: "שכם", en: "Nablus" }, pos: [35.26, 32.22] },
+  tulkarm: { name: { he: "טול כרם", en: "Tulkarm" }, pos: [35.03, 32.31] },
+  kermanshah: { name: { he: "כרמאנשאה", en: "Kermanshah" }, pos: [47.07, 34.31] },
+  isfahan: { name: { he: "אספהאן", en: "Isfahan" }, pos: [51.67, 32.65] },
+  tabriz: { name: { he: "תבריז", en: "Tabriz" }, pos: [46.29, 38.08] },
 };
 
-export type BatteryId = "iron_dome_gush_dan" | "iron_dome_south" | "davids_sling_haifa" | "patriot_haifa" | "arrow3";
+export type BatteryId =
+  | "iron_dome_gush_dan" | "iron_dome_south" | "davids_sling_haifa" | "patriot_haifa" | "arrow3" | "coalition_cap";
 export interface Battery {
   id: BatteryId;
   name: { he: string; en: string };
@@ -141,6 +154,7 @@ export interface Battery {
   radiusKm: number;
   /** estimated single-engagement kill probability (display assumption) */ pk: number;
   outer: boolean;
+  /** airborne combat air patrol rather than a ground battery */ airborne?: boolean;
 }
 export const BATTERIES: Record<BatteryId, Battery> = {
   iron_dome_gush_dan: { id: "iron_dome_gush_dan", name: { he: "כיפת ברזל · גוש דן", en: "Iron Dome · Gush Dan" }, pos: [34.86, 32.02], radiusKm: 70, pk: 0.9, outer: false },
@@ -148,6 +162,7 @@ export const BATTERIES: Record<BatteryId, Battery> = {
   davids_sling_haifa: { id: "davids_sling_haifa", name: { he: "קלע דוד · חיפה", en: "David's Sling · Haifa" }, pos: [35.08, 32.72], radiusKm: 180, pk: 0.85, outer: false },
   patriot_haifa: { id: "patriot_haifa", name: { he: "פטריוט · צפון", en: "Patriot · North" }, pos: [35.2, 32.9], radiusKm: 100, pk: 0.75, outer: false },
   arrow3: { id: "arrow3", name: { he: "חץ 3 · מעטפת חיצונית", en: "Arrow 3 · outer envelope" }, pos: [34.92, 31.85], radiusKm: 450, pk: 0.88, outer: true },
+  coalition_cap: { id: "coalition_cap", name: { he: "סיור אווירי קואליציוני · ירדן", en: "Coalition CAP · Jordan" }, pos: [37.6, 31.6], radiusKm: 260, pk: 0.9, outer: false, airborne: true },
 };
 
 /** Egyptian mechanized formations west of the canal and their forward lines. */
@@ -160,18 +175,59 @@ export const EGYPT_FORMATIONS: Array<{ id: string; label: { he: string; en: stri
 /** Contested buffer along Philadelphi / northern Sinai (drawn when fighting spreads). */
 export const SINAI_BUFFER: LonLat[] = [[34.22, 31.32], [34.27, 31.22], [34.4, 30.85], [34.0, 30.75], [33.7, 31.08], [33.9, 31.13]];
 
+/** 1979 treaty Annex I zone boundaries in Sinai — schematic. */
+export const TREATY_LINES: Array<{ id: string; label: { he: string; en: string }; path: LonLat[] }> = [
+  { id: "line_a", label: { he: "קו A", en: "Line A" }, path: [[32.95, 31.08], [32.95, 29.3]] },
+  { id: "line_b", label: { he: "קו B", en: "Line B" }, path: [[33.55, 31.1], [33.6, 28.6]] },
+  { id: "line_c", label: { he: "גבול אזור C", en: "Zone C edge" }, path: [[34.0, 31.15], [34.1, 28.1]] },
+];
+
+/** Tunnel routes under Philadelphi / Rafah (schematic). */
+export const TUNNEL_ROUTES: LonLat[][] = [
+  [[34.26, 31.30], [34.24, 31.27], [34.21, 31.23]],
+  [[34.29, 31.29], [34.27, 31.25], [34.25, 31.21]],
+  [[34.31, 31.28], [34.3, 31.25], [34.285, 31.225]],
+  [[34.33, 31.30], [34.35, 31.27], [34.3, 31.235]],
+];
+
+/** Separation barrier, drawn as the West Bank outline (schematic). */
+export function westBankRing(regions: Region[]): LonLat[] {
+  return regions.find((r) => r.id === "west_bank")?.ring ?? [];
+}
+
+export function boxAround([lon, lat]: LonLat, d: number): LonLat[] {
+  return [[lon - d, lat - d], [lon + d, lat - d], [lon + d, lat + d], [lon - d, lat + d]];
+}
+
+/** Standing order of battle positions. */
+export const BASES = {
+  nevatim: [35.01, 31.21] as LonLat,
+  hatzerim: [34.66, 31.23] as LonLat,
+  ramat_david: [35.18, 32.66] as LonLat,
+  haifa_naval: [34.82, 32.98] as LonLat,
+  ashdod_naval: [34.45, 31.88] as LonLat,
+  eilat_naval: [34.72, 28.95] as LonLat,
+  us_csg_med: [33.3, 33.4] as LonLat,
+  us_ddg_red_sea: [36.4, 24.8] as LonLat,
+  egypt_navy_port_said: [32.45, 31.55] as LonLat,
+  egypt_navy_red_sea: [34.1, 27.2] as LonLat,
+};
+
 export interface Camera {
   cx: number;
   cy: number;
   /** px per map unit */ scale: number;
 }
 
-export type FocusId = "theater" | "israel" | "tel_aviv";
+export type FocusId = "theater" | "israel" | "tel_aviv" | "west_bank" | "gaza" | "sinai";
 
 const FOCUS_BOUNDS: Record<FocusId, [LonLat, LonLat]> = {
   theater: [[29.5, 24.5], [53.5, 38.2]],
   israel: [[31.2, 29.2], [37.8, 33.6]],
   tel_aviv: [[33.6, 31.35], [35.9, 32.75]],
+  west_bank: [[34.3, 31.25], [36.1, 32.75]],
+  gaza: [[33.85, 30.95], [34.85, 31.72]],
+  sinai: [[31.4, 28.6], [35.4, 32.0]],
 };
 
 export function focusCamera(focus: FocusId, w: number, h: number): Camera {

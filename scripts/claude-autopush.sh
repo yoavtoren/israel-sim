@@ -22,7 +22,13 @@ if ! git diff --cached --quiet; then
 fi
 
 # Push only if there is something unpushed.
-if [ -n "$(git rev-list "@{u}..HEAD" 2>/dev/null || echo new)" ]; then
-  git push -q origin "$BRANCH" 2>&1 | tail -3
+[ -z "$(git rev-list "@{u}..HEAD" 2>/dev/null || echo new)" ] && exit 0
+
+# Gate the push on the same checks CI runs, so half-finished work (e.g. another
+# session mid-refactor) stays as local commits instead of failing CI.
+if ! npm run -s typecheck >/dev/null 2>&1 || ! npm run -s test >/dev/null 2>&1; then
+  echo "$(date '+%Y-%m-%d %H:%M') push skipped: typecheck/test failing — commits kept locally"
+  exit 0
 fi
+git push -q origin "$BRANCH" 2>&1 | tail -3
 exit 0
