@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { strategic as S } from "../src/index";
 
-/** The 2022 right bloc (64 seats in the 2022 roster; 54 in current polls). */
+/** The 2022 right bloc (64 seats in the 2022 roster). */
 const RIGHT: S.PartyId[] = ["likud", "shas", "utj", "religious_zionism", "otzma_yehudit", "noam"];
-/** Poll-era unity government: Gantz + Lapid + Lieberman + Likud (66). */
-const UNITY: S.PartyId[] = ["national_unity", "yesh_atid", "yisrael_beiteinu", "likud"];
-/** Poll-era center-left + Lieberman + Arab parties (64). */
-const CHANGE: S.PartyId[] = ["national_unity", "yisrael_beiteinu", "yesh_atid", "democrats", "raam", "hadash_taal"];
+/** September 2026 polls: unity — Eisenkot + Likud + Bennett/Lapid + Lieberman (67). */
+const UNITY: S.PartyId[] = ["yashar", "likud", "together", "yisrael_beiteinu"];
+/** September 2026 polls: change bloc + Ra'am + Joint List (66). */
+const CHANGE: S.PartyId[] = ["yashar", "together", "democrats", "yisrael_beiteinu", "raam", "joint_list"];
 
 function started(members: S.PartyId[], seed = "t", roster: S.SeatRoster = "polls"): S.CampaignState {
   return S.formGovernment(S.chooseParty(S.createCampaign(seed, roster), members[0]), members);
@@ -24,13 +24,20 @@ describe("M13 Prime Minister campaign", () => {
   it("both seat rosters hold exactly 120 seats; polls are the default", () => {
     for (const r of S.SEAT_ROSTERS) expect(S.PARTY_IDS.reduce((a, p) => a + S.SEATS[r][p], 0)).toBe(120);
     expect(S.createCampaign("d").roster).toBe("polls");
-    expect(S.SEATS.polls.likud).toBe(23);
-    expect(S.SEATS.polls.balad).toBe(2);
+    expect(S.SEATS.polls.yashar).toBe(24);
+    expect(S.SEATS.polls.likud).toBe(22);
+    expect(S.SEATS.polls.together).toBe(13);
+    expect(S.SEATS.polls.democrats).toBe(9);
+    expect(S.partyLeader("yashar", "polls")?.he).toBe("גדי איזנקוט");
+    expect(S.partyLeader("together", "polls")?.en).toContain("Bennett");
+    expect(S.partyLeader("democrats", "polls")?.he).toBe("יאיר גולן");
+    // lists that merged or fell below the threshold have no seats in the polls
+    for (const gone of ["yesh_atid", "national_unity", "hadash_taal", "balad", "noam"] as const) expect(S.SEATS.polls[gone]).toBe(0);
     expect(S.partyName("democrats", "election_2022").en).toBe("Labor");
     expect(S.partyName("democrats", "polls").he).toBe("הדמוקרטים");
     // a zero-seat party cannot be picked
     expect(S.chooseParty(S.createCampaign("z"), "noam").phase).toBe("party");
-    expect(S.chooseParty(S.createCampaign("z", "election_2022"), "balad").phase).toBe("party");
+    expect(S.chooseParty(S.createCampaign("z", "election_2022"), "yashar").phase).toBe("party");
     // the roster can only change before a party is picked
     const r = S.setRoster(S.createCampaign("r"), "election_2022");
     expect(r.roster).toBe("election_2022");
@@ -47,41 +54,46 @@ describe("M13 Prime Minister campaign", () => {
     expect(S.formGovernment(s, ["likud", "raam", "otzma_yehudit", "shas", "utj"])).toBe(s);
   });
 
-  it("current polls: 61 needs a compromise", () => {
-    const rightBloc = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism"]);
-    expect(rightBloc.seats).toBe(54);
-    expect(rightBloc.valid).toBe(false);
+  it("current polls (September 2026): 61 needs a compromise", () => {
+    const bloc: S.PartyId[] = ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "amcha_yisrael"];
+    const netanyahu = S.checkCoalition(bloc);
+    expect(netanyahu.seats).toBe(54);
+    expect(netanyahu.valid).toBe(false);
 
-    const plusLieberman = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "yisrael_beiteinu"]);
-    expect(plusLieberman.seats).toBe(68);
+    const plusLieberman = S.checkCoalition([...bloc, "yisrael_beiteinu"]);
+    expect(plusLieberman.seats).toBe(62);
     expect(plusLieberman.valid).toBe(true);
     expect(plusLieberman.frictions.filter((f) => f.level === "deep").length).toBe(2); // Lieberman vs. the Haredi parties
 
-    const plusGantz = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "national_unity"]);
-    expect(plusGantz.seats).toBe(70);
-    expect(plusGantz.valid).toBe(true);
+    const zionistChange = S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu"]);
+    expect(zionistChange.seats).toBe(54);
+    expect(zionistChange.valid).toBe(false);
+    expect(S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "raam"]).seats).toBe(59);
 
     const change = S.checkCoalition(CHANGE);
-    expect(change.seats).toBe(64);
+    expect(change.seats).toBe(66);
     expect(change.valid).toBe(true);
-    const pairs = change.frictions.map((f) => [f.a, f.b].sort().join("|"));
-    expect(pairs).toContain(["raam", "yisrael_beiteinu"].sort().join("|"));
-    expect(change.frictions.find((f) => [f.a, f.b].includes("hadash_taal") && [f.a, f.b].includes("yisrael_beiteinu"))?.level).toBe("deep");
-    // the most strained government starts the least stable
-    expect(change.stability).toBeLessThan(S.checkCoalition(UNITY).stability);
-    expect(S.checkCoalition(UNITY).seats).toBe(66);
+    expect(change.frictions.find((f) => [f.a, f.b].includes("joint_list") && [f.a, f.b].includes("yisrael_beiteinu"))?.level).toBe("deep");
 
-    // Hadash–Ta'al's patience starts lowest in the change bloc (deep friction with Lieberman)
+    const unity = S.checkCoalition(UNITY);
+    expect(unity.seats).toBe(67);
+    expect(unity.valid).toBe(true);
+    expect(change.stability).toBeLessThan(unity.stability);
+
+    // Eisenkot and Bennett/Lapid will not sit with Ben-Gvir
+    expect(S.checkCoalition(["yashar", "likud", "otzma_yehudit", "shas", "utj"]).vetoes.length).toBeGreaterThan(0);
+    expect(S.checkCoalition(["together", "likud", "otzma_yehudit", "shas", "utj", "yisrael_beiteinu"]).vetoes.length).toBeGreaterThan(0);
+
+    // the Joint List starts the least patient partner in the change bloc
     const g = started(CHANGE, "chg");
     expect(g.phase).toBe("policy");
-    const hadash = g.patience.hadash_taal ?? 100;
-    for (const [p, v] of Object.entries(g.patience)) if (p !== "hadash_taal" && p !== "yisrael_beiteinu") expect(v).toBeGreaterThan(hadash);
+    const joint = g.patience.joint_list ?? 100;
+    for (const [p, v] of Object.entries(g.patience)) if (p !== "joint_list") expect(v).toBeGreaterThanOrEqual(joint);
 
-    // every benchmark adds up and all but the right bloc can govern
     for (const b of S.BENCHMARK_COALITIONS) {
       const c = S.checkCoalition(b.members);
       expect(c.vetoes).toEqual([]);
-      expect(c.valid).toBe(b.id !== "right_bloc");
+      for (const m of b.members) expect(S.SEATS.polls[m]).toBeGreaterThan(0);
     }
   });
 

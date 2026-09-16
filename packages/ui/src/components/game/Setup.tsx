@@ -97,7 +97,10 @@ export function PartyPicker(props: { lang: Lang }) {
               >
                 <span className="absolute inset-x-0 top-0 h-1 opacity-80 transition-opacity group-hover:opacity-100" style={{ background: p.color }} />
                 <span className="flex w-full items-start justify-between gap-2">
-                  <span className="text-[16px] leading-[22px] font-medium">{tr(S.partyName(id, roster), lang)}</span>
+                  <span className="flex flex-col">
+                    <span className="text-[16px] leading-[22px] font-medium">{tr(S.partyName(id, roster), lang)}</span>
+                    {S.partyLeader(id, roster) !== null && <span className="text-[12px] leading-[17px] text-fg2">{tr(S.partyLeader(id, roster) ?? { he: "", en: "" }, lang)}</span>}
+                  </span>
                   <span className="flex flex-col items-center leading-none">
                     <span className="num text-[22px] font-medium text-fg0">{S.partySeats(roster, id)}</span>
                     <span className="mt-0.5 text-[10.5px] text-fg2">{he ? "מנדטים" : "seats"}</span>
@@ -203,6 +206,7 @@ export function CoalitionBuilder(props: { lang: Lang }) {
                       </span>
                       <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: p.color }} />
                       <span className="text-[15px] font-medium">{name(id)}</span>
+                      {S.partyLeader(id, roster) !== null && <span className="text-[12px] text-fg2">· {tr(S.partyLeader(id, roster) ?? { he: "", en: "" }, lang)}</span>}
                       {isPm && <span className="rounded-full bg-info px-2 text-[11px] leading-[18px] whitespace-nowrap text-white">{he ? "המפלגה שלך" : "your party"}</span>}
                     </span>
                     <span className="num text-[18px] font-medium">{S.partySeats(roster, id)}</span>

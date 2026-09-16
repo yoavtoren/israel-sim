@@ -115,15 +115,15 @@ Flow: **welcome → pick a party → form a coalition (≥61 seats, no mutual re
 government's policy on the Israeli–Palestinian conflict") → the doctrine's first dilemma (radical right: "what will you
 do in Gaza?") → consequence popups → next dilemma …** until an ending.
 
-- Parties: two seat rosters, both summing to 120 — **current polls (default)**: Likud 23, National Unity 16, Yisrael
-  Beiteinu 14, Yesh Atid 13, The Democrats 11, Shas 10, Otzma Yehudit 9, UTJ 8, Ra'am 5, Hadash–Ta'al 5, Religious
-  Zionism 4, Balad 2; and **the November 2022 election** (Religious Zionism list split into its three factions; the
-  Democrats appear as Labor). Toggle on the welcome screen. Security positions, refusals and frictions are game
-  assumptions from public positions.
-- Friction has two levels (`friction` ×1, `deepFriction` ×3) feeding starting stability and each partner's patience.
-  Poll arithmetic: right bloc 54 (cannot govern); + Lieberman 68 (deep friction with Shas/UTJ); + Gantz 70 (deep friction
-  with Otzma); center-left + Lieberman + Ra'am + Hadash–Ta'al 64 (stability 32; Lieberman–Ra'am friction,
-  Lieberman–Hadash–Ta'al deep); unity Gantz + Lapid + Lieberman + Likud 66. These are one-click benchmarks in the builder.
+- Parties: two seat rosters, both summing to 120 — **current polls (default)**: the average of the 10 polls published
+  9–15 September 2026 (per Wikipedia's polling table), largest-remainder rounded: Yashar (Eisenkot) 24, Likud 22,
+  Together (Bennett & Lapid) 13, The Democrats (Golan) 9, Yisrael Beiteinu 8, Shas 8, UTJ 8, Otzma Yehudit 7, Joint List 7,
+  Religious Zionism–Zehut 5, Ra'am 5, Amcha Yisrael (Winter) 4; Blue and White and the Reservists below the threshold.
+  And **the November 2022 election**. Toggle on the welcome screen; leaders shown on the cards. Security positions,
+  refusals and frictions are game assumptions from public positions.
+- Poll arithmetic (one-click benchmarks in the builder): Netanyahu bloc 54 ✗; + Lieberman 62 (deep friction with the
+  Haredi parties); Eisenkot + Bennett + Golan + Lieberman 54 ✗; + Ra'am 59 ✗; + Joint List 66 (stability 15, deep
+  frictions); unity Eisenkot + Likud + Bennett + Lieberman 67 (stability 63).
 - Coalition: each partner has 0–100 patience. Doctrines and options move patience by party group (far right / right /
   Haredi / center / left / Arab parties); ≤25 → threat popup, ≤0 → the party quits; below 61 seats → the government falls.
   The coalition-stability metric is the seat-weighted patience.

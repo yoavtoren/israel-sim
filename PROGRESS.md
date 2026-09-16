@@ -130,3 +130,8 @@
 - Coalition builder: seat bar with "N seats short", deep vs regular friction per card and in the footer, one-click benchmark coalitions (right bloc 54 ✗, +Gantz 70, +Lieberman 68, center-left+Lieberman+Arab parties 64, unity 66).
 - Random-play check: in current polls only the trusteeship doctrine keeps most governments alive for long; the 64-seat change bloc loses Lieberman (→50) on a PA-return doctrine, as the preview shows.
 - Gate: tsc + no-any; engine 75 tests (m13 now 10: roster sums, zero-seat picks, poll arithmetic and friction levels), UI 20; build; smoke. Browser-verified roster toggle and builder.
+
+## M13.2 — 2026-09-16 — real September 2026 poll map
+- User: the previous "polls" were not current — wanted Eisenkot, Bennett, Yair Golan etc. Researched: Yashar (Eisenkot), Together (Bennett + Lapid, Yesh Atid inside), Joint List (Hadash + Ta'al + Balad, reunited Aug 2026), Religious Zionism–Zehut (Smotrich + Feiglin), Amcha Yisrael (Winter); Blue and White and Hendel's Reservists below threshold.
+- Polls roster = average of the 10 polls of 9–15 Sep 2026 (Wikipedia table), largest remainder → 120. Leaders per roster (`partyLeader`). New benchmarks: Netanyahu bloc 54, +Lieberman 62, change bloc 54 / +Ra'am 59 / +Joint List 66, unity 67.
+- Gate: tsc + no-any; engine 75, UI 20; build ok.
