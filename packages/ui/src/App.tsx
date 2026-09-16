@@ -16,13 +16,13 @@ import { Reforms } from "./screens/Reforms";
 import { History } from "./screens/History";
 import { PostMortem } from "./screens/PostMortem";
 import { Alliances } from "./screens/Alliances";
-import { Cabinet } from "./screens/Cabinet";
+import { Game } from "./screens/Game";
 import { Tactical } from "./screens/Tactical";
 import { StrategicStrip } from "./components/StrategicStrip";
 
 const STRATEGY_NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
+  { screen: "game", label: "game", accent: DOMAIN.security },
   { screen: "alliances", label: "alliances", accent: DOMAIN.diplomacy },
-  { screen: "cabinet", label: "cabinet", accent: DOMAIN.security },
   { screen: "tactical", label: "tactical", accent: DOMAIN.diplomacy },
 ];
 
@@ -70,7 +70,7 @@ export function App() {
   }
 
   const ended = state.outcome.ended;
-  const strategicScreen = screen === "alliances" || screen === "cabinet" || screen === "tactical";
+  const strategicScreen = screen === "game" || screen === "alliances" || screen === "tactical";
   const navButton = (n: { screen: Screen; label: UIKey; accent: string }) => (
     <button
       key={n.screen}
@@ -123,7 +123,7 @@ export function App() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* top strip: clock, headline KPIs, run controls */}
-        {strategicScreen ? <StrategicStrip /> : <header className="flex items-center gap-6 border-b border-line0 bg-bg1 px-4 py-2">
+        {screen === "game" ? null : strategicScreen ? <StrategicStrip /> : <header className="flex items-center gap-6 border-b border-line0 bg-bg1 px-4 py-2">
           <Num value={fmtQuarter(state.t.year, state.t.quarter)} className="text-[24px] leading-[32px] font-medium" />
           <div className="flex items-baseline gap-1 text-[12px] text-fg1">
             {t("gdp", lang)}
@@ -159,9 +159,9 @@ export function App() {
           </div>
         )}
 
-        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" || screen === "alliances" ? "relative" : "overflow-y-auto p-4"}`}>
+        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" || screen === "alliances" || screen === "game" ? "relative" : "overflow-y-auto p-4"}`}>
           {screen === "alliances" && <Alliances />}
-          {screen === "cabinet" && <Cabinet />}
+          {screen === "game" && <Game />}
           {screen === "tactical" && <Tactical />}
           {screen === "overview" && <Overview />}
           {screen === "budget" && <Budget />}

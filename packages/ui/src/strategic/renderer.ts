@@ -22,6 +22,7 @@ export interface FrameEnv {
   lang: "he" | "en";
   nowMs: number;
   trackedId: string | null;
+  /** radar, defense envelopes, city and region labels (off when zoomed out to the world) */ chrome?: boolean;
 }
 
 const SANS = "Heebo, system-ui, sans-serif";
@@ -123,8 +124,9 @@ export function drawFrame(ctx: CanvasRenderingContext2D, env: FrameEnv): void {
 
   const active = script.launches.filter((l) => t >= l.t0 && t < endTime(l));
 
-  drawRadar(ctx, env, SL(RADAR_CENTER), pxPerKm, active);
-  drawEnvelopes(ctx, env, SL, pxPerKm, active);
+  const chrome = env.chrome !== false;
+  if (chrome) drawRadar(ctx, env, SL(RADAR_CENTER), pxPerKm, active);
+  if (chrome || active.length > 0) drawEnvelopes(ctx, env, SL, pxPerKm, active);
   drawZones(ctx, env, SL);
   drawUnits(ctx, env, SL);
 
@@ -136,7 +138,7 @@ export function drawFrame(ctx: CanvasRenderingContext2D, env: FrameEnv): void {
 
   drawReticles(ctx, env, SL, active);
   drawOrigins(ctx, env, SL);
-  drawLabels(ctx, env, SL);
+  if (chrome) drawLabels(ctx, env, SL);
 }
 
 // ---------------------------------------------------------------------------

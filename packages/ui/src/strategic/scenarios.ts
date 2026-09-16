@@ -14,14 +14,14 @@ import {
 type Bi = strategic.Bi;
 
 export type Faction =
-  | "egypt" | "gaza" | "iran" | "iraq" | "hezbollah" | "pa" | "militants"
+  | "egypt" | "gaza" | "iran" | "iraq" | "hezbollah" | "houthis" | "pa" | "militants"
   | "idf" | "us" | "coalition"
   | "mfo" | "regional";
 
 export type Affiliation = "friend" | "hostile" | "neutral";
 
 export const AFFILIATION: Record<Faction, Affiliation> = {
-  egypt: "hostile", gaza: "hostile", iran: "hostile", iraq: "hostile", hezbollah: "hostile", pa: "hostile", militants: "hostile",
+  egypt: "hostile", gaza: "hostile", iran: "hostile", iraq: "hostile", hezbollah: "hostile", houthis: "hostile", pa: "hostile", militants: "hostile",
   idf: "friend", us: "friend", coalition: "friend",
   mfo: "neutral", regional: "neutral",
 };
@@ -33,6 +33,7 @@ export const FACTION_COLORS: Record<Faction, string> = {
   iran: "#F0883E",
   iraq: "#F0883E",
   hezbollah: "#E3B341",
+  houthis: "#FFA657",
   pa: "#D2A8FF",
   militants: "#FF7B72",
   idf: "#58A6FF",
@@ -49,6 +50,7 @@ export const FACTION_NAMES: Record<Faction, Bi> = {
   iran: { he: "איראן", en: "Iran" },
   iraq: { he: "מיליציות בעיראק", en: "Iraqi militias" },
   hezbollah: { he: "חזבאללה", en: "Hezbollah" },
+  houthis: { he: "החות'ים", en: "Houthis" },
   pa: { he: "מנגנוני הרש\"פ (עריקים)", en: "PA services (defected)" },
   militants: { he: "חמושים", en: "Militants" },
   idf: { he: "צה\"ל", en: "IDF" },
@@ -339,7 +341,7 @@ export function buildSalvo(s: Salvo, r: () => number, idPrefix: string): Launch[
   for (let i = 0; i < s.count; i++) {
     const target = s.targets[i % s.targets.length];
     const city = CITIES[target];
-    const far = s.origin === "tehran" || s.origin === "isfahan" || s.origin === "tabriz";
+    const far = s.origin === "tehran" || s.origin === "isfahan" || s.origin === "tabriz" || s.origin === "yemen";
     const scatter = s.scatter ?? (far ? 1.2 : s.kind === "drone" ? 0.12 : 0.25);
     const from = jitter(o.pos, r, scatter);
     const to = jitter(city.pos, r, s.kind === "drone" ? 0.05 : 0.07);

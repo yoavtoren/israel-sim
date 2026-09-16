@@ -181,3 +181,20 @@ input.cell.edited {
 @media (prefers-reduced-motion: reduce) {
   .crisis-flash { animation: crisis-hold 0s forwards; }
 }
+
+/* campaign: countries reacting to the current event */
+@keyframes country-pulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.25; }
+}
+.country-pulse { animation: country-pulse 1.1s ease-in-out infinite; }
+
+/* campaign: consequence popups arrive like a news flash */
+@keyframes consequence-in {
+  from { transform: translateY(24px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.consequence-in { animation: consequence-in 260ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .country-pulse, .consequence-in { animation: none; }
+}

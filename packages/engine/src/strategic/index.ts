@@ -3,3 +3,4 @@ export * from "./defs";
 export * from "./reducer";
 export * from "./crisisEngine";
 export * from "./stances";
+export * from "./campaign/index";

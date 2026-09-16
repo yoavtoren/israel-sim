@@ -70,7 +70,7 @@ export const UI = {
   appTitle: { he: "חדר המצב הלאומי", en: "National Situation Room" },
   overview: { he: "תמונת מצב", en: "Overview" },
   alliances: { he: "מפת בריתות", en: "Alliance Map" },
-  cabinet: { he: "קבינט אסטרטגי", en: "Strategic Cabinet" },
+  game: { he: "ראש הממשלה", en: "Prime Minister" },
   tactical: { he: "מפה טקטית", en: "Tactical Map" },
   economySection: { he: "משק ותקציב", en: "Economy & budget" },
   strategySection: { he: "מדיניות וביטחון", en: "Policy & security" },

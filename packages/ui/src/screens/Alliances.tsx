@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { strategic } from "@engine";
 import { useStore } from "../store";
 import { useStrategic } from "../strategic/store";
+import { useCampaign } from "../strategic/campaignStore";
 import { AllianceMap } from "../components/strategic/AllianceMap";
 import { GEO_SOURCE, TIER_COLORS } from "../strategic/regionGeo";
 import type { Lang } from "../lib/strings";
@@ -20,7 +21,7 @@ const L = {
   againstUs: { he: "נגדנו", en: "Against us" },
   powers: { he: "מעצמות וגושים מחוץ למפה", en: "Powers off the map" },
   proxies: { he: "ציר ההתנגדות", en: "Axis of Resistance" },
-  toCabinet: { he: "להכרעת הקבינט", en: "To the cabinet" },
+  toCabinet: { he: "חזרה למשחק", en: "Back to the game" },
   drivers: { he: "מה קובע את העמדה", en: "What drives the stance" },
   total: { he: "סה\"כ", en: "Total" },
   sinceLast: { he: "מאז ההכרעה הקודמת", en: "since the last decision" },
@@ -159,7 +160,9 @@ export function Alliances() {
   const [selected, setSelected] = useState<strategic.ActorId | null>(null);
   const [showProxies, setShowProxies] = useState(true);
 
-  const stances = useMemo(() => strategic.computeStances(sim), [sim]);
+  const game = useCampaign((s) => s.game);
+  // the Prime Minister campaign owns the strategic state; its event overlay (boycotts, sanctions…) counts too
+  const stances = useMemo(() => (game.sim === sim ? strategic.campaignStances(game) : strategic.computeStances(sim)), [game, sim]);
   const prev = useMemo(() => (prevSim === null ? null : strategic.computeStances(prevSim)), [prevSim]);
 
   const counts = useMemo(() => {
@@ -210,7 +213,7 @@ export function Alliances() {
               )}
               <button
                 type="button"
-                onClick={() => setScreen(sim.pendingCrisis !== null ? "tactical" : "cabinet")}
+                onClick={() => setScreen("game")}
                 className="mt-2 w-full rounded-[2px] border border-info px-2 py-1 text-[12px] text-info-bright hover:bg-bg3"
               >
                 {L.toCabinet[lang]}

@@ -129,7 +129,7 @@ export const CITIES: Record<CityId, City> = {
 
 export type OriginId =
   | "sinai" | "sinai_south" | "tehran" | "western_iraq" | "south_lebanon" | "gaza"
-  | "jenin" | "nablus" | "tulkarm" | "kermanshah" | "isfahan" | "tabriz";
+  | "jenin" | "nablus" | "tulkarm" | "kermanshah" | "isfahan" | "tabriz" | "yemen";
 export const ORIGINS: Record<OriginId, { name: { he: string; en: string }; pos: LonLat }> = {
   sinai: { name: { he: "צפון סיני", en: "Northern Sinai" }, pos: [33.75, 30.95] },
   sinai_south: { name: { he: "מרכז סיני", en: "Central Sinai" }, pos: [33.55, 30.2] },
@@ -143,6 +143,7 @@ export const ORIGINS: Record<OriginId, { name: { he: string; en: string }; pos: 
   kermanshah: { name: { he: "כרמאנשאה", en: "Kermanshah" }, pos: [47.07, 34.31] },
   isfahan: { name: { he: "אספהאן", en: "Isfahan" }, pos: [51.67, 32.65] },
   tabriz: { name: { he: "תבריז", en: "Tabriz" }, pos: [46.29, 38.08] },
+  yemen: { name: { he: "צנעא, תימן", en: "Sana'a, Yemen" }, pos: [44.2, 15.35] },
 };
 
 export type BatteryId =
