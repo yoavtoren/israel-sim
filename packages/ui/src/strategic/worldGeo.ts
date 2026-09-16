@@ -73,7 +73,12 @@ const BOUNDS: Record<WorldFocus, [LonLat, LonLat]> = {
 };
 
 export function fitWorld(focus: WorldFocus, w: number, h: number, inset = { left: 0, right: 0, top: 0, bottom: 0 }): Camera {
-  const [a, b] = BOUNDS[focus];
+  return fitBounds(BOUNDS[focus], w, h, inset);
+}
+
+/** Camera that frames a lon/lat box inside the free area of the screen. */
+export function fitBounds(bounds: [LonLat, LonLat], w: number, h: number, inset = { left: 0, right: 0, top: 0, bottom: 0 }): Camera {
+  const [a, b] = bounds;
   const p0 = project([a[0], b[1]]);
   const p1 = project([b[0], a[1]]);
   const aw = Math.max(100, w - inset.left - inset.right);

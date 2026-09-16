@@ -8,6 +8,7 @@ import { useStrategic } from "./store";
 import { visualScript } from "./visuals";
 import { buildTurnScript } from "./scenarios";
 import { sound } from "./sound";
+import { useLiving } from "./living/director";
 
 type Campaign = strategic.CampaignState;
 
@@ -29,14 +30,15 @@ function freshSeed(): string {
   return `pm-${Date.now().toString(36)}`;
 }
 
-/** Put the right animation on the map for the current screen of the game. */
+/** Crisis scenes still play as tactical scripts; every other event is a
+ *  living-map scene started by the director. */
 function stage(game: Campaign): void {
   const head = game.phase === "consequences" ? game.queue[0] : undefined;
   const dilemma = game.phase === "dilemma" || game.phase === "policy" ? strategic.currentDilemma(game) : null;
   const visual = head?.visual ?? dilemma?.visual ?? null;
   const key = head !== undefined ? `${game.seed}:${head.id}` : `${game.seed}:${game.step}:${dilemma?.id ?? "-"}`;
   const st = useStrategic.getState();
-  if (visual !== null) {
+  if (visual !== null && visual.kind === "crisis") {
     const script = visualScript(visual, key, game.step + 1);
     if (st.script.key !== script.key) useStrategic.setState({ script, t: 0, playing: true, modalOpen: false, trackedId: null });
   } else if (st.script.launches.length > 0 && !st.playing) {
@@ -47,6 +49,7 @@ function stage(game: Campaign): void {
 function sync(game: Campaign, prev: Campaign | null): void {
   useStrategic.setState({ sim: game.sim, prevSim: prev?.sim ?? null });
   stage(game);
+  useLiving.getState().observe(prev, game, performance.now());
 }
 
 const first = strategic.createCampaign(freshSeed());

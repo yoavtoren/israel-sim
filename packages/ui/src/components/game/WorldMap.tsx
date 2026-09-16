@@ -9,9 +9,10 @@ import type { Lang } from "../../lib/strings";
 import { useStrategic } from "../../strategic/store";
 import { toMap, toScreen, type Camera } from "../../strategic/geo";
 import { TIER_COLORS } from "../../strategic/regionGeo";
-import { COUNTRY_HE, WORLD_ACTOR, WORLD_COUNTRIES, WORLD_LABELS, WORLD_NAME, fitWorld, ringsToPath, type WorldFocus } from "../../strategic/worldGeo";
+import { COUNTRY_HE, WORLD_ACTOR, WORLD_COUNTRIES, WORLD_LABELS, WORLD_NAME, fitBounds, fitWorld, ringsToPath, type WorldFocus } from "../../strategic/worldGeo";
 import { drawFrame, shakeOffset } from "../../strategic/renderer";
-import { ambientFromGame, ambientMotionActive, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { drawLivingScenes, drawLivingStill, useLiving } from "../../strategic/living/director";
+import { sound } from "../../strategic/sound";
 import { useCampaign } from "../../strategic/campaignStore";
 
 type Stances = Record<strategic.ActorId, strategic.ActorStance>;
@@ -130,16 +131,15 @@ export function WorldMap(props: {
       if (reduced) return false;
       if (!camSettled) return true;
       const st = useStrategic.getState();
-      return ambientMotionActive(ambientFromGame(useCampaign.getState().game), {
-        playing: st.playing,
-        crisisOpen: st.sim.pendingCrisis !== null,
-      });
+      return st.playing || useLiving.getState().activeAt(performance.now());
     };
     const frame = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       const { w, h } = sizeRef.current;
-      const target = fitWorld(targetRef.current.focus, w, h, targetRef.current.inset);
+      // while a scene plays the camera frames where it happens; then it returns to the story
+      const sceneBox = useLiving.getState().boundsAt(now);
+      const target = sceneBox !== null ? fitBounds(sceneBox, w, h, targetRef.current.inset) : fitWorld(targetRef.current.focus, w, h, targetRef.current.inset);
       if (camRef.current === null) camRef.current = fitWorld("world", w, h, targetRef.current.inset);
       if (!manual.current) camRef.current = lerpCam(camRef.current, target, 1 - Math.exp(-dt * 1.6));
       const cam = camRef.current;
@@ -160,10 +160,17 @@ export function WorldMap(props: {
         ctx.clearRect(-20, -20, w + 40, h + 40);
         const L = langRef.current;
 
+        const living = useLiving.getState();
+        living.settle(now);
+        const env = {
+          cam, w, h, lang: L, now, game: useCampaign.getState().game,
+          sound: (k: "alert" | "launch" | "intercept" | "impact") => {
+            if (useStrategic.getState().soundOn) sound[k]();
+          },
+        };
+        drawLivingStill(ctx, env);
+
         // country labels, sized to what fits at this zoom
-        const world = ambientFromGame(useCampaign.getState().game);
-        const amb = { cam, w, h, nowMs: now, lang: L, world };
-        drawAmbientGround(ctx, amb);
 
         ctx.textAlign = "center";
         for (const lab of WORLD_LABELS) {
@@ -189,8 +196,9 @@ export function WorldMap(props: {
           ctx.fillText(name, p.x, p.y);
         }
 
-        drawFrame(ctx, { script: st.script, t: st.t, cam, w, h, lang: L, nowMs: now, trackedId: st.trackedId, chrome: cam.scale > 1.4 });
-        drawAmbientAir(ctx, amb);
+        // crisis scripts only exist while they play
+        if (st.playing) drawFrame(ctx, { script: st.script, t: st.t, cam, w, h, lang: L, nowMs: now, trackedId: st.trackedId, chrome: false });
+        drawLivingScenes(ctx, env);
       }
       raf = needsMotion() ? requestAnimationFrame(frame) : 0;
     };
@@ -207,11 +215,13 @@ export function WorldMap(props: {
     wake();
     const unsubStrategic = useStrategic.subscribe(wake);
     const unsubCampaign = useCampaign.subscribe(wake);
+    const unsubLiving = useLiving.subscribe(wake);
     return () => {
       if (raf !== 0) cancelAnimationFrame(raf);
       wakeRef.current = null;
       unsubStrategic();
       unsubCampaign();
+      unsubLiving();
     };
   }, []);
 

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { strategic } from "@engine";
 import type { Lang } from "../../lib/strings";
 import { useCampaign } from "../../strategic/campaignStore";
+import { useLiving } from "../../strategic/living/director";
 import { TIER_COLORS } from "../../strategic/regionGeo";
 
 const S = strategic;
@@ -357,6 +358,8 @@ export function ConsequenceCard(props: { game: Game; lang: Lang }) {
   const { game, lang } = props;
   const he = lang === "he";
   const ack = useCampaign((s) => s.acknowledge);
+  const replay = useLiving((s) => s.replay);
+  const canReplay = useLiving((s) => s.lastTrigger !== null);
   const e = game.queue[0];
   if (e === undefined) return null;
   const st = SEVERITY_STYLE[e.severity];
@@ -392,9 +395,17 @@ export function ConsequenceCard(props: { game: Game; lang: Lang }) {
             </div>
           )}
         </div>
-        <button type="button" autoFocus onClick={ack} className="btn btn-primary mt-5 w-full py-2.5 text-[15px]">
-          {game.queue.length > 1 ? (he ? "המשך" : "Continue") : game.ending !== null ? (he ? "לסיכום" : "To the verdict") : he ? "להחלטה הבאה" : "To the next decision"}
-        </button>
+        <div className="mt-5 flex gap-2">
+          <button type="button" autoFocus onClick={ack} className="btn btn-primary flex-1 py-2.5 text-[15px]">
+            {game.queue.length > 1 ? (he ? "המשך" : "Continue") : game.ending !== null ? (he ? "לסיכום" : "To the verdict") : he ? "להחלטה הבאה" : "To the next decision"}
+          </button>
+          {canReplay && (
+            <button type="button" onClick={() => replay(performance.now())} className="btn btn-ghost px-3 text-[13px]" title={he ? "הצג שוב את האירוע על המפה" : "Replay the event on the map"}>
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              {he ? "הצג שוב" : "Replay"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

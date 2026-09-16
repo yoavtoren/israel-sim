@@ -11,7 +11,7 @@ import {
 } from "../../strategic/geo";
 import { COUNTRY_SHAPES, ringsPath } from "../../strategic/regionGeo";
 import { drawFrame, launchPos, shakeOffset } from "../../strategic/renderer";
-import { ambientFromGame, ambientMotionActive, drawAmbientAir, drawAmbientGround } from "../../strategic/ambient";
+import { drawLivingStill } from "../../strategic/living/director";
 import { useCampaign } from "../../strategic/campaignStore";
 import { crisisFocus } from "../../strategic/crisisScripts";
 import { endTime, focusAt, type Launch } from "../../strategic/scenarios";
@@ -125,10 +125,7 @@ export function TacticalMap() {
       if (reduced) return false;
       if (!camSettled) return true;
       const st = useStrategic.getState();
-      return ambientMotionActive(ambientFromGame(useCampaign.getState().game), {
-        playing: st.playing,
-        crisisOpen: st.sim.pendingCrisis !== null,
-      });
+      return st.playing;
     };
     const frame = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
@@ -163,10 +160,8 @@ export function TacticalMap() {
         }
         ctx.setTransform(dpr, 0, 0, dpr, shake.x * dpr, shake.y * dpr);
         ctx.clearRect(-20, -20, w + 40, h + 40);
-        const amb = { cam, w, h, nowMs: now, lang: langRef.current, world: ambientFromGame(useCampaign.getState().game) };
-        drawAmbientGround(ctx, amb);
+        drawLivingStill(ctx, { cam, w, h, lang: langRef.current, now, game: useCampaign.getState().game });
         drawFrame(ctx, { script, t, cam, w, h, lang: langRef.current, nowMs: now, trackedId: st.trackedId });
-        drawAmbientAir(ctx, amb);
       }
       raf = needsMotion() ? requestAnimationFrame(frame) : 0;
     };

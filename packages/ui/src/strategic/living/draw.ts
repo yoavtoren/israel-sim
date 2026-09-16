@@ -55,7 +55,7 @@ export function makeFrame(ctx: CanvasRenderingContext2D, cam: Camera, w: number,
   const S = (p: Pt) => toScreen(p, cam, w, h);
   return {
     ctx, w, h, ppd, lang,
-    u: Math.max(0.55, Math.min(2.4, ppd / 150)),
+    u: Math.max(0.55, Math.min(4.2, ppd / 150)),
     S,
     L: (ll) => S(project(ll)),
     on: (p, m = 40) => p.x > -m && p.x < w + m && p.y > -m && p.y < h + m,
@@ -1009,7 +1009,7 @@ export interface PersonStyle {
 
 export function person(f: Frame, p: Pt, stride: number, st: PersonStyle): void {
   const { ctx } = f;
-  const k = 0.8 * Math.min(f.u, 1.5);
+  const k = 0.8 * Math.min(f.u, 3.6);
   if (st.down === true) {
     ctx.strokeStyle = st.color;
     ctx.lineWidth = 1.1 * k;
