@@ -7,16 +7,14 @@ export function Panel(props: { title?: ReactNode; accent?: string; children: Rea
   return (
     <section className={`panel ${props.className ?? ""}`}>
       {props.title !== undefined && (
-        <header
-          className="flex items-center gap-2 border-b border-line0 px-3 py-2 text-[15px] leading-[22px] font-medium"
-        >
+        <header className="flex items-center gap-2.5 px-5 pt-4 pb-1 text-[17px] leading-[24px] font-medium">
           {props.accent !== undefined && (
-            <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: props.accent }} />
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: props.accent }} />
           )}
-          {props.title}
+          <span className="display">{props.title}</span>
         </header>
       )}
-      <div className="p-3">{props.children}</div>
+      <div className={props.title !== undefined ? "px-5 pt-2 pb-5" : "p-5"}>{props.children}</div>
     </section>
   );
 }
@@ -79,7 +77,7 @@ export function Sparkline(props: {
         {props.refLine !== undefined && (
           <line x1={pad} x2={w - pad} y1={y(props.refLine)} y2={y(props.refLine)} stroke={INK.line1} strokeDasharray="2 3" strokeWidth={1} />
         )}
-        <polyline points={points} fill="none" stroke={props.color ?? INK.fg1} strokeWidth={1.5} />
+        <polyline points={points} fill="none" stroke={props.color ?? INK.fg1} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </bdi>
   );
@@ -96,12 +94,12 @@ export function GaugeBar(props: {
   const v = Math.max(0, Math.min(1, props.value));
   return (
     <bdi dir="ltr" className="block w-full">
-      <div className="relative w-full overflow-hidden rounded-[2px] bg-bg2" style={{ height: h }}>
-        <div className="absolute inset-y-0 left-0" style={{ width: `${v * 100}%`, background: props.color }} />
+      <div className="relative w-full overflow-hidden rounded-full bg-bg3" style={{ height: h }}>
+        <div className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-300" style={{ width: `${v * 100}%`, background: props.color }} />
         {props.tick !== undefined && (
           <div
             className="absolute inset-y-0 w-[2px]"
-            style={{ left: `${Math.max(0, Math.min(1, props.tick)) * 100}%`, background: SEM.badBright, opacity: 0.7 }}
+            style={{ left: `${Math.max(0, Math.min(1, props.tick)) * 100}%`, background: SEM.badBright, opacity: 0.8 }}
           />
         )}
       </div>
@@ -131,29 +129,29 @@ export function Dial(props: { value: number; ghost?: number; label: string; colo
     <div className="flex flex-col items-center">
       <bdi dir="ltr">
         <svg width={size} height={size / 2 + 20}>
-          <path d={arc(0, 1)} fill="none" stroke={INK.line0} strokeWidth={6} />
-          <path d={arc(0, props.value)} fill="none" stroke={props.color} strokeWidth={6} />
+          <path d={arc(0, 1)} fill="none" stroke="#EBE6DC" strokeWidth={9} strokeLinecap="round" />
+          <path d={arc(0.0001, Math.max(0.0001, props.value))} fill="none" stroke={props.color} strokeWidth={9} strokeLinecap="round" />
           {g !== null && <line x1={cx} y1={cy} x2={g.x} y2={g.y} stroke={INK.fg2} strokeWidth={1.5} strokeDasharray="3 2" />}
           <line x1={cx} y1={cy} x2={n.x} y2={n.y} stroke={INK.fg0} strokeWidth={2} />
           <circle cx={cx} cy={cy} r={3} fill={INK.fg0} />
         </svg>
       </bdi>
-      <div className="num text-[24px] leading-[32px]">{(props.value * 100).toFixed(0)}%</div>
-      <div className="text-[11px] leading-[16px] text-fg1">{props.label}</div>
+      <div className="num text-[24px] leading-[32px] font-medium">{(props.value * 100).toFixed(0)}%</div>
+      <div className="text-[13px] leading-[18px] text-fg1">{props.label}</div>
     </div>
   );
 }
 
 export function Chip(props: { children: ReactNode; tone: "warn" | "bad" | "info" | "good" | "muted" }) {
   const tones: Record<string, string> = {
-    warn: "border-warn text-warn-bright",
-    bad: "border-bad text-bad-bright",
-    info: "border-info text-info-bright",
-    good: "border-good text-good-bright",
-    muted: "border-line1 text-fg1",
+    warn: "bg-warn-dim text-warn-bright",
+    bad: "bg-bad-dim text-bad-bright",
+    info: "bg-info-dim text-info-bright",
+    good: "bg-good-dim text-good-bright",
+    muted: "bg-bg3 text-fg1",
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-[2px] border px-1.5 py-0.5 text-[11px] leading-[16px] ${tones[props.tone]}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] leading-[17px] font-medium ${tones[props.tone]}`}>
       {props.children}
     </span>
   );

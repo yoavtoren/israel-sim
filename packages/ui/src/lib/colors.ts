@@ -1,29 +1,29 @@
-/** Color scales from DESIGN.md — the only chart colors in the app. */
+/** Color scales from DESIGN.md — the only chart colors in the app (light theme). */
 
 import type { SectorId } from "@engine";
 
 export const SECTOR_COLORS: Record<SectorId, string> = {
-  secular: "#4C9BE8",
-  national_religious: "#2EA98F",
-  haredi: "#8B7EC8",
-  arab: "#E8A33D",
-  other: "#C97BA8",
+  secular: "#3F84CF",
+  national_religious: "#2A9A82",
+  haredi: "#7A6BBD",
+  arab: "#D9912A",
+  other: "#BF6A9A",
 };
 
 export const DOMAIN = {
-  fiscal: "#E3B341",
-  macro: "#7EE787",
-  security: "#E8604C",
-  diplomacy: "#58A6FF",
-  social: "#D2A8FF",
-  infra: "#79C0FF",
+  fiscal: "#C9921F",
+  macro: "#3C9A66",
+  security: "#D05A43",
+  diplomacy: "#2F63B0",
+  social: "#8A63C2",
+  infra: "#3B8FB8",
 } as const;
 
-export const INK = { fg0: "#E6EDF3", fg1: "#93A4B5", fg2: "#5C6B7A", line0: "#2A3444", line1: "#3A4658", bg1: "#111722", bg2: "#1A2230" } as const;
-export const SEM = { good: "#2EA043", goodBright: "#3FB950", bad: "#DA3633", badBright: "#F85149", warn: "#D29922", warnBright: "#E3B341", info: "#3B82D0", infoBright: "#58A6FF" } as const;
+export const INK = { fg0: "#1C2330", fg1: "#555E6C", fg2: "#8B919A", line0: "#E7E1D6", line1: "#D3CBBD", bg1: "#FFFFFF", bg2: "#F6F3ED" } as const;
+export const SEM = { good: "#3C9A66", goodBright: "#1F7A4A", bad: "#D9534A", badBright: "#B3302A", warn: "#D49A2A", warnBright: "#946312", info: "#2F63B0", infoBright: "#24518F" } as const;
 
-/** DESIGN map sequential ramp, 5 stops */
-const SEQ = ["#0E1B2C", "#1E4976", "#2E7BB8", "#58A6FF", "#A5D6FF"];
+/** sequential ramp on paper, 5 stops (light → deep blue) */
+const SEQ = ["#EEF3F8", "#C6D8EC", "#8DB3DA", "#4F86C0", "#23508F"];
 
 function hexToRgb(h: string): [number, number, number] {
   return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
@@ -43,10 +43,10 @@ export function seqColor(u: number): string {
   return mix(SEQ[i], SEQ[i + 1], x - i);
 }
 
-/** diverging vs a midpoint: bad-base → bg-1 → good-base (DESIGN §1) */
+/** diverging vs a midpoint: bad → paper → good (DESIGN §1) */
 export function divColor(u: number): string {
   const x = Math.max(-1, Math.min(1, u));
-  return x < 0 ? mix(INK.bg1, SEM.bad, -x) : mix(INK.bg1, SEM.good, x);
+  return x < 0 ? mix("#F4F1EA", SEM.bad, -x) : mix("#F4F1EA", SEM.good, x);
 }
 
 /** socio-economic cluster 1–10: warn → info interpolation (DESIGN §1) */
@@ -57,12 +57,12 @@ export function clusterColor(cluster: number): string {
 
 /** semantic band for a 0–1 gauge where higher is better */
 export function bandColor(v: number, warnBelow: number, badBelow: number): string {
-  if (v < badBelow) return SEM.badBright;
-  if (v < warnBelow) return SEM.warnBright;
+  if (v < badBelow) return SEM.bad;
+  if (v < warnBelow) return SEM.warn;
   return SEM.good;
 }
 
 /** threat heat 0–1 */
 export function threatColor(v: number): string {
-  return mix(INK.bg2, SEM.bad, Math.max(0, Math.min(1, v)));
+  return mix("#F6E9E4", SEM.bad, Math.max(0, Math.min(1, v)));
 }

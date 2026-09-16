@@ -1,6 +1,8 @@
-/** Knesset parties for the Prime Minister campaign: seats as elected in the
- *  November 2022 election (the Religious Zionism joint list shown as its three
- *  factions), and coalition rules.
+/** Knesset parties for the Prime Minister campaign and the coalition rules.
+ *
+ *  Two seat rosters: "polls" (a current polling benchmark, the default) and
+ *  "election_2022" (as elected in November 2022, the Religious Zionism joint
+ *  list shown as its three factions). Both sum to exactly 120.
  *
  *  Security positions, refusals and friction are ASSUMPTIONS drawn from the
  *  parties' public positions — a game abstraction, not a statement of what any
@@ -9,8 +11,46 @@
 import type { Bi, CoalitionType, PolicyTrack } from "../types";
 
 export type PartyId =
-  | "likud" | "yesh_atid" | "national_unity" | "shas" | "utj" | "religious_zionism"
-  | "otzma_yehudit" | "yisrael_beiteinu" | "raam" | "hadash_taal" | "labor" | "noam";
+  | "likud" | "national_unity" | "yisrael_beiteinu" | "yesh_atid" | "democrats" | "shas"
+  | "otzma_yehudit" | "utj" | "raam" | "hadash_taal" | "religious_zionism" | "balad" | "noam";
+
+export type SeatRoster = "polls" | "election_2022";
+export const SEAT_ROSTERS: SeatRoster[] = ["polls", "election_2022"];
+
+export const ROSTER_LABELS: Record<SeatRoster, Bi> = {
+  polls: { he: "סקרים עדכניים", en: "Current polls" },
+  election_2022: { he: "בחירות 2022", en: "2022 election" },
+};
+
+export const ROSTER_NOTES: Record<SeatRoster, Bi> = {
+  polls: { he: "ממוצע סקרים מייצג (הנחה); בל\"ד סביב אחוז החסימה", en: "A representative polling average (assumption); Balad around the threshold" },
+  election_2022: { he: "תוצאות בחירות נובמבר 2022", en: "November 2022 election results" },
+};
+
+export const SEATS: Record<SeatRoster, Record<PartyId, number>> = {
+  polls: {
+    likud: 23, national_unity: 16, yisrael_beiteinu: 14, yesh_atid: 13, democrats: 11, shas: 10,
+    otzma_yehudit: 9, utj: 8, raam: 5, hadash_taal: 5, religious_zionism: 4, balad: 2, noam: 0,
+  },
+  election_2022: {
+    likud: 32, yesh_atid: 24, national_unity: 12, shas: 11, religious_zionism: 7, utj: 7,
+    otzma_yehudit: 6, yisrael_beiteinu: 6, raam: 5, hadash_taal: 5, democrats: 4, noam: 1, balad: 0,
+  },
+};
+
+export function partySeats(roster: SeatRoster, p: PartyId): number {
+  return SEATS[roster][p];
+}
+
+export const PARTY_IDS: PartyId[] = [
+  "likud", "national_unity", "yisrael_beiteinu", "yesh_atid", "democrats", "shas",
+  "otzma_yehudit", "utj", "raam", "hadash_taal", "religious_zionism", "balad", "noam",
+];
+
+/** Parties with seats in a roster, largest first. */
+export function rosterParties(roster: SeatRoster): PartyId[] {
+  return PARTY_IDS.filter((p) => SEATS[roster][p] > 0).sort((a, b) => SEATS[roster][b] - SEATS[roster][a]);
+}
 
 /** Reaction groups: dilemmas address groups, not individual parties. */
 export type PartyTag = "far_right" | "right" | "haredi" | "center" | "left" | "arab";
@@ -18,82 +58,92 @@ export type PartyTag = "far_right" | "right" | "haredi" | "center" | "left" | "a
 export interface PartyDef {
   id: PartyId;
   name: Bi;
-  seats: number;
   tag: PartyTag;
   /** security axis: −2 dovish … +2 hawkish */ hawk: number;
   color: string;
   blurb: Bi;
   /** will not sit in a government with these parties */ refuses: PartyId[];
-  /** can sit together, but with friction (stability penalty) */ friction: PartyId[];
+  /** can sit together, with friction (stability penalty) */ friction: PartyId[];
+  /** can sit together only under heavy strain (triple penalty) */ deepFriction: PartyId[];
 }
-
-export const PARTY_IDS: PartyId[] = [
-  "likud", "yesh_atid", "national_unity", "shas", "religious_zionism", "utj",
-  "otzma_yehudit", "yisrael_beiteinu", "raam", "hadash_taal", "labor", "noam",
-];
 
 export const PARTIES: Record<PartyId, PartyDef> = {
   likud: {
-    id: "likud", name: { he: "הליכוד", en: "Likud" }, seats: 32, tag: "right", hawk: 1.2, color: "#3B82D0",
+    id: "likud", name: { he: "הליכוד", en: "Likud" }, tag: "right", hawk: 1.2, color: "#3B82D0",
     blurb: { he: "ימין לאומי-ליברלי, מפלגת השלטון הגדולה.", en: "National-liberal right; the largest ruling party." },
-    refuses: ["hadash_taal"], friction: ["raam", "yesh_atid", "labor"],
-  },
-  yesh_atid: {
-    id: "yesh_atid", name: { he: "יש עתיד", en: "Yesh Atid" }, seats: 24, tag: "center", hawk: 0, color: "#2F9FD8",
-    blurb: { he: "מרכז ליברלי-חילוני.", en: "Liberal secular center." },
-    refuses: ["otzma_yehudit", "noam"], friction: ["shas", "utj", "religious_zionism", "likud"],
+    refuses: ["hadash_taal", "balad"], friction: ["yesh_atid", "democrats"], deepFriction: ["raam"],
   },
   national_unity: {
-    id: "national_unity", name: { he: "המחנה הממלכתי", en: "National Unity" }, seats: 12, tag: "center", hawk: 0.6, color: "#4F6FB8",
+    id: "national_unity", name: { he: "המחנה הממלכתי", en: "National Unity" }, tag: "center", hawk: 0.6, color: "#4F6FB8",
     blurb: { he: "מרכז-ימין ביטחוני.", en: "Security-minded center-right." },
-    refuses: ["noam"], friction: ["otzma_yehudit", "religious_zionism", "hadash_taal"],
-  },
-  shas: {
-    id: "shas", name: { he: "ש\"ס", en: "Shas" }, seats: 11, tag: "haredi", hawk: 0.7, color: "#1F2F57",
-    blurb: { he: "חרדית-ספרדית, דגש חברתי ודתי.", en: "Sephardi Haredi; social and religious focus." },
-    refuses: ["hadash_taal"], friction: ["yesh_atid", "yisrael_beiteinu"],
-  },
-  religious_zionism: {
-    id: "religious_zionism", name: { he: "הציונות הדתית", en: "Religious Zionism" }, seats: 7, tag: "far_right", hawk: 1.9, color: "#E3A33D",
-    blurb: { he: "ימין דתי-לאומי, תומכת סיפוח והתיישבות.", en: "Religious-nationalist right; pro-annexation and settlement." },
-    refuses: ["raam", "hadash_taal", "labor"], friction: ["yesh_atid", "national_unity"],
-  },
-  utj: {
-    id: "utj", name: { he: "יהדות התורה", en: "United Torah Judaism" }, seats: 7, tag: "haredi", hawk: 0.5, color: "#5C6B7A",
-    blurb: { he: "חרדית-אשכנזית.", en: "Ashkenazi Haredi." },
-    refuses: ["hadash_taal"], friction: ["yesh_atid", "yisrael_beiteinu"],
-  },
-  otzma_yehudit: {
-    id: "otzma_yehudit", name: { he: "עוצמה יהודית", en: "Otzma Yehudit" }, seats: 6, tag: "far_right", hawk: 2, color: "#C0392B",
-    blurb: { he: "ימין קיצוני.", en: "Far right." },
-    refuses: ["raam", "hadash_taal", "labor", "yesh_atid"], friction: ["national_unity"],
+    refuses: ["noam", "balad"], friction: ["religious_zionism", "hadash_taal"], deepFriction: ["otzma_yehudit"],
   },
   yisrael_beiteinu: {
-    id: "yisrael_beiteinu", name: { he: "ישראל ביתנו", en: "Yisrael Beiteinu" }, seats: 6, tag: "right", hawk: 1.3, color: "#6FA8DC",
-    blurb: { he: "ימין חילוני.", en: "Secular right." },
-    refuses: ["hadash_taal"], friction: ["shas", "utj", "raam"],
+    id: "yisrael_beiteinu", name: { he: "ישראל ביתנו", en: "Yisrael Beiteinu" }, tag: "right", hawk: 1.3, color: "#6FA8DC",
+    blurb: { he: "ימין חילוני, נגד כפייה דתית.", en: "Secular right; against religious coercion." },
+    refuses: ["balad"], friction: ["raam"], deepFriction: ["shas", "utj", "hadash_taal"],
+  },
+  yesh_atid: {
+    id: "yesh_atid", name: { he: "יש עתיד", en: "Yesh Atid" }, tag: "center", hawk: 0, color: "#2F9FD8",
+    blurb: { he: "מרכז ליברלי-חילוני.", en: "Liberal secular center." },
+    refuses: ["otzma_yehudit", "noam", "balad"], friction: ["shas", "utj", "likud"], deepFriction: ["religious_zionism"],
+  },
+  democrats: {
+    id: "democrats", name: { he: "הדמוקרטים", en: "The Democrats" }, tag: "left", hawk: -1.4, color: "#E4572E",
+    blurb: { he: "איחוד העבודה ומרצ: שמאל ציוני.", en: "Labor and Meretz merged: the Zionist left." },
+    refuses: ["otzma_yehudit", "religious_zionism", "noam", "balad"], friction: ["shas", "utj", "yisrael_beiteinu"], deepFriction: ["likud"],
+  },
+  shas: {
+    id: "shas", name: { he: "ש\"ס", en: "Shas" }, tag: "haredi", hawk: 0.7, color: "#1F2F57",
+    blurb: { he: "חרדית-ספרדית, דגש חברתי ודתי.", en: "Sephardi Haredi; social and religious focus." },
+    refuses: ["hadash_taal", "balad"], friction: ["yesh_atid", "democrats"], deepFriction: ["yisrael_beiteinu"],
+  },
+  otzma_yehudit: {
+    id: "otzma_yehudit", name: { he: "עוצמה יהודית", en: "Otzma Yehudit" }, tag: "far_right", hawk: 2, color: "#C0392B",
+    blurb: { he: "ימין קיצוני.", en: "Far right." },
+    refuses: ["raam", "hadash_taal", "balad", "democrats", "yesh_atid"], friction: [], deepFriction: ["national_unity"],
+  },
+  utj: {
+    id: "utj", name: { he: "יהדות התורה", en: "United Torah Judaism" }, tag: "haredi", hawk: 0.5, color: "#5C6B7A",
+    blurb: { he: "חרדית-אשכנזית.", en: "Ashkenazi Haredi." },
+    refuses: ["hadash_taal", "balad"], friction: ["yesh_atid", "democrats"], deepFriction: ["yisrael_beiteinu"],
   },
   raam: {
-    id: "raam", name: { he: "רע\"מ", en: "Ra'am" }, seats: 5, tag: "arab", hawk: -1, color: "#2EA98F",
+    id: "raam", name: { he: "רע\"מ", en: "Ra'am" }, tag: "arab", hawk: -1, color: "#2EA98F",
     blurb: { he: "איסלאמית-שמרנית, דגש על הישגים אזרחיים לחברה הערבית.", en: "Conservative Islamist; focused on civic gains for Arab citizens." },
-    refuses: ["otzma_yehudit", "religious_zionism", "noam"], friction: ["likud", "yisrael_beiteinu"],
+    refuses: ["otzma_yehudit", "religious_zionism", "noam"], friction: ["yisrael_beiteinu", "balad"], deepFriction: ["likud"],
   },
   hadash_taal: {
-    id: "hadash_taal", name: { he: "חד\"ש-תע\"ל", en: "Hadash–Ta'al" }, seats: 5, tag: "arab", hawk: -2, color: "#D1495B",
-    blurb: { he: "שמאל ערבי-יהודי, מחוץ לקואליציות מאז ומעולם.", en: "Arab-Jewish left; has never joined a coalition." },
-    refuses: ["likud", "religious_zionism", "otzma_yehudit", "noam", "yisrael_beiteinu", "shas", "utj", "national_unity"], friction: ["yesh_atid"],
+    id: "hadash_taal", name: { he: "חד\"ש-תע\"ל", en: "Hadash–Ta'al" }, tag: "arab", hawk: -2, color: "#D1495B",
+    blurb: { he: "שמאל ערבי-יהודי; מעולם לא ישבה בקואליציה.", en: "Arab-Jewish left; has never sat in a coalition." },
+    refuses: ["likud", "religious_zionism", "otzma_yehudit", "noam", "shas", "utj"], friction: ["national_unity"], deepFriction: ["yisrael_beiteinu"],
   },
-  labor: {
-    id: "labor", name: { he: "העבודה", en: "Labor" }, seats: 4, tag: "left", hawk: -1.4, color: "#E4572E",
-    blurb: { he: "שמאל ציוני.", en: "Zionist left." },
-    refuses: ["otzma_yehudit", "religious_zionism", "noam"], friction: ["likud", "shas", "utj"],
+  religious_zionism: {
+    id: "religious_zionism", name: { he: "הציונות הדתית", en: "Religious Zionism" }, tag: "far_right", hawk: 1.9, color: "#E3A33D",
+    blurb: { he: "ימין דתי-לאומי, תומכת סיפוח והתיישבות.", en: "Religious-nationalist right; pro-annexation and settlement." },
+    refuses: ["raam", "hadash_taal", "balad", "democrats"], friction: ["national_unity"], deepFriction: ["yesh_atid"],
+  },
+  balad: {
+    id: "balad", name: { he: "בל\"ד", en: "Balad" }, tag: "arab", hawk: -2, color: "#7A3E9D",
+    blurb: { he: "לאומית-ערבית; שוללת השתתפות בממשלה ציונית.", en: "Arab nationalist; rejects joining a Zionist government." },
+    refuses: ["likud", "national_unity", "yisrael_beiteinu", "yesh_atid", "democrats", "shas", "otzma_yehudit", "utj", "religious_zionism", "noam"],
+    friction: ["raam"], deepFriction: [],
   },
   noam: {
-    id: "noam", name: { he: "נעם", en: "Noam" }, seats: 1, tag: "far_right", hawk: 1.8, color: "#8B6E4E",
+    id: "noam", name: { he: "נעם", en: "Noam" }, tag: "far_right", hawk: 1.8, color: "#8B6E4E",
     blurb: { he: "ימין דתי-שמרני.", en: "Religious-conservative right." },
-    refuses: ["raam", "hadash_taal", "labor", "yesh_atid", "national_unity"], friction: [],
+    refuses: ["raam", "hadash_taal", "balad", "democrats", "yesh_atid", "national_unity"], friction: [], deepFriction: [],
   },
 };
+
+/** Names that differ by roster (the Democrats ran as Labor in 2022). */
+const ROSTER_NAMES: Partial<Record<SeatRoster, Partial<Record<PartyId, Bi>>>> = {
+  election_2022: { democrats: { he: "העבודה", en: "Labor" } },
+};
+
+export function partyName(p: PartyId, roster: SeatRoster): Bi {
+  return ROSTER_NAMES[roster]?.[p] ?? PARTIES[p].name;
+}
 
 export const TAG_LABELS: Record<PartyTag, Bi> = {
   far_right: { he: "ימין קיצוני", en: "Far right" },
@@ -106,10 +156,13 @@ export const TAG_LABELS: Record<PartyTag, Bi> = {
 
 export const MAJORITY = 61;
 
+export type FrictionLevel = "friction" | "deep";
+export const FRICTION_WEIGHT: Record<FrictionLevel, number> = { friction: 1, deep: 3 };
+
 export interface CoalitionCheck {
   seats: number;
   /** refusals inside the proposed coalition: [refuser, refused] */ vetoes: Array<[PartyId, PartyId]>;
-  frictions: Array<[PartyId, PartyId]>;
+  /** unordered pairs, each listed once with its worst level */ frictions: Array<{ a: PartyId; b: PartyId; level: FrictionLevel }>;
   majority: boolean;
   valid: boolean;
   /** 0–100 starting coalition stability */ stability: number;
@@ -117,29 +170,73 @@ export interface CoalitionCheck {
   type: CoalitionType;
 }
 
-export function checkCoalition(members: PartyId[]): CoalitionCheck {
-  const set = new Set(members);
-  const seats = members.reduce((s, p) => s + PARTIES[p].seats, 0);
+/** The friction level between two parties, whichever side declares it. */
+export function frictionBetween(a: PartyId, b: PartyId): FrictionLevel | null {
+  const A = PARTIES[a];
+  const B = PARTIES[b];
+  if (A.deepFriction.includes(b) || B.deepFriction.includes(a)) return "deep";
+  if (A.friction.includes(b) || B.friction.includes(a)) return "friction";
+  return null;
+}
+
+export function refusesEachOther(a: PartyId, b: PartyId): boolean {
+  return PARTIES[a].refuses.includes(b) || PARTIES[b].refuses.includes(a);
+}
+
+export function checkCoalition(members: PartyId[], roster: SeatRoster = "polls"): CoalitionCheck {
+  const list = [...new Set(members)];
+  const set = new Set(list);
+  const seats = list.reduce((s, p) => s + SEATS[roster][p], 0);
   const vetoes: Array<[PartyId, PartyId]> = [];
-  const frictions: Array<[PartyId, PartyId]> = [];
-  const seen = new Set<string>();
-  for (const p of members) {
-    for (const r of PARTIES[p].refuses) if (set.has(r)) vetoes.push([p, r]);
-    for (const f of PARTIES[p].friction) {
-      const key = [p, f].sort().join("|");
-      if (set.has(f) && !seen.has(key)) {
-        seen.add(key);
-        frictions.push([p, f]);
-      }
+  for (const p of list) for (const r of PARTIES[p].refuses) if (set.has(r)) vetoes.push([p, r]);
+  const frictions: CoalitionCheck["frictions"] = [];
+  for (let i = 0; i < list.length; i++) {
+    for (let j = i + 1; j < list.length; j++) {
+      const level = frictionBetween(list[i], list[j]);
+      if (level !== null) frictions.push({ a: list[i], b: list[j], level });
     }
   }
-  const hawk = seats === 0 ? 0 : members.reduce((s, p) => s + PARTIES[p].hawk * PARTIES[p].seats, 0) / seats;
-  const spread = members.length === 0 ? 0 : Math.max(...members.map((p) => PARTIES[p].hawk)) - Math.min(...members.map((p) => PARTIES[p].hawk));
+  const hawk = seats === 0 ? 0 : list.reduce((s, p) => s + PARTIES[p].hawk * SEATS[roster][p], 0) / seats;
+  const spread = list.length === 0 ? 0 : Math.max(...list.map((p) => PARTIES[p].hawk)) - Math.min(...list.map((p) => PARTIES[p].hawk));
+  const strain = frictions.reduce((s, f) => s + FRICTION_WEIGHT[f.level], 0);
   const majority = seats >= MAJORITY;
-  const stability = Math.round(Math.max(20, Math.min(85, 60 + Math.min(8, seats - 61) * 2 - spread * 5 - frictions.length * 3)));
+  const stability = Math.round(Math.max(15, Math.min(85, 60 + Math.min(8, seats - 61) * 2 - spread * 5 - strain * 3)));
   const type: CoalitionType = hawk >= 1.1 ? "RIGHT_WING_BLOC" : hawk <= 0.1 ? "CENTER_LEFT_BLOC" : "BENNETT_LIEBERMAN_GOLAN_ABBAS";
   return { seats, vetoes, frictions, majority, valid: majority && vetoes.length === 0, stability, hawk, type };
 }
+
+/** Friction strain a partner carries inside a coalition (for its starting patience). */
+export function partnerStrain(p: PartyId, members: PartyId[]): number {
+  return members.reduce((s, m) => {
+    if (m === p) return s;
+    const level = frictionBetween(p, m);
+    return level === null ? s : s + FRICTION_WEIGHT[level];
+  }, 0);
+}
+
+/** Reference coalitions shown in the builder (the poll-era arithmetic). */
+export const BENCHMARK_COALITIONS: Array<{ id: string; label: Bi; members: PartyId[] }> = [
+  {
+    id: "right_bloc", label: { he: "גוש הימין", en: "Right-wing bloc" },
+    members: ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism"],
+  },
+  {
+    id: "right_plus_gantz", label: { he: "גוש הימין + גנץ", en: "Right bloc + Gantz" },
+    members: ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "national_unity"],
+  },
+  {
+    id: "right_plus_lieberman", label: { he: "גוש הימין + ליברמן", en: "Right bloc + Lieberman" },
+    members: ["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "yisrael_beiteinu"],
+  },
+  {
+    id: "change_bloc", label: { he: "מרכז-שמאל + ליברמן + מפלגות ערביות", en: "Center-left + Lieberman + Arab parties" },
+    members: ["national_unity", "yisrael_beiteinu", "yesh_atid", "democrats", "raam", "hadash_taal"],
+  },
+  {
+    id: "unity", label: { he: "אחדות / חירום", en: "Unity / emergency" },
+    members: ["national_unity", "yesh_atid", "yisrael_beiteinu", "likud"],
+  },
+];
 
 /** Partner patience change when a doctrine is adopted (assumption). */
 export const DOCTRINE_REACTIONS: Record<PolicyTrack, Record<PartyTag, number>> = {

@@ -1,55 +1,58 @@
-/* DESIGN.md tokens — the only colors/spacing/type in the app. */
+/* DESIGN.md tokens — the only colors/spacing/type in the app.
+ * Light "briefing paper" theme: warm paper ground, white cards, ink text,
+ * a serif display face for headlines and soft, layered elevation. */
 @import "tailwindcss";
 
 @theme {
-  /* surfaces (cool ink ramp) */
-  --color-bg0: #0a0e14;
-  --color-bg1: #111722;
-  --color-bg2: #1a2230;
-  --color-bg3: #232d3f;
-  --color-line0: #2a3444;
-  --color-line1: #3a4658;
+  /* surfaces (warm paper ramp) — bg0 page · bg1 card · bg2 inset/hover · bg3 pressed */
+  --color-bg0: #f4f1ea;
+  --color-bg1: #ffffff;
+  --color-bg2: #f6f3ed;
+  --color-bg3: #ebe6dc;
+  --color-line0: #e7e1d6;
+  --color-line1: #d3cbbd;
 
-  /* text */
-  --color-fg0: #e6edf3;
-  --color-fg1: #93a4b5;
-  --color-fg2: #5c6b7a;
+  /* ink */
+  --color-fg0: #1c2330;
+  --color-fg1: #555e6c;
+  --color-fg2: #8b919a;
 
-  /* semantic ramps */
-  --color-good-dim: #1f6e33;
-  --color-good: #2ea043;
-  --color-good-bright: #3fb950;
-  --color-bad-dim: #8b2e2a;
-  --color-bad: #da3633;
-  --color-bad-bright: #f85149;
-  --color-warn-dim: #7a5b0e;
-  --color-warn: #d29922;
-  --color-warn-bright: #e3b341;
-  --color-info-dim: #1f4e8c;
-  --color-info: #3b82d0;
-  --color-info-bright: #58a6ff;
+  /* semantic ramps — dim: tinted fill · base: borders/marks · bright: text on paper */
+  --color-good-dim: #dcefe3;
+  --color-good: #3c9a66;
+  --color-good-bright: #1f7a4a;
+  --color-bad-dim: #f8e0dc;
+  --color-bad: #d9534a;
+  --color-bad-bright: #b3302a;
+  --color-warn-dim: #f7ecd2;
+  --color-warn: #d49a2a;
+  --color-warn-bright: #946312;
+  --color-info-dim: #e2ebf7;
+  --color-info: #2f63b0;
+  --color-info-bright: #24518f;
 
   /* domain accents */
-  --color-dom-fiscal: #e3b341;
-  --color-dom-macro: #7ee787;
-  --color-dom-security: #e8604c;
-  --color-dom-diplomacy: #58a6ff;
-  --color-dom-social: #d2a8ff;
-  --color-dom-infra: #79c0ff;
+  --color-dom-fiscal: #c9921f;
+  --color-dom-macro: #3c9a66;
+  --color-dom-security: #d05a43;
+  --color-dom-diplomacy: #2f63b0;
+  --color-dom-social: #8a63c2;
+  --color-dom-infra: #3b8fb8;
 
   /* fixed sector palette */
-  --color-sec-secular: #4c9be8;
-  --color-sec-national-religious: #2ea98f;
-  --color-sec-haredi: #8b7ec8;
-  --color-sec-arab: #e8a33d;
-  --color-sec-other: #c97ba8;
+  --color-sec-secular: #3f84cf;
+  --color-sec-national-religious: #2a9a82;
+  --color-sec-haredi: #7a6bbd;
+  --color-sec-arab: #d9912a;
+  --color-sec-other: #bf6a9a;
 
-  --font-sans: "Heebo", "Rubik", system-ui, sans-serif;
+  --font-sans: "Rubik", "Heebo", system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre", "Rubik", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --radius-cell: 2px;
-  --radius-panel: 4px;
-  --radius-modal: 6px;
+  --radius-cell: 6px;
+  --radius-panel: 14px;
+  --radius-modal: 18px;
 }
 
 html,
@@ -62,17 +65,40 @@ body {
   background: var(--color-bg0);
   color: var(--color-fg0);
   font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 14px;
+  line-height: 21px;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Every number in the app is mono, tabular, LTR-isolated (DESIGN §3/§4). */
+::selection {
+  background: #cfe0f5;
+}
+
+/* headlines: newspaper serif */
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+/* Every number: tabular, LTR-isolated — in the text face, not a terminal font. */
 .num {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* small caps-style section label */
+.eyebrow {
+  font-size: 11.5px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--color-fg2);
+  letter-spacing: 0.02em;
 }
 
 /* placeholder-confidence values: assumption, not data (DESIGN §7) */
@@ -86,11 +112,78 @@ body {
   background: var(--color-bg1);
   border: 1px solid var(--color-line0);
   border-radius: var(--radius-panel);
+  box-shadow: 0 1px 2px rgb(60 48 30 / 0.04), 0 2px 8px rgb(60 48 30 / 0.04);
 }
 
-/* overlays are the only shadowed element (DESIGN §2) */
+/* floating cards over the map / modals */
 .overlay {
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
+  box-shadow:
+    0 1px 2px rgb(40 32 20 / 0.06),
+    0 6px 16px rgb(40 32 20 / 0.08),
+    0 18px 40px rgb(40 32 20 / 0.08);
+}
+
+/* frosted card used over maps */
+.glass {
+  background: rgb(255 255 255 / 0.9);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+}
+
+/* primary / secondary buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease, transform 80ms ease;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--color-fg0);
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #2c3647;
+}
+.btn-accent {
+  background: var(--color-info);
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+.btn-accent:hover:not(:disabled) {
+  background: var(--color-info-bright);
+}
+.btn-danger {
+  background: var(--color-bad-bright);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #962620;
+}
+.btn-ghost {
+  background: var(--color-bg1);
+  border: 1px solid var(--color-line0);
+  color: var(--color-fg1);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-line1);
+  color: var(--color-fg0);
+  background: var(--color-bg2);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
 }
 
 /* value pulse in the semantic direction (DESIGN §5) */
@@ -102,13 +195,12 @@ body {
   0% { color: var(--color-bad-bright); }
   100% { color: inherit; }
 }
-.pulse-good { animation: pulse-good 250ms ease-out; }
-.pulse-bad { animation: pulse-bad 250ms ease-out; }
+.pulse-good { animation: pulse-good 400ms ease-out; }
+.pulse-bad { animation: pulse-bad 400ms ease-out; }
 
-/* dense scrollbars for an instrument panel */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-bg3) transparent;
+  scrollbar-color: var(--color-line1) transparent;
 }
 
 /* time scrubber */
@@ -117,17 +209,18 @@ input[type="range"] {
   appearance: none;
   height: 4px;
   background: var(--color-bg3);
-  border-radius: 2px;
+  border-radius: 999px;
   outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 10px;
-  height: 18px;
-  border-radius: 2px;
-  background: var(--color-info-bright);
-  border: 1px solid var(--color-line1);
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid var(--color-info);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
   cursor: ew-resize;
 }
 
@@ -138,33 +231,35 @@ input[type="range"].slider-ghost {
   cursor: ew-resize;
 }
 input[type="range"].slider-ghost::-webkit-slider-thumb {
-  width: 6px;
-  height: 16px;
-  background: var(--color-fg1);
-  border: none;
-  border-radius: 1px;
-  opacity: 0.65;
+  width: 8px;
+  height: 18px;
+  background: var(--color-fg0);
+  border: 2px solid #fff;
+  border-radius: 4px;
+  opacity: 0.8;
 }
 
 /* number input cells (budget chamber) */
 input.cell {
-  background: var(--color-bg2);
+  background: var(--color-bg1);
   border: 1px solid var(--color-line0);
   border-radius: var(--radius-cell);
   color: var(--color-fg0);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   direction: ltr;
   text-align: right;
-  padding: 1px 6px;
+  padding: 2px 8px;
   width: 100%;
 }
 input.cell:focus {
   border-color: var(--color-info);
+  box-shadow: 0 0 0 3px var(--color-info-dim);
   outline: none;
 }
 input.cell.edited {
   border-color: var(--color-warn);
+  background: #fffaf0;
 }
 
 .maplibregl-map {
@@ -173,11 +268,11 @@ input.cell.edited {
 
 /* crisis alert: red edge flash when the crisis engine halts the timeline */
 @keyframes crisis-flash {
-  0%, 100% { box-shadow: inset 0 0 0 3px rgba(248, 81, 73, 0.95), inset 0 0 60px rgba(248, 81, 73, 0.45); }
-  50% { box-shadow: inset 0 0 0 1px rgba(248, 81, 73, 0.35), inset 0 0 20px rgba(248, 81, 73, 0.12); }
+  0%, 100% { box-shadow: inset 0 0 0 3px rgba(217, 83, 74, 0.9), inset 0 0 60px rgba(217, 83, 74, 0.28); }
+  50% { box-shadow: inset 0 0 0 1px rgba(217, 83, 74, 0.3), inset 0 0 20px rgba(217, 83, 74, 0.08); }
 }
 .crisis-flash { animation: crisis-flash 0.7s ease-in-out 4, crisis-hold 0s 2.8s forwards; }
-@keyframes crisis-hold { to { box-shadow: inset 0 0 0 2px rgba(248, 81, 73, 0.7), inset 0 0 40px rgba(248, 81, 73, 0.2); } }
+@keyframes crisis-hold { to { box-shadow: inset 0 0 0 2px rgba(217, 83, 74, 0.6), inset 0 0 40px rgba(217, 83, 74, 0.14); } }
 @media (prefers-reduced-motion: reduce) {
   .crisis-flash { animation: crisis-hold 0s forwards; }
 }
@@ -189,12 +284,17 @@ input.cell.edited {
 }
 .country-pulse { animation: country-pulse 1.1s ease-in-out infinite; }
 
-/* campaign: consequence popups arrive like a news flash */
+/* campaign: cards arrive softly */
 @keyframes consequence-in {
-  from { transform: translateY(24px) scale(0.98); opacity: 0; }
+  from { transform: translateY(16px); opacity: 0; }
   to { transform: none; opacity: 1; }
 }
-.consequence-in { animation: consequence-in 260ms ease-out; }
+.consequence-in { animation: consequence-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in { animation: fade-in 240ms ease-out; }
 @media (prefers-reduced-motion: reduce) {
-  .country-pulse, .consequence-in { animation: none; }
+  .country-pulse, .consequence-in, .fade-in { animation: none; }
 }

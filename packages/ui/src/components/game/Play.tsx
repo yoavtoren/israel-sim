@@ -75,7 +75,7 @@ export function Hud(props: { game: Game; lang: Lang }) {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-[12px]">
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: S.PARTIES[game.party].color }} />
-            <span className="font-medium">{he ? "ראש הממשלה" : "Prime Minister"} · {tr(S.PARTIES[game.party].name, lang)}</span>
+            <span className="font-medium">{he ? "ראש הממשלה" : "Prime Minister"} · {tr(S.partyName(game.party, game.roster), lang)}</span>
             <span className={`num ${seats >= 61 ? "text-fg0" : "text-bad-bright"}`}>{seats}</span>
             <span className="text-fg2">{he ? "מנדטים" : "seats"}</span>
           </div>
@@ -85,17 +85,17 @@ export function Hud(props: { game: Game; lang: Lang }) {
               return (
                 <span
                   key={p}
-                  title={`${tr(S.PARTIES[p].name, lang)} · ${he ? "סבלנות" : "patience"} ${Math.round(pat)}`}
+                  title={`${tr(S.partyName(p, game.roster), lang)} · ${he ? "סבלנות" : "patience"} ${Math.round(pat)}`}
                   className={`flex items-center gap-1 rounded-[2px] border px-1 text-[10px] leading-[16px] ${pat <= 25 ? "border-bad text-bad-bright" : pat <= 45 ? "border-warn text-warn-bright" : "border-line1 text-fg1"}`}
                 >
                   <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: S.PARTIES[p].color }} />
-                  {tr(S.PARTIES[p].name, lang)}
+                  {tr(S.partyName(p, game.roster), lang)}
                   <span className="num">{Math.round(pat)}</span>
                 </span>
               );
             })}
             {game.departed.map((p) => (
-              <span key={p} className="rounded-[2px] border border-line0 px-1 text-[10px] leading-[16px] text-fg2 line-through">{tr(S.PARTIES[p].name, lang)}</span>
+              <span key={p} className="rounded-[2px] border border-line0 px-1 text-[10px] leading-[16px] text-fg2 line-through">{tr(S.partyName(p, game.roster), lang)}</span>
             ))}
           </div>
         </div>
@@ -146,7 +146,7 @@ function PartnerImpact(props: { game: Game; option: strategic.DilemmaOption; isD
         const quits = after <= 0;
         return (
           <span key={p} className={`rounded-[2px] border px-1.5 text-[10px] leading-[16px] ${quits ? "border-bad bg-bad-dim/40 font-bold text-bad-bright" : d > 0 ? "border-good/50 text-good-bright" : "border-warn/50 text-warn-bright"}`}>
-            {tr(S.PARTIES[p].name, lang)} {quits ? (lang === "he" ? "· פורשת" : "· quits") : <span className="num">{d > 0 ? "+" : ""}{d}</span>}
+            {tr(S.partyName(p, game.roster), lang)} {quits ? (lang === "he" ? "· פורשת" : "· quits") : <span className="num">{d > 0 ? "+" : ""}{d}</span>}
           </span>
         );
       })}

@@ -91,14 +91,14 @@ export function visualScript(visual: Visual, key: string, turn: number): Tactica
       { pos: [35.2, 31.78], label: { he: "ירושלים", en: "Jerusalem" } },
       { pos: [34.99, 32.8], label: { he: "חיפה", en: "Haifa" } },
     ];
-    sites.forEach((s, i) => zones.push({ id: `v-protest-${i}`, kind: "contested", path: boxAround(s.pos, 0.035), t0: 3 + i * 6, t1: 1e9, color: "#E3B341", label: s.label }));
+    sites.forEach((s, i) => zones.push({ id: `v-protest-${i}`, kind: "contested", path: boxAround(s.pos, 0.035), t0: 3 + i * 6, t1: 1e9, color: "#B8860B", label: s.label }));
     markers.push({ t: 3, kind: "alert", label: { he: "הפגנות המוניות", en: "Mass protests" } });
   } else if (visual.kind === "nuclear") {
     const gz: LonLat = [34.42, 31.45];
     blasts.push({ id: "v-nuke", pos: gz, t: 8, heavy: true }, { id: "v-nuke-2", pos: [34.44, 31.47], t: 9, heavy: true });
     // fallout plume carried north-east over the Israeli south (schematic)
-    zones.push({ id: "v-fireball", kind: "contested", path: circle(gz, 0.09), t0: 8, t1: 1e9, color: "#F85149", label: null });
-    zones.push({ id: "v-fallout", kind: "contested", path: circle([34.78, 31.62], 0.28, 1.6), t0: 40, t1: 1e9, color: "#E3B341", label: { he: "אזור נשורת משוער", en: "Estimated fallout zone" } });
+    zones.push({ id: "v-fireball", kind: "contested", path: circle(gz, 0.09), t0: 8, t1: 1e9, color: "#C8372D", label: null });
+    zones.push({ id: "v-fallout", kind: "contested", path: circle([34.78, 31.62], 0.28, 1.6), t0: 40, t1: 1e9, color: "#B8860B", label: { he: "אזור נשורת משוער", en: "Estimated fallout zone" } });
     markers.push({ t: 8, kind: "impact", label: { he: "פיצוץ גרעיני", en: "Nuclear detonation" } }, { t: 40, kind: "alert", label: { he: "נשורת רדיואקטיבית", en: "Radioactive fallout" } });
   }
 

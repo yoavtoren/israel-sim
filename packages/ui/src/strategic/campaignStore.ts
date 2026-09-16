@@ -15,7 +15,9 @@ interface CampaignStore {
   game: Campaign;
   /** coalition being assembled (includes the PM's party) */ draft: strategic.PartyId[];
   newGame(): void;
+  setRoster(r: strategic.SeatRoster): void;
   pickParty(p: strategic.PartyId): void;
+  /** replace the draft with a reference coalition (keeps the PM's party) */ loadCoalition(members: strategic.PartyId[]): void;
   backToParties(): void;
   toggleMember(p: strategic.PartyId): void;
   formGovernment(): void;
@@ -54,15 +56,27 @@ export const useCampaign = create<CampaignStore>((set, get) => ({
   draft: [],
 
   newGame() {
-    const game = strategic.createCampaign(freshSeed());
+    const game = strategic.createCampaign(freshSeed(), get().game.roster);
     useStrategic.setState({ script: buildTurnScript(game.sim), t: 0, playing: false });
     sync(game, null);
     set({ game, draft: [] });
   },
 
+  setRoster(r) {
+    set({ game: strategic.setRoster(get().game, r) });
+  },
+
+  loadCoalition(members) {
+    const { game } = get();
+    if (game.party === null) return;
+    set({ draft: [...new Set([game.party, ...members.filter((m) => strategic.SEATS[game.roster][m] > 0)])] });
+  },
+
   pickParty(p) {
     sound.unlock();
-    const game = strategic.chooseParty(get().game, p);
+    const prev = get().game;
+    const game = strategic.chooseParty(prev, p);
+    if (game === prev) return;
     set({ game, draft: [p] });
   },
 

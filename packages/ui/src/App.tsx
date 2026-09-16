@@ -63,103 +63,126 @@ export function App() {
 
   if (!booted || state === null) {
     return (
-      <div className="flex h-full items-center justify-center bg-bg0 text-fg1">
-        <span className="animate-pulse text-[15px]">{t("loading", lang)}</span>
+      <div className="flex h-full flex-col items-center justify-center gap-3 bg-bg0 text-fg1">
+        <div className="display text-[28px] text-fg0">{t("appTitle", lang)}</div>
+        <div className="h-1 w-40 overflow-hidden rounded-full bg-bg3">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-info" />
+        </div>
+        <span className="text-[14px]">{t("loading", lang)}</span>
       </div>
     );
   }
 
   const ended = state.outcome.ended;
   const strategicScreen = screen === "game" || screen === "alliances" || screen === "tactical";
-  const navButton = (n: { screen: Screen; label: UIKey; accent: string }) => (
-    <button
-      key={n.screen}
-      type="button"
-      onClick={() => setScreen(n.screen)}
-      className={`flex w-full items-center gap-2 px-4 py-2 text-start text-[13px] leading-[20px] ${
-        screen === n.screen ? "bg-bg3 text-fg0" : "text-fg1 hover:bg-bg2"
-      }`}
-    >
-      <span className="inline-block h-2 w-2 rounded-[2px]" style={{ background: n.accent }} />
-      {t(n.label, lang)}
-    </button>
-  );
+  const navButton = (n: { screen: Screen; label: UIKey; accent: string }) => {
+    const active = screen === n.screen;
+    return (
+      <button
+        key={n.screen}
+        type="button"
+        onClick={() => setScreen(n.screen)}
+        aria-current={active ? "page" : undefined}
+        className={`group flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-start text-[14px] leading-[20px] transition-colors ${
+          active ? "bg-bg1 font-medium text-fg0 shadow-[0_1px_2px_rgb(40_32_20/0.08),0_2px_6px_rgb(40_32_20/0.05)]" : "text-fg1 hover:bg-bg3/60 hover:text-fg0"
+        }`}
+      >
+        <span
+          className={`inline-block h-2 w-2 rounded-full transition-transform ${active ? "scale-125" : "opacity-70 group-hover:opacity-100"}`}
+          style={{ background: n.accent }}
+        />
+        {t(n.label, lang)}
+      </button>
+    );
+  };
 
   return (
     <div className="flex h-full bg-bg0">
-      {/* sidebar — 280px (DESIGN §2) */}
-      <aside className="flex w-[280px] shrink-0 flex-col border-e border-line0 bg-bg1">
-        <div className="border-b border-line0 px-4 py-3">
-          <div className="text-[18px] leading-[26px] font-bold">{t("appTitle", lang)}</div>
-          <div className="num text-[11px] text-fg2">israel-sim</div>
+      <aside className="flex w-[240px] shrink-0 flex-col border-e border-line0 bg-bg0">
+        <div className="px-5 pt-5 pb-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-fg0 text-[15px] text-white">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="2" y="8" width="3" height="6" rx="1" fill="#E9C77E" />
+                <rect x="6.5" y="5" width="3" height="9" rx="1" fill="#86B2D6" />
+                <rect x="11" y="2" width="3" height="12" rx="1" fill="#8FD1A8" />
+              </svg>
+            </span>
+            <div className="display text-[19px] leading-[24px]">{t("appTitle", lang)}</div>
+          </div>
         </div>
-        <nav className="flex-1 overflow-y-auto py-2">
-          <div className="px-4 pt-1 pb-1 text-[11px] text-fg2">{t("strategySection", lang)}</div>
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-3">
+          <div className="eyebrow px-3 pt-2 pb-1.5">{t("strategySection", lang)}</div>
           {STRATEGY_NAV.map(navButton)}
-          <div className="mt-2 border-t border-line0 px-4 pt-3 pb-1 text-[11px] text-fg2">{t("economySection", lang)}</div>
+          <div className="eyebrow px-3 pt-5 pb-1.5">{t("economySection", lang)}</div>
           {NAV.map(navButton)}
           {ended && (
             <button
               type="button"
               onClick={() => setScreen("postmortem")}
-              className={`flex w-full items-center gap-2 px-4 py-2 text-start text-[13px] ${
-                screen === "postmortem" ? "bg-bg3 text-fg0" : "text-bad-bright hover:bg-bg2"
+              className={`mt-2 flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-start text-[14px] ${
+                screen === "postmortem" ? "bg-bad-dim font-medium text-bad-bright" : "text-bad-bright hover:bg-bad-dim/60"
               }`}
             >
-              <span className="inline-block h-2 w-2 rounded-[2px] bg-bad" />
+              <span className="inline-block h-2 w-2 rounded-full bg-bad" />
               {t("postmortem", lang)}
             </button>
           )}
         </nav>
-        <div className="border-t border-line0 px-4 py-2 text-[11px] leading-[16px] text-fg2">
-          <div>
-            {t("seed", lang)}: <span className="num">{seed}</span>
-          </div>
-          <button type="button" className="mt-1 text-info-bright hover:underline" onClick={() => setLang(lang === "he" ? "en" : "he")}>
+        <div className="flex items-center justify-between border-t border-line0 px-5 py-3 text-[12px] text-fg2">
+          <span>
+            {t("seed", lang)} <span className="num text-fg1">{seed}</span>
+          </span>
+          <button
+            type="button"
+            className="rounded-full border border-line0 bg-bg1 px-2.5 py-0.5 text-[12px] text-fg1 hover:border-line1 hover:text-fg0"
+            onClick={() => setLang(lang === "he" ? "en" : "he")}
+          >
             {lang === "he" ? "English" : "עברית"}
           </button>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* top strip: clock, headline KPIs, run controls */}
-        {screen === "game" ? null : strategicScreen ? <StrategicStrip /> : <header className="flex items-center gap-6 border-b border-line0 bg-bg1 px-4 py-2">
-          <Num value={fmtQuarter(state.t.year, state.t.quarter)} className="text-[24px] leading-[32px] font-medium" />
-          <div className="flex items-baseline gap-1 text-[12px] text-fg1">
-            {t("gdp", lang)}
-            <Num value={fmtBudget(state.macro.gdp_real, 0)} raw={state.macro.gdp_real} direction={1} className="text-fg0" />
+        {screen === "game" ? null : strategicScreen ? <StrategicStrip /> : <header className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-line0 bg-bg0 px-6 py-3">
+          <Num value={fmtQuarter(state.t.year, state.t.quarter)} className="display text-[26px] leading-[32px]" />
+          <div className="flex flex-col leading-[18px]">
+            <span className="text-[12px] text-fg2">{t("gdp", lang)}</span>
+            <Num value={fmtBudget(state.macro.gdp_real, 0)} raw={state.macro.gdp_real} direction={1} className="text-[16px] font-medium text-fg0" />
           </div>
-          <div className="flex items-baseline gap-1 text-[12px] text-fg1">
-            {t("debtGdp", lang)}
-            <Num value={fmtPct(state.macro.debt_gdp, 1)} raw={state.macro.debt_gdp} direction={-1} className="text-fg0" />
+          <div className="flex flex-col leading-[18px]">
+            <span className="text-[12px] text-fg2">{t("debtGdp", lang)}</span>
+            <Num value={fmtPct(state.macro.debt_gdp, 1)} raw={state.macro.debt_gdp} direction={-1} className="text-[16px] font-medium text-fg0" />
           </div>
-          <div className="flex items-baseline gap-1 text-[12px] text-fg1">
-            {t("unemployment", lang)}
-            <Num value={fmtPct(state.macro.unemployment, 2)} raw={state.macro.unemployment} direction={-1} className="text-fg0" />
+          <div className="flex flex-col leading-[18px]">
+            <span className="text-[12px] text-fg2">{t("unemployment", lang)}</span>
+            <Num value={fmtPct(state.macro.unemployment, 2)} raw={state.macro.unemployment} direction={-1} className="text-[16px] font-medium text-fg0" />
           </div>
-          <div className="ms-auto flex items-center gap-1">
-            {busy && <span className="me-2 animate-pulse text-[12px] text-fg2">…</span>}
-            {STEPS.map((s) => (
-              <button
-                key={s.label}
-                type="button"
-                disabled={busy || ended}
-                onClick={() => void advance(s.quarters)}
-                className="num rounded-[2px] border border-line0 bg-bg2 px-2 py-1 text-[12px] text-fg1 hover:bg-bg3 hover:text-fg0 disabled:opacity-40"
-              >
-                {s.label}
-              </button>
-            ))}
+          <div className="ms-auto flex items-center gap-3">
+            {busy && <span className="animate-pulse text-[13px] text-fg2">{t("loading", lang)}</span>}
+            <div dir="ltr" className="flex items-center rounded-[10px] border border-line0 bg-bg1 p-0.5">
+              {STEPS.map((s) => (
+                <button
+                  key={s.label}
+                  type="button"
+                  disabled={busy || ended}
+                  onClick={() => void advance(s.quarters)}
+                  className="num rounded-[8px] px-2.5 py-1 text-[13px] text-fg1 transition-colors hover:bg-bg3 hover:text-fg0 disabled:opacity-40"
+                >
+                  +{s.label}
+                </button>
+              ))}
+            </div>
           </div>
         </header>}
 
         {ended && !strategicScreen && screen !== "postmortem" && (
-          <div className="border-b border-bad bg-bad-dim/30 px-4 py-1.5 text-[13px] text-bad-bright">
+          <div className="border-b border-bad/30 bg-bad-dim px-6 py-2 text-[14px] text-bad-bright">
             {t("runEnded", lang)} — {state.outcome.kind}
           </div>
         )}
 
-        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" || screen === "alliances" || screen === "game" ? "relative" : "overflow-y-auto p-4"}`}>
+        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" || screen === "alliances" || screen === "game" ? "relative" : "overflow-y-auto p-6"}`}>
           {screen === "alliances" && <Alliances />}
           {screen === "game" && <Game />}
           {screen === "tactical" && <Tactical />}

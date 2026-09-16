@@ -24,20 +24,20 @@ export const COUNTRY_SHAPES: CountryShape[] = GEO.countries;
 
 export type TierColors = Record<strategic.StanceTier, string>;
 
-/** Diverging ramp: blue = with us, grey = neutral, amber → red = against us. */
+/** Diverging ramp on paper: blue = with us, stone = neutral, amber → brick = against us. */
 export const TIER_COLORS: TierColors = {
-  ALLY: "#2F6FD6",
-  FRIENDLY: "#4F8FB0",
-  NEUTRAL: "#56606E",
-  COLD: "#B08326",
-  HOSTILE: "#C8552F",
-  ENEMY: "#B3202A",
+  ALLY: "#3569B8",
+  FRIENDLY: "#86B2D6",
+  NEUTRAL: "#D6D1C6",
+  COLD: "#E9C77E",
+  HOSTILE: "#E08A5E",
+  ENEMY: "#C0453B",
 };
 
-export const ISRAEL_FILL = "#DCE6F0";
-export const CONTEXT_FILL = "#111823";
-export const CONTEXT_STROKE = "#243042";
-export const SEA = "#070B11";
+export const ISRAEL_FILL = "#1F3F6E";
+export const CONTEXT_FILL = "#F7F4EE";
+export const CONTEXT_STROKE = "#D9D2C5";
+export const SEA = "#DCE7EC";
 
 /** Which actor, if any, owns each outline. */
 export const ACTOR_BY_MAPKEY: Map<string, strategic.ActorId> = new Map(

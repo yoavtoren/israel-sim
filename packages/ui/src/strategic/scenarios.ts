@@ -28,21 +28,21 @@ export const AFFILIATION: Record<Faction, Affiliation> = {
 
 /** Attack-vector colors: red Egypt, green Gaza, orange Iran/Iraq, cyan/blue IDF & partners. */
 export const FACTION_COLORS: Record<Faction, string> = {
-  egypt: "#F85149",
-  gaza: "#3FB950",
-  iran: "#F0883E",
-  iraq: "#F0883E",
-  hezbollah: "#E3B341",
-  houthis: "#FFA657",
-  pa: "#D2A8FF",
-  militants: "#FF7B72",
-  idf: "#58A6FF",
-  us: "#79C0FF",
-  coalition: "#A5D6FF",
-  mfo: "#7EE787",
-  regional: "#AFF5B4",
+  egypt: "#C8372D",
+  gaza: "#2E8B4E",
+  iran: "#D96A1C",
+  iraq: "#D96A1C",
+  hezbollah: "#B8860B",
+  houthis: "#C9761A",
+  pa: "#8457C2",
+  militants: "#D1495B",
+  idf: "#2F63B0",
+  us: "#3C7DC4",
+  coalition: "#5A8FC7",
+  mfo: "#3C9A66",
+  regional: "#5DA57A",
 };
-export const INTERCEPTOR_COLOR = "#56D4DD";
+export const INTERCEPTOR_COLOR = "#0E8A94";
 
 export const FACTION_NAMES: Record<Faction, Bi> = {
   egypt: { he: "מצרים", en: "Egypt" },

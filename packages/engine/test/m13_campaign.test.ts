@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { strategic as S } from "../src/index";
 
+/** The 2022 right bloc (64 seats in the 2022 roster; 54 in current polls). */
 const RIGHT: S.PartyId[] = ["likud", "shas", "utj", "religious_zionism", "otzma_yehudit", "noam"];
-const UNITY: S.PartyId[] = ["likud", "yesh_atid", "national_unity"];
+/** Poll-era unity government: Gantz + Lapid + Lieberman + Likud (66). */
+const UNITY: S.PartyId[] = ["national_unity", "yesh_atid", "yisrael_beiteinu", "likud"];
+/** Poll-era center-left + Lieberman + Arab parties (64). */
+const CHANGE: S.PartyId[] = ["national_unity", "yisrael_beiteinu", "yesh_atid", "democrats", "raam", "hadash_taal"];
 
-function started(members: S.PartyId[], seed = "t"): S.CampaignState {
-  return S.formGovernment(S.chooseParty(S.createCampaign(seed), members[0]), members);
+function started(members: S.PartyId[], seed = "t", roster: S.SeatRoster = "polls"): S.CampaignState {
+  return S.formGovernment(S.chooseParty(S.createCampaign(seed, roster), members[0]), members);
 }
+
+const started2022 = (members: S.PartyId[], seed = "t") => started(members, seed, "election_2022");
 
 function drain(s: S.CampaignState): S.CampaignState {
   let x = s;
@@ -15,21 +21,72 @@ function drain(s: S.CampaignState): S.CampaignState {
 }
 
 describe("M13 Prime Minister campaign", () => {
-  it("parties hold 120 seats; coalition rules enforce majority and refusals", () => {
-    expect(S.PARTY_IDS.reduce((a, p) => a + S.PARTIES[p].seats, 0)).toBe(120);
-    const right = S.checkCoalition(RIGHT);
+  it("both seat rosters hold exactly 120 seats; polls are the default", () => {
+    for (const r of S.SEAT_ROSTERS) expect(S.PARTY_IDS.reduce((a, p) => a + S.SEATS[r][p], 0)).toBe(120);
+    expect(S.createCampaign("d").roster).toBe("polls");
+    expect(S.SEATS.polls.likud).toBe(23);
+    expect(S.SEATS.polls.balad).toBe(2);
+    expect(S.partyName("democrats", "election_2022").en).toBe("Labor");
+    expect(S.partyName("democrats", "polls").he).toBe("הדמוקרטים");
+    // a zero-seat party cannot be picked
+    expect(S.chooseParty(S.createCampaign("z"), "noam").phase).toBe("party");
+    expect(S.chooseParty(S.createCampaign("z", "election_2022"), "balad").phase).toBe("party");
+    // the roster can only change before a party is picked
+    const r = S.setRoster(S.createCampaign("r"), "election_2022");
+    expect(r.roster).toBe("election_2022");
+    expect(S.setRoster(S.chooseParty(r, "likud"), "polls").roster).toBe("election_2022");
+  });
+
+  it("2022 roster: the right bloc has 64; refusals block a government", () => {
+    const right = S.checkCoalition(RIGHT, "election_2022");
     expect(right.valid).toBe(true);
     expect(right.seats).toBe(64);
     expect(right.type).toBe("RIGHT_WING_BLOC");
-    expect(S.checkCoalition(["likud", "otzma_yehudit", "raam", "shas", "utj"]).vetoes.length).toBeGreaterThan(0);
-    expect(S.checkCoalition(["likud", "shas"]).majority).toBe(false);
-    // an invalid government is not formed
-    const s = S.chooseParty(S.createCampaign("x"), "likud");
+    expect(S.checkCoalition(["likud", "otzma_yehudit", "raam", "shas", "utj"], "election_2022").vetoes.length).toBeGreaterThan(0);
+    const s = S.chooseParty(S.createCampaign("x", "election_2022"), "likud");
     expect(S.formGovernment(s, ["likud", "raam", "otzma_yehudit", "shas", "utj"])).toBe(s);
   });
 
+  it("current polls: 61 needs a compromise", () => {
+    const rightBloc = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism"]);
+    expect(rightBloc.seats).toBe(54);
+    expect(rightBloc.valid).toBe(false);
+
+    const plusLieberman = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "yisrael_beiteinu"]);
+    expect(plusLieberman.seats).toBe(68);
+    expect(plusLieberman.valid).toBe(true);
+    expect(plusLieberman.frictions.filter((f) => f.level === "deep").length).toBe(2); // Lieberman vs. the Haredi parties
+
+    const plusGantz = S.checkCoalition(["likud", "shas", "utj", "otzma_yehudit", "religious_zionism", "national_unity"]);
+    expect(plusGantz.seats).toBe(70);
+    expect(plusGantz.valid).toBe(true);
+
+    const change = S.checkCoalition(CHANGE);
+    expect(change.seats).toBe(64);
+    expect(change.valid).toBe(true);
+    const pairs = change.frictions.map((f) => [f.a, f.b].sort().join("|"));
+    expect(pairs).toContain(["raam", "yisrael_beiteinu"].sort().join("|"));
+    expect(change.frictions.find((f) => [f.a, f.b].includes("hadash_taal") && [f.a, f.b].includes("yisrael_beiteinu"))?.level).toBe("deep");
+    // the most strained government starts the least stable
+    expect(change.stability).toBeLessThan(S.checkCoalition(UNITY).stability);
+    expect(S.checkCoalition(UNITY).seats).toBe(66);
+
+    // Hadash–Ta'al's patience starts lowest in the change bloc (deep friction with Lieberman)
+    const g = started(CHANGE, "chg");
+    expect(g.phase).toBe("policy");
+    const hadash = g.patience.hadash_taal ?? 100;
+    for (const [p, v] of Object.entries(g.patience)) if (p !== "hadash_taal" && p !== "yisrael_beiteinu") expect(v).toBeGreaterThan(hadash);
+
+    // every benchmark adds up and all but the right bloc can govern
+    for (const b of S.BENCHMARK_COALITIONS) {
+      const c = S.checkCoalition(b.members);
+      expect(c.vetoes).toEqual([]);
+      expect(c.valid).toBe(b.id !== "right_bloc");
+    }
+  });
+
   it("forming a government opens the doctrine popup with patient partners", () => {
-    const s = started(RIGHT);
+    const s = started2022(RIGHT);
     expect(s.phase).toBe("policy");
     expect(s.current).toBe("DOCTRINE");
     expect(Object.keys(s.patience).length).toBe(RIGHT.length - 1);
@@ -38,7 +95,7 @@ describe("M13 Prime Minister campaign", () => {
   });
 
   it("a doctrine the coalition cannot live with brings the government down", () => {
-    const s = S.choose(started(RIGHT), "D_WITHDRAWAL");
+    const s = S.choose(started2022(RIGHT), "D_WITHDRAWAL");
     expect(s.ending?.kind).toBe("GOVERNMENT_FELL");
     expect(s.queue.some((e) => e.quits.length > 0)).toBe(true);
     expect(s.phase).toBe("consequences");
@@ -46,7 +103,7 @@ describe("M13 Prime Minister campaign", () => {
   });
 
   it("radical right → \"what will you do in Gaza?\" → nuclear use ends the state", () => {
-    const s1 = drain(S.choose(started(RIGHT), "D_RADICAL_RIGHT"));
+    const s1 = drain(S.choose(started2022(RIGHT), "D_RADICAL_RIGHT"));
     expect(s1.current).toBe("RR_GAZA");
     expect(S.currentDilemma(s1)?.options.map((o) => o.id)).toEqual(
       expect.arrayContaining(["RR_OCCUPY", "RR_EMIGRATION", "RR_TRANSFER", "RR_NUCLEAR", "RR_SIEGE", "RR_CARPET"]),
@@ -60,7 +117,7 @@ describe("M13 Prime Minister campaign", () => {
   });
 
   it("forced transfer queues the Egyptian ballistic crisis; carrying it out collapses the state", () => {
-    const s1 = drain(S.choose(started(RIGHT), "D_RADICAL_RIGHT"));
+    const s1 = drain(S.choose(started2022(RIGHT), "D_RADICAL_RIGHT"));
     const s2 = S.choose(s1, "RR_TRANSFER");
     expect(s2.ending).toBeNull();
     expect(s2.queue.some((e) => e.focus === "europe")).toBe(true);
@@ -114,12 +171,18 @@ describe("M13 Prime Minister campaign", () => {
         for (const c of o.consequences ?? []) if (c.next !== undefined) expect(ids.has(c.next)).toBe(true);
       }
     }
-    const coalitions = [RIGHT, UNITY, ["yesh_atid", "national_unity", "yisrael_beiteinu", "labor", "raam", "shas"] as S.PartyId[]];
+    const coalitions: Array<{ members: S.PartyId[]; roster: S.SeatRoster }> = [
+      { members: RIGHT, roster: "election_2022" },
+      { members: UNITY, roster: "polls" },
+      { members: CHANGE, roster: "polls" },
+    ];
     const endings = new Set<string>();
     for (let seed = 0; seed < 90; seed++) {
       let x = seed * 7919 + 13;
       const r = () => ((x = (x * 48271) % 2147483647) / 2147483647);
-      let s = started(coalitions[seed % 3], `rand-${seed}`);
+      const c = coalitions[seed % 3];
+      let s = started(c.members, `rand-${seed}`, c.roster);
+      expect(s.phase).toBe("policy");
       let guard = 0;
       while (s.phase !== "ended" && guard++ < 400) {
         if (s.phase === "consequences") {

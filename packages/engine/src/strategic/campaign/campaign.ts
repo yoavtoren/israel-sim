@@ -14,7 +14,7 @@ import { clamp, createInitialState, seedFromString, updateMetrics } from "../red
 import type { Bi, CrisisId, CrisisOptionId, GambleBranch, MetricKey, SimulationMetrics } from "../types";
 import { METRIC_KEYS } from "../types";
 import { AUTHORED_DILEMMAS, CEASEFIRE_TALKS, DOCTRINE } from "./dilemmas";
-import { DOCTRINE_REACTIONS, MAJORITY, PARTIES, checkCoalition, type PartyId, type PartyTag } from "./parties";
+import { DOCTRINE_REACTIONS, MAJORITY, PARTIES, SEATS, checkCoalition, partnerStrain, partyName, type PartyId, type PartyTag, type SeatRoster } from "./parties";
 import type {
   CampaignFlags, CampaignState, CampaignView, ConsequenceDef, ConsequenceEvent, DilemmaDef, DilemmaOption,
   Ending, MapFocus, Severity,
@@ -120,11 +120,12 @@ const NO_FLAGS: CampaignFlags = {
 
 export const TERM_STEPS = 16;
 
-export function createCampaign(seed: string): CampaignState {
+export function createCampaign(seed: string, roster: SeatRoster = "polls"): CampaignState {
   return {
     phase: "party",
     seed,
     rngState: seedFromString(`campaign:${seed}`),
+    roster,
     party: null,
     coalition: [],
     patience: {},
@@ -145,23 +146,28 @@ export function createCampaign(seed: string): CampaignState {
   };
 }
 
+/** Switch between the 2022 election and current polls (before a party is picked). */
+export function setRoster(state: CampaignState, roster: SeatRoster): CampaignState {
+  if (state.phase !== "party" || state.roster === roster) return state;
+  return { ...state, roster };
+}
+
 export function chooseParty(state: CampaignState, party: PartyId): CampaignState {
-  if (state.phase !== "party") return state;
+  if (state.phase !== "party" || SEATS[state.roster][party] === 0) return state;
   return { ...state, party, coalition: [party], phase: "coalition" };
 }
 
 export function formGovernment(state: CampaignState, members: PartyId[]): CampaignState {
   if (state.phase !== "coalition" || state.party === null) return state;
   const set = [...new Set([state.party, ...members])];
-  const check = checkCoalition(set);
+  const check = checkCoalition(set, state.roster);
   if (!check.valid) return state;
   const sim = createInitialState(check.type, state.seed);
   const patience: Partial<Record<PartyId, number>> = {};
   for (const p of set) {
     if (p === state.party) continue;
-    const frictions = check.frictions.filter(([a, b]) => a === p || b === p).length;
     // a partner that just signed the coalition deal starts fairly patient; friction wears it down
-    patience[p] = clamp(Math.round(45 + check.stability * 0.45 - frictions * 6));
+    patience[p] = clamp(Math.round(45 + check.stability * 0.45 - partnerStrain(p, set) * 6));
   }
   const next: CampaignState = {
     ...state,
@@ -173,8 +179,8 @@ export function formGovernment(state: CampaignState, members: PartyId[]): Campai
     log: [{
       step: 0, severity: "good",
       text: {
-        he: `הממשלה הושבעה: ${set.map((p) => PARTIES[p].name.he).join(", ")} (${check.seats} מנדטים).`,
-        en: `Government sworn in: ${set.map((p) => PARTIES[p].name.en).join(", ")} (${check.seats} seats).`,
+        he: `הממשלה הושבעה: ${set.map((p) => partyName(p, state.roster).he).join(", ")} (${check.seats} מנדטים).`,
+        en: `Government sworn in: ${set.map((p) => partyName(p, state.roster).en).join(", ")} (${check.seats} seats).`,
       },
     }],
   };
@@ -186,7 +192,7 @@ export function formGovernment(state: CampaignState, members: PartyId[]): Campai
 // ---------------------------------------------------------------------------
 
 export function coalitionSeats(state: CampaignState): number {
-  return state.coalition.reduce((s, p) => s + PARTIES[p].seats, 0);
+  return state.coalition.reduce((s, p) => s + SEATS[state.roster][p], 0);
 }
 
 export function campaignView(state: CampaignState): CampaignView {
@@ -237,9 +243,9 @@ export function stepDate(step: number): Bi {
 
 function syncCoalitionMetric(state: CampaignState): CampaignState {
   const partners = state.coalition.filter((p) => p !== state.party);
-  const seats = partners.reduce((s, p) => s + PARTIES[p].seats, 0);
+  const seats = partners.reduce((s, p) => s + SEATS[state.roster][p], 0);
   const margin = coalitionSeats(state) - (MAJORITY - 1);
-  const avg = seats === 0 ? 70 : partners.reduce((s, p) => s + (state.patience[p] ?? 50) * PARTIES[p].seats, 0) / seats;
+  const avg = seats === 0 ? 70 : partners.reduce((s, p) => s + (state.patience[p] ?? 50) * SEATS[state.roster][p], 0) / seats;
   const value = clamp(Math.round(avg * 0.8 + Math.min(10, margin) * 2));
   return { ...state, sim: { ...state.sim, metrics: { ...state.sim.metrics, coalitionStability: value } } };
 }
@@ -354,8 +360,8 @@ function settleCoalition(w: Work, before: Partial<Record<PartyId, number>>): voi
     const seats = coalitionSeats(w.s);
     pushEvent(w, {
       headline: {
-        he: `${quits.map((q) => PARTIES[q].name.he).join(" ו")} ${quits.length > 1 ? "פורשות" : "פורשת"} מהקואליציה`,
-        en: `${quits.map((q) => PARTIES[q].name.en).join(" and ")} ${quits.length > 1 ? "quit" : "quits"} the coalition`,
+        he: `${quits.map((q) => partyName(q, w.s.roster).he).join(" ו")} ${quits.length > 1 ? "פורשות" : "פורשת"} מהקואליציה`,
+        en: `${quits.map((q) => partyName(q, w.s.roster).en).join(" and ")} ${quits.length > 1 ? "quit" : "quits"} the coalition`,
       },
       body: {
         he: `לקואליציה נותרו ${seats} מנדטים${seats < MAJORITY ? " — אין רוב בכנסת." : "."}`,
@@ -368,8 +374,8 @@ function settleCoalition(w: Work, before: Partial<Record<PartyId, number>>): voi
   if (threats.length > 0) {
     pushEvent(w, {
       headline: {
-        he: `${threats.map((q) => PARTIES[q].name.he).join(" ו")} מאיימת לפרוש`,
-        en: `${threats.map((q) => PARTIES[q].name.en).join(" and ")} threatens to quit`,
+        he: `${threats.map((q) => partyName(q, w.s.roster).he).join(" ו")} מאיימת לפרוש`,
+        en: `${threats.map((q) => partyName(q, w.s.roster).en).join(" and ")} threatens to quit`,
       },
       body: { he: "עוד צעד בכיוון הזה — והם בחוץ.", en: "One more step in this direction and they are out." },
       severity: "warn", focus: "israel", visual: null, deltas: {}, stance: {}, quits: [], threats,

@@ -37,7 +37,7 @@ interface Scene {
   after: Record<string, (r: () => number, a: number, branch: Branch | null) => Parts>;
 }
 
-const WAR_WARN = "#E3B341";
+const WAR_WARN = "#B8860B";
 const zone = (id: string, kind: ZoneFx["kind"], path: LonLat[], t0: number, t1: number, color: string, label: Bi | null = null): ZoneFx =>
   ({ id, kind, path, t0, t1, color, label });
 const mk = (t: number, kind: Marker["kind"], he: string, en: string): Marker => ({ t, kind, label: { he, en } });
@@ -223,7 +223,7 @@ const EGYPT_TREATY: Scene = {
   focus: "sinai",
   pre() {
     const p = empty();
-    for (const l of TREATY_LINES) p.zones.push(zone(l.id, "treaty_line", l.path, 0, 1e9, "#7EE787", l.label));
+    for (const l of TREATY_LINES) p.zones.push(zone(l.id, "treaty_line", l.path, 0, 1e9, "#2E8B4E", l.label));
     p.units.push(
       unit("idf-philadelphi", "idf", "armor", "XX", { he: "אוגדה 162 · פילדלפי המורחב", en: "162nd Div. · expanded Philadelphi" }, [34.4, 31.3], [34.22, 31.22], 10, 150),
       unit("eg-div", "egypt", "mech", "XX", { he: "דיביזיה ממוכנת · חוצה לאזור B", en: "Mech. division · crossing into Zone B" }, EG_DIV_FROM, EG_DIV_TO, 40, 280),
@@ -358,7 +358,7 @@ const TUNNELS: Scene = {
   focus: "gaza",
   pre(r) {
     const p = empty();
-    TUNNEL_ROUTES.forEach((route, i) => p.zones.push(zone(`tunnel-${i}`, "tunnels", route, 20 + i * 12, 1e9, "#D29922", i === 0 ? { he: "מערך מנהרות", en: "Tunnel network" } : null)));
+    TUNNEL_ROUTES.forEach((route, i) => p.zones.push(zone(`tunnel-${i}`, "tunnels", route, 20 + i * 12, 1e9, "#9A6A12", i === 0 ? { he: "מערך מנהרות", en: "Tunnel network" } : null)));
     p.units.push(
       unit("reg-rafah", "regional", "police", "II", { he: "כוח שיטור אזורי · רפיח", en: "Regional police · Rafah" }, [34.25, 31.29]),
       unit("reg-khan", "regional", "police", "II", { he: "כוח שיטור אזורי · ח'אן יונס", en: "Regional police · Khan Yunis" }, [34.31, 31.35]),

@@ -6,7 +6,7 @@
 import type { CrisisPrecedent, CrisisGamble } from "../crisisEngine";
 import type { ActorId } from "../stances";
 import type { Bi, CrisisId, CrisisOptionId, GambleBranch, PolicyTrack, SimulationMetrics, SimulationState } from "../types";
-import type { PartyId, PartyTag } from "./parties";
+import type { PartyId, PartyTag, SeatRoster } from "./parties";
 
 type Deltas = Partial<SimulationMetrics>;
 
@@ -144,6 +144,7 @@ export interface CampaignState {
   phase: CampaignPhase;
   seed: string;
   rngState: number;
+  /** which seat numbers the Knesset uses */ roster: SeatRoster;
   party: PartyId | null;
   coalition: PartyId[];
   /** 0–100 per coalition partner (the PM's own party is not tracked) */ patience: Partial<Record<PartyId, number>>;
