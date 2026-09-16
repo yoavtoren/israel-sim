@@ -48,62 +48,57 @@ export function Reforms() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
         <Panel title={t("reforms", lang)} accent={DOMAIN.diplomacy}>
-          <ul className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
+          <ul className="-mx-2 flex flex-col">
             {meta.reforms.map((r) => {
               const st = state.reforms[r.id]?.status ?? "pending";
               const isEnacted = st === "enacted";
               const prereqsMet = r.prerequisites.every((p) => enacted.has(p));
               const drafted = draft.reforms[r.id];
-              const tone =
-                drafted === "enact"
-                  ? "border-good bg-good-dim/40"
-                  : drafted === "repeal"
-                    ? "border-bad bg-bad-dim/40"
-                    : isEnacted
-                      ? "border-line0 bg-bg2"
-                      : "border-line0 bg-bg1 hover:border-line1";
+              const tone = drafted === "enact" ? "bg-good-dim/50" : drafted === "repeal" ? "bg-bad-dim/50" : "hover:bg-bg2";
               return (
-                <li key={r.id} className={`flex flex-col rounded-[12px] border px-4 py-3 transition-colors ${tone}`}>
-                  <div className="flex items-start gap-3">
-                    <span className="flex-1 text-[14.5px] leading-[21px] font-medium text-fg0">{REFORM_NAMES[r.id]?.[lang] ?? r.id}</span>
-                    <span className="num shrink-0 text-[13px] text-fg1">
+                <li key={r.id} className="border-b border-line0 last:border-0">
+                  <div className={`flex items-center gap-4 rounded-[10px] px-3 py-3 transition-colors ${tone}`}>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="text-[14.5px] leading-[21px] font-medium text-fg0">{REFORM_NAMES[r.id]?.[lang] ?? r.id}</span>
+                        {isEnacted && <Chip tone="good">{t("enacted", lang)}</Chip>}
+                        {st === "repealed" && <Chip tone="muted">{t("repealed", lang)}</Chip>}
+                        {!r.reversible && <Chip tone="bad">{t("irreversible", lang)}</Chip>}
+                      </div>
+                      {!prereqsMet && !isEnacted && (
+                        <div className="mt-0.5 text-[12.5px] leading-[18px] text-warn-bright">
+                          {t("prereqMissing", lang)}:{" "}
+                          <span className="text-fg1">{r.prerequisites.filter((p) => !enacted.has(p)).map((p) => REFORM_NAMES[p]?.[lang] ?? p).join(", ")}</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="num w-24 shrink-0 text-end text-[13.5px] text-fg1">
                       {fmtBudget(r.fiscal_cost, 1)}
                       <span className="text-fg2">/y</span>
                     </span>
-                  </div>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    {isEnacted && <Chip tone="good">{t("enacted", lang)}</Chip>}
-                    {st === "repealed" && <Chip tone="muted">{t("repealed", lang)}</Chip>}
-                    {!r.reversible && <Chip tone="bad">{t("irreversible", lang)}</Chip>}
-                  </div>
-                  {!prereqsMet && !isEnacted && (
-                    <div className="mt-2 text-[12px] leading-[18px] text-warn-bright">
-                      {t("prereqMissing", lang)}:{" "}
-                      <span className="text-fg1">{r.prerequisites.filter((p) => !enacted.has(p)).map((p) => REFORM_NAMES[p]?.[lang] ?? p).join(", ")}</span>
+                    <div className="flex w-[92px] shrink-0 justify-end">
+                      {!isEnacted && (
+                        <button
+                          type="button"
+                          disabled={!prereqsMet}
+                          onClick={() => setReformDraft(r.id, drafted === "enact" ? null : "enact")}
+                          className={`btn w-full px-3 py-1.5 text-[13px] ${drafted === "enact" ? "bg-good text-white hover:bg-good-bright" : "btn-ghost"}`}
+                        >
+                          {drafted === "enact" ? "✓ " : ""}
+                          {t("enact", lang)}
+                        </button>
+                      )}
+                      {isEnacted && r.reversible && (
+                        <button
+                          type="button"
+                          onClick={() => setReformDraft(r.id, drafted === "repeal" ? null : "repeal")}
+                          className={`btn w-full px-3 py-1.5 text-[13px] ${drafted === "repeal" ? "btn-danger" : "btn-ghost"}`}
+                        >
+                          {drafted === "repeal" ? "✓ " : ""}
+                          {t("repeal", lang)}
+                        </button>
+                      )}
                     </div>
-                  )}
-                  <div className="mt-auto flex gap-2 pt-3">
-                    {!isEnacted && (
-                      <button
-                        type="button"
-                        disabled={!prereqsMet}
-                        onClick={() => setReformDraft(r.id, drafted === "enact" ? null : "enact")}
-                        className={`btn px-3.5 py-1.5 text-[13px] ${drafted === "enact" ? "bg-good text-white hover:bg-good-bright" : "btn-ghost"}`}
-                      >
-                        {drafted === "enact" ? "✓ " : ""}
-                        {t("enact", lang)}
-                      </button>
-                    )}
-                    {isEnacted && r.reversible && (
-                      <button
-                        type="button"
-                        onClick={() => setReformDraft(r.id, drafted === "repeal" ? null : "repeal")}
-                        className={`btn px-3.5 py-1.5 text-[13px] ${drafted === "repeal" ? "btn-danger" : "btn-ghost"}`}
-                      >
-                        {drafted === "repeal" ? "✓ " : ""}
-                        {t("repeal", lang)}
-                      </button>
-                    )}
                   </div>
                 </li>
               );

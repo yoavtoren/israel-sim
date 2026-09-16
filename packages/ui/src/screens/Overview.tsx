@@ -40,13 +40,13 @@ export function Overview() {
   const tail = frames.slice(-16);
 
   const kpis: Array<{ label: string; value: string; raw: number; dir: number; path: string; pick: (f: typeof now) => number; fmtDelta: (d: number) => string }> = [
-    { label: t("gdp", lang), value: fmtBudget(now.gdp_real, 0), raw: now.gdp_real, dir: 1, path: "macro.gdp_real", pick: (f) => f.gdp_real, fmtDelta: (d) => `${d > 0 ? "+" : ""}${((d / yearAgo.gdp_real) * 100).toFixed(1)}%` },
+    { label: t("gdp", lang), value: fmtBudget(now.gdp_real, 0), raw: now.gdp_real, dir: 1, path: "macro.gdp_real", pick: (f) => f.gdp_real, fmtDelta: (d) => `${((d / yearAgo.gdp_real) * 100).toFixed(1)}%` },
     { label: t("debtGdp", lang), value: fmtPct(now.debt_gdp, 1), raw: now.debt_gdp, dir: -1, path: "macro.debt_gdp", pick: (f) => f.debt_gdp, fmtDelta: pp },
     { label: t("unemployment", lang), value: fmtPct(now.unemployment, 2), raw: now.unemployment, dir: -1, path: "macro.unemployment", pick: (f) => f.unemployment, fmtDelta: pp },
     { label: t("inflation", lang), value: fmtPct(now.inflation, 1), raw: now.inflation, dir: -1, path: "macro.inflation", pick: (f) => f.inflation, fmtDelta: pp },
     { label: t("deficit", lang), value: fmtPct(now.deficit / now.gdp_real, 1), raw: now.deficit, dir: -1, path: "fiscal.deficit", pick: (f) => f.deficit / f.gdp_real, fmtDelta: pp },
     { label: t("poverty", lang), value: fmtPct(now.poverty_rate, 1), raw: now.poverty_rate, dir: -1, path: "macro.poverty_rate", pick: (f) => f.poverty_rate, fmtDelta: pp },
-    { label: t("rating", lang), value: now.credit_rating.toFixed(1), raw: now.credit_rating, dir: 1, path: "macro.credit_rating", pick: (f) => f.credit_rating, fmtDelta: (d) => `${d > 0 ? "+" : ""}${d.toFixed(1)}` },
+    { label: t("rating", lang), value: now.credit_rating.toFixed(1), raw: now.credit_rating, dir: 1, path: "macro.credit_rating", pick: (f) => f.credit_rating, fmtDelta: (d) => d.toFixed(1) },
     { label: t("participation", lang), value: fmtPct(now.participation, 1), raw: now.participation, dir: 1, path: "macro.participation", pick: (f) => f.participation, fmtDelta: pp },
   ];
 
@@ -60,7 +60,8 @@ export function Overview() {
         {kpis.map((k) => {
           const series = tail.map(k.pick);
           const delta = k.pick(now) - k.pick(yearAgo);
-          const flat = Math.abs(delta) < 1e-9 || frames.length < 2;
+          const deltaText = k.fmtDelta(Math.abs(delta));
+          const flat = frames.length < 2 || !/[1-9]/.test(deltaText);
           const good = Math.sign(delta) === Math.sign(k.dir);
           return (
             <div key={k.path} className="panel flex flex-col gap-1 px-5 pt-4 pb-3">
@@ -79,7 +80,7 @@ export function Overview() {
                     <span
                       className={`num inline-flex items-center rounded-full px-2 text-[11.5px] font-medium ${good ? "bg-good-dim text-good-bright" : "bg-bad-dim text-bad-bright"}`}
                     >
-                      {delta > 0 ? "▲" : "▼"} {k.fmtDelta(delta)}
+                      {delta > 0 ? "▲" : "▼"} {deltaText}
                     </span>
                     <span>{yoyLabel}</span>
                   </>
@@ -160,7 +161,8 @@ export function Overview() {
   );
 }
 
-const pp = (d: number): string => `${d > 0 ? "+" : ""}${(d * 100).toFixed(1)}pp`;
+/** unsigned magnitude in percentage points — the arrow carries the sign */
+const pp = (d: number): string => `${(d * 100).toFixed(1)}pp`;
 
 function MiniStat(props: { label: string; value: string; alarm?: boolean }) {
   return (

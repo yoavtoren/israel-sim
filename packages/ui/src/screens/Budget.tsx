@@ -3,7 +3,7 @@
  *  "מה יישבר" panel fed by the engine's shadow-tick preview (not hardcoded warnings).
  */
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import type { MinistryId, WorldState } from "@engine";
 import { useStore, draftIsEmpty, type Draft } from "../store";
 import { MINISTRY_NAMES, t, type Lang } from "../lib/strings";
@@ -51,7 +51,7 @@ export function Budget() {
         {/* fixed fiscal strip — live, deficit colored by band (DESIGN §6.1).
             Values come from the latest frame: at boot the raw state has empty fiscal
             flows and the frame is seeded from a zero-change shadow tick. */}
-        <div className="panel flex flex-wrap items-center gap-x-10 gap-y-3 px-6 py-4">
+        <div className="panel flex flex-wrap items-center gap-x-9 gap-y-3 px-6 py-4">
           <Strip label={t("revenue", lang)} value={fmtBudget(latest(frames).revenue_total, 1)} raw={latest(frames).revenue_total} dir={1} path="fiscal.revenue" />
           <Strip label={t("spend", lang)} value={fmtBudget(latest(frames).spend_total, 1)} raw={latest(frames).spend_total} dir={0} path="fiscal.ministries" />
           <Strip
@@ -61,15 +61,17 @@ export function Budget() {
             dir={-1}
             path="fiscal.deficit"
             color={deficitColor(latest(frames).deficit, state.macro.gdp_real)}
+            sub={
+              previewedDeficit !== undefined ? (
+                <span className="flex items-baseline gap-1.5 text-[12px] text-fg2">
+                  {t("proposed", lang)}
+                  <span className="num text-[14px] font-medium" style={{ color: deficitColor(previewedDeficit.proposed, state.macro.gdp_real) }}>
+                    {fmtBudget(previewedDeficit.proposed, 1)}
+                  </span>
+                </span>
+              ) : undefined
+            }
           />
-          {previewedDeficit !== undefined && (
-            <span className="flex flex-col">
-              <span className="eyebrow !text-[12px]">{t("proposed", lang)}</span>
-              <span className="num text-[20px] leading-[34px] font-medium" style={{ color: deficitColor(previewedDeficit.proposed, state.macro.gdp_real) }}>
-                ← {fmtBudget(previewedDeficit.proposed, 1)}
-              </span>
-            </span>
-          )}
           <span className="ms-auto flex gap-2">
             {dirty && (
               <button type="button" onClick={clearDraft} className="btn btn-ghost px-4 py-2 text-[13px]">
@@ -238,14 +240,14 @@ export function Budget() {
             <header className="px-5 pt-4 pb-1">
               <span className="display text-[18px] leading-[26px]">{t("topDiffs", lang)}</span>
             </header>
-            <table className="mb-3 w-full text-[12.5px] leading-[18px]">
+            <table className="mb-3 w-full table-fixed text-[12.5px] leading-[18px]">
               <tbody>
                 {preview.diffs.slice(0, 10).map((d) => (
                   <tr key={d.path} className="border-b border-line0 last:border-0 hover:bg-bg2">
-                    <td className="max-w-[200px] truncate px-5 py-2 text-fg1" title={d.path} dir="ltr">
-                      <Traceable path={d.path}>{d.path}</Traceable>
+                    <td className="truncate py-2 ps-5 pe-2 text-fg1" title={d.path} dir="ltr">
+                      <Traceable path={d.path} className="max-w-full truncate">{d.path}</Traceable>
                     </td>
-                    <td className={`num px-5 py-2 text-end font-medium ${deltaClass(d.path, d.delta)}`}>{fmtSigned(d.delta, 2)}</td>
+                    <td className={`num w-[84px] py-2 ps-2 pe-5 text-end font-medium ${deltaClass(d.path, d.delta)}`}>{fmtSigned(d.delta, 2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -257,7 +259,7 @@ export function Budget() {
   );
 }
 
-function Strip(props: { label: string; value: string; raw: number; dir: number; path: string; color?: string }) {
+function Strip(props: { label: string; value: string; raw: number; dir: number; path: string; color?: string; sub?: ReactNode }) {
   return (
     <div className="flex flex-col">
       <span className="eyebrow !text-[12px]">{props.label}</span>
@@ -265,6 +267,7 @@ function Strip(props: { label: string; value: string; raw: number; dir: number; 
         <Num value={props.value} raw={props.raw} direction={props.dir} className="text-[26px] leading-[34px] font-medium tracking-tight" title={props.path} />
       </Traceable>
       {props.color !== undefined && <span className="mt-0.5 block h-[3px] w-full rounded-full" style={{ background: props.color, opacity: 0.85 }} />}
+      {props.sub !== undefined && <span className="mt-1">{props.sub}</span>}
     </div>
   );
 }

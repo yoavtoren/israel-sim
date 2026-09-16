@@ -70,24 +70,26 @@ function TracePopover(props: { path: string; pos: { x: number; y: number }; onCl
       {entries.length === 0 ? (
         <div className="py-2 text-[13px] text-fg2">{lang === "he" ? "ללא שינוי ברבעון האחרון" : "no change last quarter"}</div>
       ) : (
-        <table className="w-full text-[12.5px] leading-[18px]">
-          <tbody>
-            {entries.map((e, i) => (
-              <tr key={i} className="border-b border-line0 last:border-0">
-                <td className="num py-1.5 pe-2 text-fg2">{e.step}</td>
-                <td className="py-1.5 pe-2 text-fg0">{e.fn}</td>
-                <td className={`num py-1.5 pe-2 font-medium ${e.delta >= 0 ? "text-good-bright" : "text-bad-bright"}`}>{fmtSigned(e.delta, 2)}</td>
-                <td className="num py-1.5 text-[11.5px] text-fg2">
-                  {e.constant_id !== null && (
-                    <span className={placeholders.has(e.constant_id) ? "assumption" : ""} title={placeholders.has(e.constant_id) ? t("assumption", lang) : undefined}>
-                      {e.constant_id}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="flex flex-col text-[12.5px] leading-[18px]">
+          {entries.map((e, i) => (
+            <li key={i} className="border-b border-line0 py-1.5 last:border-0">
+              <div className="flex items-baseline gap-2">
+                <span className="num shrink-0 text-fg2">{e.step}</span>
+                <span className="min-w-0 flex-1 truncate text-fg0" dir="ltr" title={e.fn}>
+                  {e.fn}
+                </span>
+                <span className={`num shrink-0 font-medium ${e.delta >= 0 ? "text-good-bright" : "text-bad-bright"}`}>{fmtSigned(e.delta, 2)}</span>
+              </div>
+              {e.constant_id !== null && (
+                <div className="num mt-0.5 truncate text-[11.5px] text-fg2" title={e.constant_id}>
+                  <span className={placeholders.has(e.constant_id) ? "assumption" : ""} title={placeholders.has(e.constant_id) ? t("assumption", lang) : undefined}>
+                    {e.constant_id}
+                  </span>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>,
     document.body,

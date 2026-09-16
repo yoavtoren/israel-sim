@@ -25,7 +25,7 @@ const INDICATORS: Array<{ id: Indicator; label: UIKey }> = [
 const BLANK_STYLE: maplibregl.StyleSpecification = {
   version: 8,
   sources: {},
-  layers: [{ id: "bg", type: "background", paint: { "background-color": "#E9EEF0" } }],
+  layers: [{ id: "bg", type: "background", paint: { "background-color": "#ECE8DF" } }],
 };
 
 interface Hover {

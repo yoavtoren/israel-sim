@@ -8,7 +8,7 @@ import { useStore } from "../store";
 import { ADVERSARY_NAMES, MUNITION_NAMES, t } from "../lib/strings";
 import { fmtInt, fmtPct } from "../lib/format";
 import { EventFeed } from "./Overview";
-import { DOMAIN, SEM, threatColor, bandColor } from "../lib/colors";
+import { DOMAIN, SEM, bandColor } from "../lib/colors";
 import { Dial, GaugeBar, Num, Panel, TrendArrow } from "../components/ui";
 import { Traceable } from "../components/CausalTrace";
 
@@ -25,13 +25,12 @@ export function Security() {
   const ghost = frames[Math.max(0, frames.length - 5)];
   const first = frames[0];
   const qos = now.quarters_of_supply;
-  const qosColor = qos < 4 ? SEM.badBright : qos < 8 ? SEM.warnBright : SEM.good;
 
   const fmtQos = Number.isFinite(qos) ? qos.toFixed(1) : "∞";
   const qosTone = qos < 4 ? "bg-bad-dim text-bad-bright" : qos < 8 ? "bg-warn-dim text-warn-bright" : "bg-good-dim text-good-bright";
 
   return (
-    <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+    <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 xl:grid-cols-[300px_minmax(0,1fr)_320px]">
       {/* left: stockpile gauges */}
       <Panel title={t("stockpiles", lang)} accent={DOMAIN.security}>
         <div className="flex flex-col gap-5">
@@ -58,7 +57,6 @@ export function Security() {
             <div className="flex items-baseline gap-2">
               <Num value={fmtQos} raw={Number.isFinite(qos) ? qos : 9999} direction={1} className="text-[30px] leading-[38px] font-medium" />
               <span className="text-[12px]">{lang === "he" ? "רבעונים" : "quarters"}</span>
-              <span className="ms-auto inline-block h-2.5 w-2.5 rounded-full" style={{ background: qosColor }} />
             </div>
           </div>
         </div>
@@ -121,19 +119,19 @@ export function Security() {
             const back = frames[Math.max(0, frames.length - 9)];
             const delta = level - (back.threat[adv] ?? level);
             return (
-              <div key={adv} className="-mx-2 flex items-center gap-3 rounded-[8px] px-2 py-1.5 hover:bg-bg2">
-                <span className="w-24 shrink-0 truncate text-[13px] text-fg0">{ADVERSARY_NAMES[adv]?.[lang] ?? adv}</span>
-                <div className="flex flex-1 items-center gap-2">
-                  <bdi dir="ltr" className="block flex-1">
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-bg3">
-                      <div className="h-full rounded-full" style={{ width: `${Math.max(2, level * 100)}%`, background: threatColor(Math.max(0.35, level)) }} />
-                    </div>
-                  </bdi>
-                  <span className="num w-9 text-end text-[13px] font-medium text-fg0">{fmtPct(level, 0)}</span>
+              <div key={adv} className="-mx-2 rounded-[10px] px-2 py-2 hover:bg-bg2">
+                <div className="mb-1.5 flex items-baseline gap-2">
+                  <span className="min-w-0 flex-1 truncate text-[13.5px] text-fg0">{ADVERSARY_NAMES[adv]?.[lang] ?? adv}</span>
+                  <span className="num text-[13px]">
+                    <TrendArrow delta={delta} goodDir={-1} />
+                  </span>
+                  <span className="num w-10 text-end text-[14px] font-medium text-fg0">{fmtPct(level, 0)}</span>
                 </div>
-                <span className="num w-4 text-center text-[13px]">
-                  <TrendArrow delta={delta} goodDir={-1} />
-                </span>
+                <bdi dir="ltr" className="block">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-bg3">
+                    <div className="h-full rounded-full" style={{ width: `${Math.max(2, level * 100)}%`, background: level > 0.66 ? SEM.bad : level > 0.33 ? SEM.warn : SEM.good }} />
+                  </div>
+                </bdi>
               </div>
             );
           })}

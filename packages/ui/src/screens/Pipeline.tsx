@@ -95,7 +95,7 @@ export function Pipeline() {
                 <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -4 }}>
                   <CartesianGrid stroke={INK.line0} strokeDasharray="2 4" vertical={false} />
                   <XAxis dataKey="x" tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "Rubik, system-ui, sans-serif" }} axisLine={{ stroke: INK.line1 }} tickLine={false} tickMargin={6} minTickGap={24} />
-                  <YAxis tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "Rubik, system-ui, sans-serif" }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => fmtCompact(v, 0)} />
+                  <YAxis tick={{ fill: INK.fg2, fontSize: 11, fontFamily: "Rubik, system-ui, sans-serif" }} axisLine={false} tickLine={false} width={44} tickFormatter={(v: number) => fmtCompact(v, Math.abs(v) < 10 ? 1 : 0)} />
                   <Tooltip
                     cursor={{ stroke: INK.line1, strokeDasharray: "3 3" }}
                     content={(p: TooltipProps<number, string>) =>
@@ -146,7 +146,7 @@ export function Pipeline() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Panel title={t("largestPending", lang)} accent={DOMAIN.fiscal}>
           {largest.length === 0 ? (
-            <div className="rounded-[10px] bg-bg2 py-6 text-center text-[13px] text-fg2">—</div>
+            <div className="rounded-[10px] bg-bg2 py-6 text-center text-[13px] text-fg2">{lang === "he" ? "הרשימה תתמלא כשהחלטות תקציב יתחילו להבשיל" : "Fills in as budget decisions start maturing"}</div>
           ) : (
             <table className="w-full text-[13px] leading-[20px]">
               <thead>

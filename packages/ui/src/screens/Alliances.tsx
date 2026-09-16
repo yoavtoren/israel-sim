@@ -36,9 +36,21 @@ const OFF_MAP: strategic.ActorId[] = strategic.ACTOR_IDS.filter((id) => strategi
 
 const signed = (v: number): string => (v > 0 ? `+${v}` : `${v}`);
 
+/** light tint + readable ink for a tier pill */
+const TIER_INK: Record<strategic.StanceTier, [string, string]> = {
+  ALLY: ["#E2EBF7", "#24518F"],
+  FRIENDLY: ["#E8F0F7", "#35658F"],
+  NEUTRAL: ["#EFECE6", "#555E6C"],
+  COLD: ["#F7ECD2", "#946312"],
+  HOSTILE: ["#F9E4D9", "#A5502A"],
+  ENEMY: ["#F8E0DC", "#B3302A"],
+};
+const tierTint = (t: strategic.StanceTier): string => TIER_INK[t][0];
+const tierInk = (t: strategic.StanceTier): string => TIER_INK[t][1];
+
 function Swatch(props: { tier: strategic.StanceTier; size?: number }) {
   const s = props.size ?? 10;
-  return <span className="inline-block shrink-0 rounded-[2px]" style={{ width: s, height: s, background: TIER_COLORS[props.tier] }} />;
+  return <span className="inline-block shrink-0 rounded-full ring-1 ring-black/5" style={{ width: s, height: s, background: TIER_COLORS[props.tier] }} />;
 }
 
 /** −100…+100 bar with the tier bands underneath and a marker at the score. */
@@ -54,16 +66,21 @@ function StanceScale(props: { score: number; prev: number | null }) {
   ];
   return (
     <bdi dir="ltr" className="block w-full">
-      <div className="relative h-3 w-full overflow-hidden rounded-[2px]">
-        {bands.map(([tier, a, b]) => (
-          <div key={tier} className="absolute inset-y-0" style={{ left: pos(a), width: `${((b - a) / 200) * 100}%`, background: TIER_COLORS[tier], opacity: 0.45 }} />
-        ))}
+      <div className="relative h-4 w-full">
+        <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 overflow-hidden rounded-full">
+          {bands.map(([tier, a, b]) => (
+            <div key={tier} className="absolute inset-y-0" style={{ left: pos(a), width: `${((b - a) / 200) * 100}%`, background: TIER_COLORS[tier], opacity: 0.6 }} />
+          ))}
+        </div>
         {props.prev !== null && props.prev !== props.score && (
-          <div className="absolute inset-y-0 w-[2px] bg-fg2" style={{ left: pos(props.prev) }} />
+          <div className="absolute top-1/2 h-3 w-[2px] -translate-y-1/2 rounded-full bg-fg2" style={{ left: pos(props.prev) }} />
         )}
-        <div className="absolute -top-0.5 h-4 w-[3px] rounded-[1px] bg-white" style={{ left: `calc(${pos(props.score)} - 1px)` }} />
+        <div
+          className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+          style={{ left: `calc(${pos(props.score)} - 8px)`, background: "#1C2330" }}
+        />
       </div>
-      <div className="mt-0.5 flex justify-between text-[10px] text-fg2">
+      <div className="mt-1 flex justify-between text-[11.5px] text-fg2">
         <span className="num">−100</span>
         <span className="num">0</span>
         <span className="num">+100</span>
@@ -76,7 +93,7 @@ function Delta(props: { now: number; prev: number | null; lang: Lang }) {
   if (props.prev === null || props.prev === props.now) return null;
   const d = props.now - props.prev;
   return (
-    <span className={`num text-[11px] ${d > 0 ? "text-good-bright" : "text-bad-bright"}`} title={L.sinceLast[props.lang]}>
+    <span className={`num text-[11.5px] font-medium ${d > 0 ? "text-good-bright" : "text-bad-bright"}`} title={L.sinceLast[props.lang]}>
       {d > 0 ? "▲" : "▼"}
       {Math.abs(d)}
     </span>
@@ -89,40 +106,45 @@ function DetailPanel(props: { id: strategic.ActorId; stances: Stances; prev: Sta
   const st = stances[id];
   const prevScore = prev === null ? null : prev[id].score;
   return (
-    <div className="overlay w-[320px] rounded-[6px] border border-line0 bg-bg1/95 text-[13px]">
-      <div className="flex items-start gap-2 border-b border-line0 px-3 py-2">
-        <Swatch tier={st.tier} size={12} />
-        <div className="min-w-0 flex-1 leading-[18px]">
-          <div className="text-[15px] font-medium text-fg0">{def.name[lang]}</div>
-          {def.entity !== undefined && <div className="text-[12px] text-fg1">{def.entity[lang]}</div>}
+    <div className="overlay glass w-[340px] rounded-[16px] border border-line0 text-[13px]">
+      <div className="flex items-start gap-3 px-5 pt-4 pb-3">
+        <Swatch tier={st.tier} size={14} />
+        <div className="min-w-0 flex-1">
+          <div className="display text-[20px] leading-[26px] text-fg0">{def.name[lang]}</div>
+          {def.entity !== undefined && <div className="text-[12.5px] leading-[18px] text-fg1">{def.entity[lang]}</div>}
         </div>
-        <button type="button" onClick={props.onClose} className="text-[12px] text-fg2 hover:text-fg0" aria-label={L.close[lang]}>
+        <button
+          type="button"
+          onClick={props.onClose}
+          className="-me-1 flex h-7 w-7 items-center justify-center rounded-full text-[13px] text-fg2 hover:bg-bg3 hover:text-fg0"
+          aria-label={L.close[lang]}
+        >
           ✕
         </button>
       </div>
-      <div className="px-3 py-2">
-        <div className="mb-1 flex items-baseline gap-2">
-          <span className="font-medium" style={{ color: TIER_COLORS[st.tier] === TIER_COLORS.NEUTRAL ? "#C9D1D9" : TIER_COLORS[st.tier] }}>
+      <div className="px-5 pb-4">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="rounded-full px-2.5 text-[12.5px] leading-[22px] font-medium" style={{ background: tierTint(st.tier), color: tierInk(st.tier) }}>
             {strategic.TIER_LABELS[st.tier][lang]}
           </span>
-          <bdi className="num text-[18px] text-fg0">{signed(st.score)}</bdi>
+          <bdi className="num text-[22px] leading-[28px] font-medium text-fg0">{signed(st.score)}</bdi>
           <Delta now={st.score} prev={prevScore} lang={lang} />
         </div>
         <StanceScale score={st.score} prev={prevScore} />
-        <p className="mt-2 text-[12px] leading-[18px] text-fg1">{def.note[lang]}</p>
+        <p className="mt-3 text-[13px] leading-[20px] text-fg1">{def.note[lang]}</p>
       </div>
-      <div className="border-t border-line0 px-3 py-2">
-        <div className="mb-1 text-[11px] text-fg2">{L.drivers[lang]}</div>
-        <ul className="space-y-0.5">
+      <div className="border-t border-line0 px-5 pt-3 pb-4">
+        <div className="eyebrow mb-1.5">{L.drivers[lang]}</div>
+        <ul className="space-y-1">
           {st.drivers.map((d, i) => (
-            <li key={i} className="flex items-baseline justify-between gap-2 text-[12px]">
+            <li key={i} className="flex items-baseline justify-between gap-2 text-[13px]">
               <span className="text-fg1">{d.label[lang]}</span>
-              <bdi className={`num ${i === 0 ? "text-fg1" : d.delta > 0 ? "text-good-bright" : "text-bad-bright"}`}>{signed(d.delta)}</bdi>
+              <bdi className={`num font-medium ${i === 0 ? "text-fg1" : d.delta > 0 ? "text-good-bright" : "text-bad-bright"}`}>{signed(d.delta)}</bdi>
             </li>
           ))}
-          <li className="flex items-baseline justify-between gap-2 border-t border-line0 pt-0.5 text-[12px]">
-            <span className="text-fg0">{L.total[lang]}</span>
-            <bdi className="num text-fg0">{signed(st.score)}</bdi>
+          <li className="mt-1 flex items-baseline justify-between gap-2 border-t border-line0 pt-1.5 text-[13px]">
+            <span className="font-medium text-fg0">{L.total[lang]}</span>
+            <bdi className="num font-medium text-fg0">{signed(st.score)}</bdi>
           </li>
         </ul>
       </div>
@@ -134,16 +156,16 @@ function Ranking(props: { stances: Stances; prev: Stances | null; lang: Lang; on
   const { stances, prev, lang } = props;
   const sorted = [...strategic.ACTOR_IDS].sort((a, b) => stances[b].score - stances[a].score);
   return (
-    <div className="overlay flex max-h-full w-[260px] flex-col rounded-[6px] border border-line0 bg-bg1/95 text-[12px]">
-      <div className="border-b border-line0 px-3 py-1.5 text-[11px] text-fg2">{L.ranking[lang]}</div>
-      <ul className="min-h-0 overflow-y-auto py-1">
+    <div className="overlay glass flex max-h-full w-[260px] flex-col rounded-[16px] border border-line0 text-[13px]">
+      <div className="eyebrow px-4 pt-3 pb-1.5">{L.ranking[lang]}</div>
+      <ul className="min-h-0 overflow-y-auto px-1.5 pb-2">
         {sorted.map((id) => (
           <li key={id}>
-            <button type="button" onClick={() => props.onSelect(id)} className="flex w-full items-center gap-2 px-3 py-[3px] text-start hover:bg-bg3">
+            <button type="button" onClick={() => props.onSelect(id)} className="flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-[5px] text-start hover:bg-bg2">
               <Swatch tier={stances[id].tier} />
-              <span className="min-w-0 flex-1 truncate text-fg1">{strategic.ACTOR_DEFS[id].name[lang]}</span>
+              <span className="min-w-0 flex-1 truncate text-fg0">{strategic.ACTOR_DEFS[id].name[lang]}</span>
               <Delta now={stances[id].score} prev={prev === null ? null : prev[id].score} lang={lang} />
-              <bdi className="num w-9 text-end text-fg0">{signed(stances[id].score)}</bdi>
+              <bdi className="num w-9 text-end font-medium text-fg1">{signed(stances[id].score)}</bdi>
             </button>
           </li>
         ))}
@@ -183,38 +205,46 @@ export function Alliances() {
         inset={{ x: lang === "he" ? 272 : -272, bottom: 90 }}
       />
 
-      <div className="pointer-events-none absolute inset-0 flex flex-col gap-3 p-3">
-        <div className="flex min-h-0 flex-1 items-start justify-between gap-3">
+      <div className="pointer-events-none absolute inset-0 flex flex-col gap-3 p-4">
+        <div className="flex min-h-0 flex-1 items-start justify-between gap-4">
           {/* legend */}
           <div className="flex min-h-0 flex-col gap-3 self-stretch">
-            <div className="overlay pointer-events-auto w-[260px] rounded-[6px] border border-line0 bg-bg1/95 px-3 py-2">
-              <div className="text-[15px] leading-[22px] font-medium">{L.title[lang]}</div>
-              <div className="mb-2 text-[11px] text-fg2">{L.subtitle[lang]}</div>
-              <div className="mb-1 flex justify-between text-[11px]">
-                <span style={{ color: TIER_COLORS.ALLY }}>◀ {L.withUs[lang]}</span>
-                <span style={{ color: TIER_COLORS.ENEMY }}>{L.againstUs[lang]} ▶</span>
+            <div className="overlay glass pointer-events-auto w-[260px] rounded-[16px] border border-line0 px-4 pt-3.5 pb-4">
+              <div className="display text-[20px] leading-[26px]">{L.title[lang]}</div>
+              <div className="mb-3 text-[12.5px] leading-[18px] text-fg1">{L.subtitle[lang]}</div>
+              <div className="mb-1.5 flex justify-between text-[12px] font-medium">
+                <span className="text-info-bright">{L.withUs[lang]}</span>
+                <span className="text-bad-bright">{L.againstUs[lang]}</span>
               </div>
-              <ul className="space-y-0.5 text-[12px]">
+              <bdi dir={lang === "he" ? "rtl" : "ltr"} className="mb-3 flex h-2 w-full gap-[2px] overflow-hidden rounded-full">
                 {strategic.STANCE_TIERS.map((tier) => (
-                  <li key={tier} className="flex items-center gap-2">
-                    <Swatch tier={tier} size={12} />
+                  <span key={tier} className="h-full flex-1" style={{ background: TIER_COLORS[tier] }} />
+                ))}
+              </bdi>
+              <ul className="space-y-1 text-[13px]">
+                {strategic.STANCE_TIERS.map((tier) => (
+                  <li key={tier} className="flex items-center gap-2.5">
+                    <Swatch tier={tier} size={11} />
                     <span className="flex-1 text-fg1">{strategic.TIER_LABELS[tier][lang]}</span>
-                    <span className="num text-fg2">{counts[tier]}</span>
+                    <span className="num min-w-[22px] rounded-full bg-bg3 px-1.5 text-center text-[11.5px] leading-[18px] text-fg1">{counts[tier]}</span>
                   </li>
                 ))}
               </ul>
-              <label className="mt-2 flex cursor-pointer items-center gap-2 text-[12px] text-fg1">
-                <input type="checkbox" checked={showProxies} onChange={(e) => setShowProxies(e.target.checked)} />
-                <span className="inline-block h-0 w-4 border-t border-dashed" style={{ borderColor: "#F85149" }} />
+              <label className="mt-3 flex cursor-pointer items-center gap-2 border-t border-line0 pt-3 text-[13px] text-fg1">
+                <input type="checkbox" className="accent-[#1C2330]" checked={showProxies} onChange={(e) => setShowProxies(e.target.checked)} />
+                <span className="inline-block h-0 w-4 border-t-2 border-dashed border-bad-bright" />
                 {L.proxies[lang]}
               </label>
               {sim.pendingCrisis !== null && (
-                <div className="mt-2 animate-pulse rounded-[2px] border border-bad px-2 py-0.5 text-[12px] text-bad-bright">{L.crisis[lang]}</div>
+                <div className="mt-3 flex animate-pulse items-center gap-2 rounded-[10px] bg-bad-dim px-3 py-1.5 text-[12.5px] text-bad-bright">
+                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-bad" />
+                  {L.crisis[lang]}
+                </div>
               )}
               <button
                 type="button"
                 onClick={() => setScreen("game")}
-                className="mt-2 w-full rounded-[2px] border border-info px-2 py-1 text-[12px] text-info-bright hover:bg-bg3"
+                className="btn btn-primary mt-3 w-full px-3 py-2 text-[13px]"
               >
                 {L.toCabinet[lang]}
               </button>
@@ -232,21 +262,21 @@ export function Alliances() {
         </div>
 
         {/* off-map powers */}
-        <div className="overlay pointer-events-auto flex flex-wrap items-center gap-2 self-start rounded-[6px] border border-line0 bg-bg1/95 px-3 py-1.5 text-[12px]">
-          <span className="text-[11px] text-fg2">{L.powers[lang]}</span>
+        <div className="overlay glass pointer-events-auto flex flex-wrap items-center gap-2 self-start rounded-[16px] border border-line0 px-4 py-2.5 text-[13px]">
+          <span className="eyebrow me-1">{L.powers[lang]}</span>
           {OFF_MAP.map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => setSelected(id)}
-              className={`flex items-center gap-1.5 rounded-[2px] border px-1.5 py-0.5 hover:bg-bg3 ${selected === id ? "border-fg1" : "border-line0"}`}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors hover:bg-bg2 ${selected === id ? "border-fg0 bg-bg1" : "border-line0 bg-bg1/70"}`}
             >
               <Swatch tier={stances[id].tier} />
               <span className="text-fg0">{strategic.ACTOR_DEFS[id].name[lang]}</span>
-              <bdi className="num text-fg1">{signed(stances[id].score)}</bdi>
+              <bdi className="num font-medium text-fg1">{signed(stances[id].score)}</bdi>
             </button>
           ))}
-          <span className="ms-2 text-[10px] text-fg2">
+          <span className="basis-full pt-1 text-[11.5px] leading-[16px] text-fg2">
             {L.hint[lang]} · {L.assumptions[lang]} · {GEO_SOURCE}
           </span>
         </div>

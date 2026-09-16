@@ -77,7 +77,7 @@ export function Sparkline(props: {
         {props.refLine !== undefined && (
           <line x1={pad} x2={w - pad} y1={y(props.refLine)} y2={y(props.refLine)} stroke={INK.line1} strokeDasharray="2 3" strokeWidth={1} />
         )}
-        <polyline points={points} fill="none" stroke={props.color ?? INK.fg1} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points={points} fill="none" stroke={props.color ?? INK.fg1} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" strokeOpacity={max === min ? 0.3 : 1} strokeDasharray={max === min ? "2 3" : undefined} />
       </svg>
     </bdi>
   );
