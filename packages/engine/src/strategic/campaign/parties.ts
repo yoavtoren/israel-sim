@@ -62,8 +62,10 @@ export const ROSTER_NOTES: Record<SeatRoster, Bi> = {
 };
 
 export const SEATS: Record<SeatRoster, Record<PartyId, number>> = {
+  // Eisenkot and Bennett carry one extra seat each (a gameplay adjustment on top of the
+  // poll average), so the change bloc leaning on Ra'am reaches exactly 61. Total: 122.
   polls: {
-    yashar: 24, likud: 22, together: 13, democrats: 9, yisrael_beiteinu: 8, shas: 8, utj: 8, otzma_yehudit: 7,
+    yashar: 25, likud: 22, together: 14, democrats: 9, yisrael_beiteinu: 8, shas: 8, utj: 8, otzma_yehudit: 7,
     joint_list: 7, religious_zionism: 5, raam: 5, amcha_yisrael: 4,
     national_unity: 0, yesh_atid: 0, hadash_taal: 0, balad: 0, noam: 0, miluimnikim_calcalit: 0,
   },

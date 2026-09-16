@@ -21,12 +21,12 @@ function drain(s: S.CampaignState): S.CampaignState {
 }
 
 describe("M13 Prime Minister campaign", () => {
-  it("both seat rosters hold exactly 120 seats; polls are the default", () => {
-    for (const r of S.SEAT_ROSTERS) expect(S.PARTY_IDS.reduce((a, p) => a + S.SEATS[r][p], 0)).toBe(120);
+  it("seat rosters hold 120 seats (polls: 122, with the extra Eisenkot and Bennett seats); polls are the default", () => {
+    for (const r of S.SEAT_ROSTERS) expect(S.PARTY_IDS.reduce((a, p) => a + S.SEATS[r][p], 0)).toBe(r === "polls" ? 122 : 120);
     expect(S.createCampaign("d").roster).toBe("polls");
-    expect(S.SEATS.polls.yashar).toBe(24);
+    expect(S.SEATS.polls.yashar).toBe(25);
     expect(S.SEATS.polls.likud).toBe(22);
-    expect(S.SEATS.polls.together).toBe(13);
+    expect(S.SEATS.polls.together).toBe(14);
     expect(S.SEATS.polls.democrats).toBe(9);
     expect(S.partyLeader("yashar", "polls")?.he).toBe("גדי איזנקוט");
     expect(S.partyLeader("together", "polls")?.en).toContain("Bennett");
@@ -66,17 +66,20 @@ describe("M13 Prime Minister campaign", () => {
     expect(plusLieberman.frictions.filter((f) => f.level === "deep").length).toBe(2); // Lieberman vs. the Haredi parties
 
     const zionistChange = S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu"]);
-    expect(zionistChange.seats).toBe(54);
+    expect(zionistChange.seats).toBe(56);
     expect(zionistChange.valid).toBe(false);
-    expect(S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "raam"]).seats).toBe(59);
+    // leaning on Ra'am reaches exactly 61
+    const withRaam = S.checkCoalition(["yashar", "together", "democrats", "yisrael_beiteinu", "raam"]);
+    expect(withRaam.seats).toBe(61);
+    expect(withRaam.valid).toBe(true);
 
     const change = S.checkCoalition(CHANGE);
-    expect(change.seats).toBe(66);
+    expect(change.seats).toBe(68);
     expect(change.valid).toBe(true);
     expect(change.frictions.find((f) => [f.a, f.b].includes("joint_list") && [f.a, f.b].includes("yisrael_beiteinu"))?.level).toBe("deep");
 
     const unity = S.checkCoalition(UNITY);
-    expect(unity.seats).toBe(67);
+    expect(unity.seats).toBe(69);
     expect(unity.valid).toBe(true);
     expect(change.stability).toBeLessThan(unity.stability);
 
