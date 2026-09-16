@@ -277,7 +277,7 @@ const TRACK_SHORT: Record<PolicyTrack, Bi> = {
   RADICAL_LEFT_UNILATERAL_WITHDRAWAL: { he: "נסיגה חד-צדדית", en: "Unilateral withdrawal" },
 };
 
-const CRISIS_SHORT: Record<CrisisOptionId, Bi> = {
+const CRISIS_SHORT: Partial<Record<CrisisOptionId, Bi>> = {
   A_CANCEL_TRANSFER: { he: "ביטול הטרנספר תחת אש", en: "Transfer cancelled under fire" },
   B_AIR_RETALIATION: { he: "תקיפה אווירית במצרים", en: "Air strikes in Egypt" },
   C_GROUND_INVASION_SINAI: { he: "פלישה לסיני", en: "Sinai invasion" },
@@ -300,7 +300,7 @@ export function actorStance(id: ActorId, state: SimulationState): ActorStance {
     add(METRIC_SHORT[k], w * (m[k] - start[k]));
   }
 
-  const track = state.pendingCrisis !== null ? state.pendingCrisis.action.track : state.activeTrack;
+  const track = state.pendingCrisis?.action.track ?? state.activeTrack;
   if (track !== null) add(TRACK_SHORT[track], def.tracks[track]);
 
   const f = state.flags;
@@ -312,11 +312,12 @@ export function actorStance(id: ActorId, state: SimulationState): ActorStance {
     if (passed > 0) add({ he: `${passed} נקודות בדיקה אומתו`, en: `${passed} checkpoints verified` }, def.perCheckpoint * passed);
   }
 
-  if (state.pendingCrisis !== null) {
+  if (state.pendingCrisis?.id === "EGYPTIAN_BALLISTIC_ATTACK") {
     add({ he: "משבר פתוח מול מצרים", en: "Open crisis with Egypt" }, def.crisisOpen);
-  } else {
+  } else if (state.pendingCrisis === null) {
     const option = lastCrisisOption(state);
-    if (option !== null) add(CRISIS_SHORT[option], def.crisisOutcome?.[option]);
+    const label = option === null ? undefined : CRISIS_SHORT[option];
+    if (option !== null && label !== undefined) add(label, def.crisisOutcome?.[option]);
   }
 
   const raw = drivers.reduce((s, d) => s + d.delta, 0);

@@ -54,3 +54,22 @@ time-compressed ×12 for playback (telemetry reports real speed and time-to-impa
 | Right-wing bloc | economic collapse @5 | coalition collapse (81%) | falls @1 | falls @1 |
 | Bennett–Lieberman–Golan–Abbas | falls @1 | **term completed (100%)** | falls @3 | falls @1 |
 | Center-left bloc | falls @1 | **term completed (100%)** | term completed | falls @1 |
+
+## Alliance map (home screen)
+
+The app opens on a regional map; every relevant state or armed actor is filled by its **stance toward Israel**, a score from −100 to +100 in six tiers:
+
+| Tier | Score | Color |
+|---|---|---|
+| Ally | ≥ 55 | deep blue |
+| Friendly | 20 … 54 | steel blue |
+| Neutral / cold peace | −15 … 19 | grey |
+| Strained | −45 … −16 | amber |
+| Hostile | −80 … −46 | orange-red |
+| Enemy / at war | < −80 | red, hatched |
+
+- Engine: `packages/engine/src/strategic/stances.ts`, which is pure and recomputed from `SimulationState`. The score is `base (2026) + Σ weight × (metric − term-start metric) + track in force + flags (normalization, Gulf funding, terror rearmament, checkpoints) + open or resolved crisis`, clamped to ±100. Each term is returned as a `driver` and listed in the country panel.
+- **All numbers are assumptions**, not measurements. The baselines are a judgment call on the 2026 status quo.
+- Actors: 20 on the map (Lebanon = Hezbollah, Yemen = Houthis, Iraq = pro-Iran militias, Gaza = Hamas, West Bank = PA) and 6 off the map (US, EU, UK, China, India, Morocco).
+- Geography: Natural Earth 1:50m (public domain), cut by `scripts/build-region-geo.mjs` into `packages/ui/src/strategic/region-geo.json`. It uses the same equirectangular projection as the tactical map.
+- Trend arrows compare against the state before the last decision (`prevSim` in the strategic store).

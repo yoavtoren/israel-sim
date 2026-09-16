@@ -88,14 +88,34 @@ export const CHECKPOINT_ORDER: CheckpointKey[] = [
   "localPolicingFunctional",
 ];
 
-export type CrisisId = "EGYPTIAN_BALLISTIC_ATTACK";
-export type CrisisOptionId = "A_CANCEL_TRANSFER" | "B_AIR_RETALIATION" | "C_GROUND_INVASION_SINAI" | "D_US_MEDIATION";
-export const CRISIS_OPTION_IDS: CrisisOptionId[] = [
-  "A_CANCEL_TRANSFER",
-  "B_AIR_RETALIATION",
-  "C_GROUND_INVASION_SINAI",
-  "D_US_MEDIATION",
+export type CrisisId =
+  | "EGYPTIAN_BALLISTIC_ATTACK"
+  | "PA_SECURITY_COLLAPSE"
+  | "EGYPT_TREATY_BREACH"
+  | "IRAN_COMBINED_BARRAGE"
+  | "TUNNEL_NETWORK_EXPOSED";
+
+export const CRISIS_IDS: CrisisId[] = [
+  "EGYPTIAN_BALLISTIC_ATTACK",
+  "PA_SECURITY_COLLAPSE",
+  "EGYPT_TREATY_BREACH",
+  "IRAN_COMBINED_BARRAGE",
+  "TUNNEL_NETWORK_EXPOSED",
 ];
+
+export type CrisisOptionId =
+  // forced-transfer directive → Egyptian ballistic attack
+  | "A_CANCEL_TRANSFER" | "B_AIR_RETALIATION" | "C_GROUND_INVASION_SINAI" | "D_US_MEDIATION"
+  // PA security coordination collapses
+  | "PA_DEFENSIVE_SHIELD_2" | "PA_US_STABILIZATION" | "PA_RETREAT_TO_BARRIER"
+  // peace-treaty breach in Sinai
+  | "EGT_STOP_AND_MONITORS" | "EGT_PREEMPTIVE_STRIKE" | "EGT_US_IMF_PRESSURE"
+  // combined Iranian / Iraqi missile and drone barrage
+  | "IRN_WIDE_RETALIATION" | "IRN_DEFENSIVE_SURGICAL" | "IRN_REGIONAL_ALLIANCE"
+  // offensive tunnel network exposed
+  | "TUN_FREEZE_FUNDS" | "TUN_ULTIMATUM_48H" | "TUN_SPECIAL_FORCES";
+
+export type GambleBranch = "success" | "failure";
 
 export type TriggeredEvent =
   | "REGIONAL_WAR_BREAKOUT"
@@ -103,7 +123,8 @@ export type TriggeredEvent =
   | "CHECKPOINT_PASSED"
   | "PROCESS_FROZEN"
   | "COALITION_CRISIS"
-  | "SAUDI_NORMALIZATION_OPENED";
+  | "SAUDI_NORMALIZATION_OPENED"
+  | "CRISIS_TRIGGERED";
 
 export type OutcomeKind =
   | "TERM_COMPLETED"
@@ -133,13 +154,19 @@ export interface LogEntry {
 export interface PendingCrisis {
   id: CrisisId;
   action: PolicyAction;
-  /** metrics before the directive — crisis options resolve against these */ metricsBefore: SimulationMetrics;
+  /** "pre": the decision itself is suspended (forced transfer) — options resolve against
+   *  `metricsBefore`; "post": the decision already applied — options resolve against `state.metrics` */
+  phase: "pre" | "post";
+  metricsBefore: SimulationMetrics;
+  /** events already raised this turn, carried into the turn record on resolution */ events: TriggeredEvent[];
 }
 
 export interface TurnRecord {
   turn: number;
   action: PolicyAction;
+  crisisId: CrisisId | null;
   crisisOption: CrisisOptionId | null;
+  /** outcome of a probabilistic option (e.g. the 48-hour ultimatum) */ crisisBranch: GambleBranch | null;
   events: TriggeredEvent[];
   metricsAfter: SimulationMetrics;
 }
@@ -160,6 +187,7 @@ export interface SimulationState {
   historyLogs: LogEntry[];
   turns: TurnRecord[];
   /** metrics at the start and after every resolved turn */ metricsHistory: SimulationMetrics[];
+  /** turn each crisis last opened (cooldowns) */ crisisLastTurn: Partial<Record<CrisisId, number>>;
   /** mulberry32 state — the reducer stays pure and replayable */ rngState: number;
 }
 

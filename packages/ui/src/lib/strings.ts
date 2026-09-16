@@ -69,6 +69,7 @@ export const REFORM_NAMES: Record<string, { he: string; en: string }> = {
 export const UI = {
   appTitle: { he: "חדר המצב הלאומי", en: "National Situation Room" },
   overview: { he: "תמונת מצב", en: "Overview" },
+  alliances: { he: "מפת בריתות", en: "Alliance Map" },
   cabinet: { he: "קבינט אסטרטגי", en: "Strategic Cabinet" },
   tactical: { he: "מפה טקטית", en: "Tactical Map" },
   economySection: { he: "משק ותקציב", en: "Economy & budget" },

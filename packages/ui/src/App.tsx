@@ -15,11 +15,13 @@ import { Sectors } from "./screens/Sectors";
 import { Reforms } from "./screens/Reforms";
 import { History } from "./screens/History";
 import { PostMortem } from "./screens/PostMortem";
+import { Alliances } from "./screens/Alliances";
 import { Cabinet } from "./screens/Cabinet";
 import { Tactical } from "./screens/Tactical";
 import { StrategicStrip } from "./components/StrategicStrip";
 
 const STRATEGY_NAV: Array<{ screen: Screen; label: UIKey; accent: string }> = [
+  { screen: "alliances", label: "alliances", accent: DOMAIN.diplomacy },
   { screen: "cabinet", label: "cabinet", accent: DOMAIN.security },
   { screen: "tactical", label: "tactical", accent: DOMAIN.diplomacy },
 ];
@@ -68,7 +70,7 @@ export function App() {
   }
 
   const ended = state.outcome.ended;
-  const strategicScreen = screen === "cabinet" || screen === "tactical";
+  const strategicScreen = screen === "alliances" || screen === "cabinet" || screen === "tactical";
   const navButton = (n: { screen: Screen; label: UIKey; accent: string }) => (
     <button
       key={n.screen}
@@ -157,7 +159,8 @@ export function App() {
           </div>
         )}
 
-        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" ? "relative" : "overflow-y-auto p-4"}`}>
+        <main className={`min-h-0 flex-1 ${screen === "map" || screen === "tactical" || screen === "alliances" ? "relative" : "overflow-y-auto p-4"}`}>
+          {screen === "alliances" && <Alliances />}
           {screen === "cabinet" && <Cabinet />}
           {screen === "tactical" && <Tactical />}
           {screen === "overview" && <Overview />}

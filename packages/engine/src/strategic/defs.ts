@@ -4,7 +4,7 @@
  *  make the brief's rules playable over 8 turns (the UI underlines those). */
 
 import type {
-  Bi, CheckpointKey, CoalitionType, CrisisId, CrisisOptionId, GazaCivilianControl, MetricKey,
+  Bi, CheckpointKey, CoalitionType, GazaCivilianControl, MetricKey,
   OutcomeKind, PolicyTrack, SettlementPolicy, SimulationMetrics,
 } from "./types";
 
@@ -313,106 +313,6 @@ export const CHECKPOINT_DEFS: Record<CheckpointKey, CheckpointDef> = {
     },
     blocker: { he: "נדרש איום ביטחוני ≤ 50", en: "Requires security threat ≤ 50" },
     reward: { source: "assumption", deltas: { securityThreat: -10, economicStability: 5, regionalRelations: 5, coalitionStability: 5 } },
-  },
-};
-
-export interface CrisisOptionDef {
-  label: Bi;
-  objective: Bi;
-  pros: Bi[];
-  cons: Bi[];
-  /** resolved against the pre-directive metrics */ deltas: Deltas;
-  /** B/C carry the transfer out → the brief's hard failure rule fires */ executesTransfer: boolean;
-  outcomeReason: Bi;
-}
-
-export interface CrisisDef {
-  title: Bi;
-  situation: Bi;
-  options: Record<CrisisOptionId, CrisisOptionDef>;
-}
-
-export const CRISIS_DEFS: Record<CrisisId, CrisisDef> = {
-  EGYPTIAN_BALLISTIC_ATTACK: {
-    title: { he: "מתקפה בליסטית מצרית בעקבות הנחיית הטרנספר", en: "Egyptian ballistic attack after the transfer directive" },
-    situation: {
-      he: "התראות גבול בחזית מצרים. דיביזיות ממוכנות של ארמיה 2 ו-3 נערכות לאורך תעלת סואץ. טילים בליסטיים שוגרו מסיני לעבר גוש דן; סוללות חץ וקלע דוד מיירטות מעל מרכז הארץ. הקבינט מתכנס.",
-      en: "Border alerts on the Egyptian front. Mechanized divisions of the 2nd and 3rd Armies deploy along the Suez Canal. Ballistic missiles launched from Sinai toward Gush Dan; Arrow and David's Sling batteries intercept over central Israel. The cabinet convenes.",
-    },
-    options: {
-      A_CANCEL_TRANSFER: {
-        label: { he: "ביטול מיידי של הטרנספר ונסיגה דיפלומטית", en: "Cancel the transfer immediately; diplomatic retreat" },
-        objective: { he: "עצירה מיידית של האש המצרית ומניעת מלחמה כוללת.", en: "Stop Egyptian fire at once and prevent all-out war." },
-        pros: [
-          { he: "שימור הסכמי השלום עם מצרים וירדן", en: "Peace treaties with Egypt and Jordan preserved" },
-          { he: "מניעת אמברגו נשק אמריקאי", en: "US arms embargo averted" },
-          { he: "הגנה על שוק ההון", en: "Capital markets protected" },
-        ],
-        cons: [
-          { he: "פגיעה חמורה בהרתעה", en: "Severe damage to deterrence" },
-          { he: "התפרקות מיידית של הקואליציה", en: "Immediate coalition breakup" },
-          { he: "העצמת מוטיבציית הטרור בגדה ובעזה", en: "Terror motivation rises in the West Bank and Gaza" },
-        ],
-        deltas: { securityThreat: 15, regionalRelations: 30, coalitionStability: -50, usMilitaryAid: 10 },
-        executesTransfer: false,
-        outcomeReason: { he: "הטרנספר בוטל תחת אש.", en: "The transfer was cancelled under fire." },
-      },
-      B_AIR_RETALIATION: {
-        label: { he: "תקיפת תגמול אווירית ממוקדת על יעדים צבאיים במצרים", en: "Targeted air retaliation on military targets in Egypt" },
-        objective: { he: "גביית מחיר והשמדת משגרים בסיני ללא מלחמה קרקעית.", en: "Exact a price and destroy launchers in Sinai without a ground war." },
-        pros: [
-          { he: "החזרת הרתעה טקטית מול צבא סדיר", en: "Tactical deterrence restored against a regular army" },
-          { he: "סיכול סבבי ירי נוספים", en: "Further salvos prevented" },
-        ],
-        cons: [
-          { he: "הסלמה למלחמה אזורית פתוחה", en: "Escalation to open regional war" },
-          { he: "סוף הסכמי קמפ דייוויד", en: "The Camp David accords end" },
-          { he: "חסימת תעלת סואץ ומצרי טיראן לשיט ישראלי", en: "Suez Canal and Straits of Tiran closed to Israeli shipping" },
-        ],
-        deltas: { securityThreat: 35, regionalRelations: -40, usMilitaryAid: -25, economicStability: -30 },
-        executesTransfer: true,
-        outcomeReason: {
-          he: "קריסה אסטרטגית: הטרנספר בוצע תחת אש. אמברגו נשק אמריקאי מלא, מלחמה אזורית פתוחה עם מצרים וירדן וסנקציות משתקות.",
-          en: "Strategic collapse: the transfer went ahead under fire. Full US arms embargo, open regional war with Egypt and Jordan, crippling sanctions.",
-        },
-      },
-      C_GROUND_INVASION_SINAI: {
-        label: { he: "פלישה קרקעית לרפיח ולמרחב חיץ בסיני", en: "Ground invasion of Rafah and a Sinai buffer zone" },
-        objective: { he: "עומק אסטרטגי וניתוק הרצועה ממצרים.", en: "Strategic depth and severing the Strip from Egypt." },
-        pros: [
-          { he: "שליטה פיזית בצירי ההברחה", en: "Physical control of smuggling routes" },
-          { he: "מניעת ירי תלול מסלול קצר טווח", en: "Short-range high-trajectory fire prevented" },
-        ],
-        cons: [
-          { he: "מלחמה בעצימות גבוהה מול ארמיה 2 ו-3", en: "High-intensity war against the 2nd and 3rd Armies" },
-          { he: "שחיקת סד\"כ המילואים", en: "Reserve forces worn down" },
-          { he: "אמברגו נשק מערבי מיידי", en: "Immediate Western arms embargo" },
-        ],
-        deltas: { securityThreat: 60, regionalRelations: -100, internationalLegitimacy: -80, usMilitaryAid: -70 },
-        executesTransfer: true,
-        outcomeReason: {
-          he: "קריסה אסטרטגית: מלחמה קרקעית מול צבא מצרים ללא חימוש מערבי. אמברגו מלא, בידוד בינלאומי וצווי מעצר לשרשרת הפיקוד.",
-          en: "Strategic collapse: a ground war against Egypt's army with no Western munitions. Full embargo, international isolation, arrest warrants for the chain of command.",
-        },
-      },
-      D_US_MEDIATION: {
-        label: { he: "פנייה בהולה לארה\"ב ללחץ על קהיר", en: "Urgent appeal to the US to pressure Cairo" },
-        objective: { he: "מטרייה דיפלומטית ולחץ אמריקאי להפסקת אש.", en: "US diplomatic umbrella and pressure for a ceasefire." },
-        pros: [
-          { he: "שימור הברית האסטרטגית עם ארה\"ב", en: "Strategic alliance with the US preserved" },
-          { he: "מניעת שחיקת החימוש", en: "Munitions depletion avoided" },
-          { he: "הפסקת אש בתיווך בינלאומי", en: "Internationally brokered ceasefire" },
-        ],
-        cons: [
-          { he: "אובדן עצמאות ההחלטה", en: "Loss of decision autonomy" },
-          { he: "דרישה אמריקאית לחזרה לסטטוס קוו", en: "US demands a return to the status quo" },
-          { he: "כרסום בתדמית העוצמה האזורית", en: "Regional power image eroded" },
-        ],
-        deltas: { securityThreat: -10, usMilitaryAid: 20, coalitionStability: -25, internationalLegitimacy: 20 },
-        executesTransfer: false,
-        outcomeReason: { he: "הפסקת אש בתיווך אמריקאי; הטרנספר הוקפא.", en: "US-brokered ceasefire; the transfer is frozen." },
-      },
-    },
   },
 };
 
